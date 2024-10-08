@@ -23,4 +23,4 @@ zip:
 	zip ${ZIP} makefile src
 
 clean:
-	${RM} ${BUILD} ${ZIP}
+	${RM} ${BUILD} ${ZIP} *~
