@@ -11,6 +11,7 @@ ZIP=entrega.zip
 
 
 .PHONY: all tests clean zip
+.SILENT: all
 
 all:
 	 ${PY} src/main.py
@@ -22,4 +23,4 @@ zip:
 	zip ${ZIP} makefile src
 
 clean:
-	${RM} ${BUILD}
+	${RM} ${BUILD} ${ZIP}
