@@ -5,10 +5,21 @@ endif
 
 PY?=python3
 
-.PHONY: all tests clean
+MAIN=src/main.py
+BUILD=build
+ZIP=entrega.zip
+
+
+.PHONY: all tests clean zip
 
 all:
 	 ${PY} src/main.py
 
+tests:
+	mkdir ${BUILD}
+	 makefile src
+zip:
+	zip ${ZIP} makefile src
+
 clean:
-	${RM} build
+	${RM} ${BUILD}
