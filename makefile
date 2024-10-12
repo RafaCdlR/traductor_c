@@ -26,3 +26,5 @@ zip:
 
 clean:
 	${RM} ${BUILD} ${ZIP} *~
+	find -type f -name '*~' -delete
+	find -type f -name '#*#' -delete
