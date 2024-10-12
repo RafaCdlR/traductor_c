@@ -45,20 +45,25 @@ term -> ID
      '''
 
 class CLexer(Lexer):
-    tokens = {NUMBER ,ID, EQ,  NE, LE, GE, AND, OR }
+    tokens = {NUMBER ,ID, EQ,  NE, LE, GE, AND, OR , PLUS , MINUS , MULTIPLY , DIVIDE , NOT , ASSIGN }
     
-    # Ignored characters (spaces and tabs)
+    # ignorar tabs
     ignore = ' \t'
     
-    # Single-character tokens in literals (used directly in the parser)
-    literals = {'=', '+', '-', '*', '/', '!', ';'}
+    # caracteres literales 
+    literals = {'(',')' ,';'}
 
 
 
 
     NUMBER = r'[0-9]+'
     ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
-
+    PLUS  = r'\+'
+    MINUS = r'-'
+    MULTIPLY = r'\*'
+    DIVIDE = r'/'
+    NOT = r'!'
+    ASSIGN = r'='
     EQ = r'=='
     NE = r'!='
     LE = r'<='
@@ -79,14 +84,3 @@ class CLexer(Lexer):
         self.index += 1
 
 #prueba borrar luego
-
-if __name__ == '__main__':
-        lexer = CLexer()
-        tokens = CLexer.tokens
-        tokens = sorted(tokens)
-        tokenlist = lexer.tokenize('''//comentario de exitp
-                                   avion = tren == barco + s + q /r != venedicto >= Felipe''')
-
-        for t in tokenlist:
-             print(t.type , end=' ')
-
