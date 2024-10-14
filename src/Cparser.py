@@ -58,7 +58,7 @@ class CParser(Parser):
     tokens = CLexer.tokens
 
     precedence = (
-    ('left', ASSIGN),
+    ('right', ASSIGN),
     ('left', OR),
     ('left', AND),
     ('left', EQ, NE, LE, GE),
@@ -137,11 +137,9 @@ class CParser(Parser):
     def opLogAnd(self, p):
         return ('and', p.opLogAnd, p.opUnario)
 
+    
 
-    #RELLENAR UNARIOS
-    #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
-
+    # opUnario
     @_('opUnario')
     def opLogAnd(self, p):
         return p.opUnario
@@ -166,9 +164,8 @@ class CParser(Parser):
     def opUn(self, p):
         return -1
 
-    #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-
+    
 
     #opMultDiv
     @_('opMultDiv')
@@ -192,7 +189,7 @@ class CParser(Parser):
     @_('opSumaResta PLUS term')
     def opSumaResta(self, p):
 
-        #print("soy una suma ")
+        # print("soy una suma ")
         return ('plus', p.opSumaResta, p.term)
 
     @_('opSumaResta MINUS term')

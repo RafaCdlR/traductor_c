@@ -14,8 +14,6 @@ opComp -> opComp '==' opLogOr
        | opComp '<=' opLogOr
        | opComp '>=' opLogOr
        | opComp '!=' opLogOr
-       | opComp '<' opLogOr            // añadido no lo pide creo
-       | opComp '>' opLogOr            // añadido no lo pide creo
        | opLogOr
 
 opLogOr -> opLogOr '||' opLogAnd       // en C or tiene menos prioridad que and
@@ -24,9 +22,12 @@ opLogOr -> opLogOr '||' opLogAnd       // en C or tiene menos prioridad que and
 opLogAnd -> opLogAnd '&&' opUnario     // and menos prioridad que un op unario
 	 | opUnario
 
-opUnario -> '!' opUnario               // en C puede haber op unarios anidados
-	 | '-' opUnario                // en C puede haber op unarios anidados
-	 | opMultDiv
+opUnario ->  opUn opMultDiv
+
+opUn -> opUn '-'            // en C puede haber op unarios anidados
+    | opUn '!'
+    | '!'
+    | '-'
 
 opMultDiv -> opMultDiv '*' opSumaResta
 	  | opMultDiv '/' opSumaResta
