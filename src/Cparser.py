@@ -84,6 +84,10 @@ class CParser(Parser):
     def expr_list(self, p):
         return ('expr', p.expr)
 
+    @_('";"')
+    def statement(self, p):
+        return 'empty_expr_list'
+
     # expr
     @_('lvalue ASSIGN opComp')
     def expr(self, p):
@@ -214,7 +218,7 @@ if __name__ == '__main__':
     lexer = CLexer()
     parser = CParser()
 
-    textos = {"a = b + c;", "a = 6 - 2;" , "a = !b != c;" , "a == c;" , "a = b*c/d = 56;"}
+    textos = {"a = b + c;", "a = 6 - 2;" , "a = !b != c;" , "a == c;" , "a = b*c/d = 56;", "; ; ;"}
 
 
 
