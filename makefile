@@ -19,12 +19,13 @@ all:
 	 ${PY} ${MAIN}
 
 tests:
-	mkdir ${BUILD}
-	${PY} ${TESTSCR} ${TEST_PATH}
+	mkdir -p ${BUILD_PATH}
+	# ${PY} ${TESTSCR} tests ${BUILD_PATH}
+	${PY} src/Cparser.py
 zip:
 	zip ${ZIP} makefile src
 
 clean:
-	${RM} ${BUILD} ${ZIP} *~
+	${RM} -rf ${BUILD_PATH} ${ZIP} *~
 	find -type f -name '*~' -delete
 	find -type f -name '#*#' -delete
