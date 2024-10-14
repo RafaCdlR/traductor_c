@@ -62,14 +62,14 @@ class CLexer(Lexer):
     MINUS = r'-'
     MULTIPLY = r'\*'
     DIVIDE = r'/'
-    NOT = r'!'
-    ASSIGN = r'='
     EQ = r'=='
     NE = r'!='
     LE = r'<='
     GE = r'>='
     AND = r'&&'
     OR = r'\|\|'
+    ASSIGN = r'='
+    NOT = r'!'
 
     @_(r'//.*')#ignorar comentarios
     def ignorar_comentario(self, t):
