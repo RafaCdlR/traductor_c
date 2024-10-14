@@ -218,7 +218,7 @@ if __name__ == '__main__':
     lexer = CLexer()
     parser = CParser()
 
-    textos = {"a = b + c;", "a = 6 - 2;" , "a = !b != c;" , "a == c;" , "a = b*c/d = 56;", "; ; ;"}
+    textos = {"a = b + c;", "a = 6 - 2;" , "a = !b != c;" , "a == c;" , "a = b*c/d = 56;"}
 
 
 
