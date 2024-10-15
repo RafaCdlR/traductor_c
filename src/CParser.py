@@ -62,6 +62,8 @@ class CParser(Parser):
     # lexer
     tokens = CLexer.tokens
 
+
+    
     variables = dict()
     precedence = (
     ('right', ASSIGN),
@@ -73,22 +75,49 @@ class CParser(Parser):
     ('right', NOT),
     )
 
+
+    
     # S
-    @_('expr_list ";"')
+    @_('defi_list expr_list')
     def statement(self, p):
+        return (p.defi_list, p.expr_list)
 
-        #print("S")
+    @_('defi_list')
+    def statement(self, p):
+        return (p.defi_list, [])
 
-        return p.expr_list
+    @_('expr_list')
+    def statement(self, p):
+        return ([], p.expr_list)
 
 
+    
+    # defi_list    
+    @_('defi_list ";" defi')
+    def defi_list(self, p):
+        return (p.defi_list, p.defi)
 
+    @_('defi ";"')
+    def defi_list(self, p):
+        return p.defi
+
+    # defi
+    @_('TYPE ID')
+    def defi(self, p):
+        return (p.TYPE, p.ID)
+
+    @_('')
+    def defi(self, p):
+        return []
+
+
+    
     # expr_list
     @_('expr_list ";" expr')
     def expr_list(self, p):
         return ('expr_list', p.expr_list, p.expr)
 
-    @_('expr')
+    @_('expr ";"')
     def expr_list(self, p):
         return ('expr', p.expr)
 
@@ -101,6 +130,12 @@ class CParser(Parser):
     def expr(self, p):
         return p.opComp
 
+    # @_('')
+    # def expr(self, p):
+        # pass
+
+
+    
     # lvalue
     @_('lvalue ASSIGN ID')
     def lvalue(self, p):
@@ -218,22 +253,12 @@ class CParser(Parser):
         #print("soy un numero")
         return ('num', int(p.NUMBER))
 
-    # type
-    @_('TYPE ID')
-    def type(self, p):
-        if not (p.ID.value in self.variables):
-            self.variables[p.ID.value] = 0
-        else
-            print("Variable duplicada.")
-            raise SyntaxError
-
-        return ('type', p.type)
 
 if __name__ == '__main__':
     lexer = CLexer()
     parser = CParser()
 
-    textos = {"a = b + c;", "a = 6 - 2;" , "a = !b != c;" , "a == c;" , "a = b*c/d = 56;", "; ; ;"}
+    textos = {"a = b + c;", "a = 6 - 2;" , "a = !b != c;" , "a == c;" , "a = b*c/d = 56;", "; ; ;", "int a;", "int a; int b; int c;"}
 
 
 
