@@ -1,3 +1,5 @@
 # Traductor C
 
-Usar "make test" para las pruebas.
+Usar `make tests` para las pruebas.
+
+No se acepta una expresión precedida de un ';' .

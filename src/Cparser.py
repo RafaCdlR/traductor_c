@@ -5,7 +5,9 @@ import time
 
 
 
-'''S -> expr_list ';'
+'''
+
+S -> expr_list ';'
 
 expr_list -> expr_list ';' expr
            | expr
@@ -47,7 +49,7 @@ opSumaResta -> opSumaResta '+' term
 term -> ID
      | NUMBER
 
-     '''
+'''
 
 
 
@@ -67,7 +69,7 @@ class CParser(Parser):
     ('right', NOT)
     )
 
-      # S
+    # S
     @_('expr_list ";"')
     def statement(self, p):
 
@@ -83,10 +85,6 @@ class CParser(Parser):
     @_('expr')
     def expr_list(self, p):
         return ('expr', p.expr)
-
-    @_('";"')
-    def statement(self, p):
-        return 'empty_expr_list'
 
     # expr
     @_('lvalue ASSIGN opComp')
@@ -218,7 +216,7 @@ if __name__ == '__main__':
     lexer = CLexer()
     parser = CParser()
 
-    textos = {"a = b + c;", "a = 6 - 2;" , "a = !b != c;" , "a == c;" , "a = b*c/d = 56;"}
+    textos = {"a = b + c;", "a = 6 - 2;" , "a = !b != c;" , "a == c;" , "a = b*c/d = 56;", "; ; ;"}
 
 
 
