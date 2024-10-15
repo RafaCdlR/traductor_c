@@ -21,7 +21,7 @@ all:
 tests:
 	mkdir -p ${BUILD_PATH}
 	# ${PY} ${TESTSCR} tests ${BUILD_PATH}
-	${PY} src/Cparser.py
+	${PY} src/CParser.py
 zip:
 	zip ${ZIP} makefile src
 

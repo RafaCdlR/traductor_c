@@ -1,4 +1,10 @@
-S -> expr_list ';'
+S -> def_list ';' expr_list ';'
+
+def_list -> def_list ';' def
+	 | def
+	 | epsilon
+
+def -> tipo ID
 
 expr_list -> expr_list ';' expr
            | expr

@@ -1,13 +1,16 @@
 from sly import Parser
 from CLexer import CLexer
 
-import time
-
-
 
 '''
 
-S -> expr_list ';'
+S -> def_list ';' expr_list ';'
+
+def_list -> def_list ';' def
+	 | def
+	 | epsilon
+
+def -> tipo ID
 
 expr_list -> expr_list ';' expr
            | expr
@@ -59,6 +62,7 @@ class CParser(Parser):
     # lexer
     tokens = CLexer.tokens
 
+    variables = dict()
     precedence = (
     ('right', ASSIGN),
     ('left', OR),
@@ -66,7 +70,7 @@ class CParser(Parser):
     ('left', EQ, NE, LE, GE),
     ('left', PLUS, MINUS),
     ('left', MULTIPLY, DIVIDE),
-    ('right', NOT)
+    ('right', NOT),
     )
 
     # S
@@ -76,6 +80,8 @@ class CParser(Parser):
         #print("S")
 
         return p.expr_list
+
+
 
     # expr_list
     @_('expr_list ";" expr')
@@ -139,7 +145,7 @@ class CParser(Parser):
     def opLogAnd(self, p):
         return ('and', p.opLogAnd, p.opUnario)
 
-    
+
 
     # opUnario
     @_('opUnario')
@@ -167,7 +173,7 @@ class CParser(Parser):
         return -1
 
 
-    
+
 
     #opMultDiv
     @_('opMultDiv')
@@ -211,6 +217,17 @@ class CParser(Parser):
     def term(self, p):
         #print("soy un numero")
         return ('num', int(p.NUMBER))
+
+    # type
+    @_('TYPE ID')
+    def type(self, p):
+        if not (p.ID.value in self.variables):
+            self.variables[p.ID.value] = 0
+        else
+            print("Variable duplicada.")
+            raise SyntaxError
+
+        return ('type', p.type)
 
 if __name__ == '__main__':
     lexer = CLexer()

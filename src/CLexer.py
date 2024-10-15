@@ -2,8 +2,15 @@ from sly import Lexer
 
 
 
+'''
 
-'''S -> expr_list ';'
+S -> def_list ';' expr_list ';'
+
+def_list -> def_list ';' def
+	 | def
+	 | epsilon
+
+def -> tipo ID
 
 expr_list -> expr_list ';' expr
            | expr
@@ -41,23 +48,23 @@ opSumaResta -> opSumaResta '+' term
 
 term -> ID
      | NUMBER
-     
+
      '''
 
 class CLexer(Lexer):
-    tokens = {NUMBER ,ID, EQ,  NE, LE, GE, AND, OR , PLUS , MINUS , MULTIPLY , DIVIDE , NOT , ASSIGN }
-    
+    tokens = {NUMBER ,ID, EQ,  NE, LE, GE, AND, OR , PLUS , MINUS , MULTIPLY , DIVIDE , NOT , ASSIGN, TYPE }
+
     # ignorar tabs
     ignore = ' \t'
-    
-    # caracteres literales 
+
+    # caracteres literales
     literals = {'(',')' ,';'}
 
 
-
-
+    TYPE = r'int'
     NUMBER = r'[0-9]+'
     ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
+
     PLUS  = r'\+'
     MINUS = r'-'
     MULTIPLY = r'\*'
