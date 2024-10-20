@@ -10,7 +10,10 @@ def_list -> def_list ';' def
 	 | def
 	 | epsilon
 
-def -> tipo ID
+def -> tipo defd
+
+defd -> defd, ID
+    | ID
 
 expr_list -> expr_list ';' expr
            | expr
