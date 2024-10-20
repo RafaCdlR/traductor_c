@@ -58,6 +58,10 @@ term -> ID
 
 
 
+
+
+
+
 class CParser(Parser):
     # lexer
     tokens = CLexer.tokens
@@ -76,6 +80,19 @@ class CParser(Parser):
     )
 
 
+    #FUNCIONES AUXILIARES
+    def anadir_variable(self,tipo,nombre):
+        
+        if nombre not in self.variables:
+
+            if tipo == "int":
+                self.variables[nombre] = 0
+            else : 
+                raise Exception("tipo no valido")
+
+        else:
+
+            raise Exception("variable ",nombre," ya declarada anteriormente")
     
     # S
     @_('defi_list expr_list')
@@ -92,22 +109,24 @@ class CParser(Parser):
 
 
     
-    # defi_list    
-    @_('defi_list ";" defi')
+    # def_list (lista de definiciones, permite múltiples declaraciones)
+    @_('defi_list defi ";"')
     def defi_list(self, p):
-        return (p.defi_list, p.defi)
+        return p.defi_list + [p.defi]
 
     @_('defi ";"')
     def defi_list(self, p):
-        return p.defi
+        return [p.defi]
 
-    # defi
+    # def (declaración individual)
     @_('TYPE ID')
     def defi(self, p):
+        self.anadir_variable(p.TYPE, p.ID)
         return (p.TYPE, p.ID)
 
+    # Caso vacío (opcional si hay epsilon en la gramática)
     @_('')
-    def defi(self, p):
+    def defi_list(self, p):
         return []
 
 
@@ -258,7 +277,7 @@ if __name__ == '__main__':
     lexer = CLexer()
     parser = CParser()
 
-    textos = {"a = b + c;", "a = 6 - 2;" , "a = !b != c;" , "a == c;" , "a = b*c/d = 56;", "; ; ;", "int a;", "int a; int b; int c;"}
+    textos = {"a = b + c;", "a = 6 - 2;" , "a = !b != c;" , "a == c;" , "a = b*c/d = 56;", "; ; ;", "int a;", "int f; int b; int c;" , "int a"}
 
 
 
@@ -267,3 +286,12 @@ if __name__ == '__main__':
         tokens = lexer.tokenize(texto)
         result = parser.parse(tokens)
         print(result)
+
+
+    print("tabla de variables :")
+
+
+    
+    for clave,valor in parser.variables.items():
+
+        print(type(valor)," ",clave , " = ",valor)
