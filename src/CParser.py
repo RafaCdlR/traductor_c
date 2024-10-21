@@ -107,9 +107,9 @@ class CParser(Parser):
     def defi_list(self, p):
         return p.defi_list + [p.defi]
 
-    @_('defi ";"')
-    def defi_list(self, p):
-        return [p.defi]
+    # @_('defi ";"')
+    # def defi_list(self, p):
+        # return [p.defi]
 
     # def (declaración individual)
     @_('TYPE id_list')
@@ -117,6 +117,42 @@ class CParser(Parser):
         for id in p.id_list:
             self.anadir_variable(p.TYPE, id)
         return [(p.TYPE, id) for id in p.id_list]
+
+    #def (declaración individual)
+    #@_('TYPE expr')
+    #def defi(self, p):
+    #    lvalues = [item[1] for item in p.expr if item[0] == 'assign']
+    #    for id in lvalues:
+    #        self.anadir_variable(p.TYPE, id)
+    #    return (p.TYPE, p.expr)
+
+    @_('TYPE expr_mult')
+    def defi(self, p):
+        return ("expr_mult", p.TYPE, p.expr_mult)
+
+
+
+    @_('expr_mult "," expr')
+    def expr_mult(self, p):
+        lvalues = []
+        if p.expr[0] == 'assign':
+            lvalues.append(p.expr[1])
+        for id in lvalues:
+            self.anadir_variable("int", id)
+        return (p.expr_mult, p.expr)
+
+
+
+    @_('expr')
+    def expr_mult(self, p):
+        lvalues = []
+        if p.expr[0] == 'assign':
+            lvalues.append(p.expr[1])
+        for id in lvalues:
+            self.anadir_variable("int", id)
+        return p.expr
+
+
 
 
 
@@ -279,7 +315,7 @@ if __name__ == '__main__':
     parser = CParser()
 
     textos = {"a = b + c;", "a = 6 - 2;", "a = !b != c;", "a == c;",
-              "a = b*c/d = 56;", "; ; ;", "int a;", "int f; int b; int c;", "int a", "int j, k, l;"}
+              "a = b*c/d = 56;", "; ; ;", "int f; int b; int c;", "int m;", "int j, k, l;", "int s = 3;", "int a = 3; int b = 5;", "int r = 6, q = 7;", }
 
     for texto in textos:
         try:
