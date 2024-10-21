@@ -58,45 +58,35 @@ term -> ID
 '''
 
 
-
-
-
-
-
-
-
 class CParser(Parser):
     # lexer
     tokens = CLexer.tokens
 
-
-    
     variables = dict()
     precedence = (
-    ('right', ASSIGN),
-    ('left', OR),
-    ('left', AND),
-    ('left', EQ, NE, LE, GE),
-    ('left', PLUS, MINUS),
-    ('left', MULTIPLY, DIVIDE),
-    ('right', NOT),
+        ('right', ASSIGN),
+        ('left', OR),
+        ('left', AND),
+        ('left', EQ, NE, LE, GE),
+        ('left', PLUS, MINUS),
+        ('left', MULTIPLY, DIVIDE),
+        ('right', NOT),
     )
 
+    # FUNCIONES AUXILIARES
+    def anadir_variable(self, tipo, nombre):
 
-    #FUNCIONES AUXILIARES
-    def anadir_variable(self,tipo,nombre):
-        
         if nombre not in self.variables:
 
             if tipo == "int":
                 self.variables[nombre] = 0
-            else : 
+            else:
                 raise Exception("tipo no valido")
 
         else:
 
-            raise Exception("variable ",nombre," ya declarada anteriormente")
-    
+            raise Exception("variable ", nombre, " ya declarada anteriormente")
+
     # S
     @_('defi_list expr_list')
     def statement(self, p):
@@ -110,9 +100,8 @@ class CParser(Parser):
     def statement(self, p):
         return ([], p.expr_list)
 
-
-    
     # def_list (lista de definiciones, permite múltiples declaraciones)
+
     @_('defi_list defi ";"')
     def defi_list(self, p):
         return p.defi_list + [p.defi]
@@ -132,9 +121,8 @@ class CParser(Parser):
     def defi_list(self, p):
         return []
 
-
-    
     # expr_list
+
     @_('expr_list ";" expr')
     def expr_list(self, p):
         return ('expr_list', p.expr_list, p.expr)
@@ -156,9 +144,8 @@ class CParser(Parser):
     # def expr(self, p):
         # pass
 
-
-    
     # lvalue
+
     @_('lvalue ASSIGN ID')
     def lvalue(self, p):
         return ('assign_lvalue', p.lvalue, p.ID)
@@ -202,9 +189,8 @@ class CParser(Parser):
     def opLogAnd(self, p):
         return ('and', p.opLogAnd, p.opUnario)
 
-
-
     # opUnario
+
     @_('opUnario')
     def opLogAnd(self, p):
         return p.opUnario
@@ -229,10 +215,8 @@ class CParser(Parser):
     def opUn(self, p):
         return -1
 
+    # opMultDiv
 
-
-
-    #opMultDiv
     @_('opMultDiv')
     def opUnario(self, p):
         return p.opMultDiv
@@ -272,7 +256,7 @@ class CParser(Parser):
 
     @_('NUMBER')
     def term(self, p):
-        #print("soy un numero")
+        # print("soy un numero")
         return ('num', int(p.NUMBER))
 
 
@@ -280,21 +264,20 @@ if __name__ == '__main__':
     lexer = CLexer()
     parser = CParser()
 
-    textos = {"a = b + c;", "a = 6 - 2;" , "a = !b != c;" , "a == c;" , "a = b*c/d = 56;", "; ; ;", "int a;", "int f; int b; int c;" , "int a"}
-
-
+    textos = {"a = b + c;", "a = 6 - 2;", "a = !b != c;", "a == c;",
+              "a = b*c/d = 56;", "; ; ;", "int a;", "int f; int b; int c;", "int a"}
 
     for texto in textos:
-        print("\n\n\n\n",texto," :")
-        tokens = lexer.tokenize(texto)
-        result = parser.parse(tokens)
-        print(result)
-
+        try:
+            print("\n\n\n\n", texto, " :")
+            tokens = lexer.tokenize(texto)
+            result = parser.parse(tokens)
+            print(result)
+        except Exception as err:
+            print(f"Error de compilación: {err}")
 
     print("tabla de variables :")
 
+    for clave, valor in parser.variables.items():
 
-    
-    for clave,valor in parser.variables.items():
-
-        print(type(valor)," ",clave , " = ",valor)
+        print(type(valor), " ", clave, " = ", valor)
