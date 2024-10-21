@@ -39,10 +39,12 @@ opLogAnd -> opLogAnd '&&' opUnario     // and menos prioridad que un op unario
 
 opUnario ->  opUn opMultDiv
 
-opUn -> opUn '-'            // en C puede haber op unarios anidados
-    | opUn '!'
+opUn -> opUn opUnT            // en C puede haber op unarios anidados
+    | opUnT
+
+opUnT -> '-'
     | '!'
-    | '-'
+
 
 opMultDiv -> opMultDiv '*' opSumaResta
 	  | opMultDiv '/' opSumaResta
@@ -158,13 +160,22 @@ class CParser(Parser):
 
 
     # Lista de identificadores separados por comas
-    @_('ID "," id_list')
-    def id_list(self, p):
-        return [p.ID] + p.id_list
-
     @_('ID')
     def id_list(self, p):
         return [p.ID]
+
+    @_('id_list "," ID')
+    def id_list(self, p):
+        return [p.ID] + p.id_list
+
+    # @_('ID "," id_list')
+    # def id_list(self, p):
+        # return [p.ID] + p.id_list
+
+
+    # @_('ID')
+    # def id_list(self, p):
+        # return [p.ID]
 
 
     # Caso vacío
@@ -249,20 +260,24 @@ class CParser(Parser):
     def opUnario(self, p):
         return p.opUn * p.opMultDiv
 
-    @_('opUn MINUS')
+    @_('opUn opUnT')
     def opUn(self, p):
-        return -1 * p.opUn
+        return p.opUn * p.opUnT
 
-    @_('opUn NOT')
+    @_('opUnT')
     def opUn(self, p):
-        return not p.opUn
+        return p.opUnT
+
+    # @_('opUn NOT')
+    # def opUn(self, p):
+    #    return not p.opUn
 
     @_('NOT')
-    def opUn(self, p):
+    def opUnT(self, p):
         return False
 
     @_('MINUS')
-    def opUn(self, p):
+    def opUnT(self, p):
         return -1
 
     # opMultDiv
