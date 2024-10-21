@@ -61,7 +61,7 @@ term -> ID
 class CParser(Parser):
     # lexer
     tokens = CLexer.tokens
-
+    debugfile = 'parser.out'
     variables = dict()
     precedence = (
         ('right', ASSIGN),
@@ -102,6 +102,7 @@ class CParser(Parser):
 
     # def_list (lista de definiciones, permite múltiples declaraciones)
 
+    # def_list (lista de definiciones, permite múltiples declaraciones)
     @_('defi_list defi ";"')
     def defi_list(self, p):
         return p.defi_list + [p.defi]
@@ -111,16 +112,29 @@ class CParser(Parser):
         return [p.defi]
 
     # def (declaración individual)
-    @_('TYPE ID')
+    @_('TYPE id_list')
     def defi(self, p):
-        self.anadir_variable(p.TYPE, p.ID)
-        return (p.TYPE, p.ID)
+        for id in p.id_list:
+            self.anadir_variable(p.TYPE, id)
+        return [(p.TYPE, id) for id in p.id_list]
 
-    # Caso vacío (opcional si hay epsilon en la gramática)
+
+
+
+    # Lista de identificadores separados por comas
+    @_('ID "," id_list')
+    def id_list(self, p):
+        return [p.ID] + p.id_list
+
+    @_('ID')
+    def id_list(self, p):
+        return [p.ID]
+
+
+    # Caso vacío
     @_('')
     def defi_list(self, p):
         return []
-
     # expr_list
 
     @_('expr_list ";" expr')
@@ -265,7 +279,7 @@ if __name__ == '__main__':
     parser = CParser()
 
     textos = {"a = b + c;", "a = 6 - 2;", "a = !b != c;", "a == c;",
-              "a = b*c/d = 56;", "; ; ;", "int a;", "int f; int b; int c;", "int a"}
+              "a = b*c/d = 56;", "; ; ;", "int a;", "int f; int b; int c;", "int a", "int j, k, l;"}
 
     for texto in textos:
         try:
