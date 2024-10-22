@@ -2,63 +2,6 @@ from sly import Parser
 from CLexer import CLexer
 
 
-'''
-
-S -> def_list ';' expr_list ';'
-
-def_list -> def_list ';' def
-	 | def
-	 | epsilon
-
-def -> tipo defd
-
-defd -> defd, ID
-    | ID
-
-expr_list -> expr_list ';' expr
-           | expr
-           | epsilon
-
-expr -> lvalue '=' opComp
-      | opComp
-
-lvalue -> lvalue '=' ID
-       | ID
-
-opComp -> opComp '==' opLogOr
-       | opComp '<=' opLogOr
-       | opComp '>=' opLogOr
-       | opComp '!=' opLogOr
-       | opLogOr
-
-opLogOr -> opLogOr '||' opLogAnd       // en C or tiene menos prioridad que and
-	| opLogAnd
-
-opLogAnd -> opLogAnd '&&' opUnario     // and menos prioridad que un op unario
-	 | opUnario
-
-opUnario ->  opUn opMultDiv
-
-opUn -> opUn opUnT            // en C puede haber op unarios anidados
-    | opUnT
-
-opUnT -> '-'
-    | '!'
-
-
-opMultDiv -> opMultDiv '*' opSumaResta
-	  | opMultDiv '/' opSumaResta
-	  | opSumaResta
-
-opSumaResta -> opSumaResta '+' term
-	    | opSumaResta '-' term
-	    | term
-
-term -> ID
-     | NUMBER
-
-'''
-
 
 class CParser(Parser):
     # lexer
@@ -182,6 +125,7 @@ class CParser(Parser):
     @_('')
     def defi_list(self, p):
         return []
+
     # expr_list
 
     @_('expr_list ";" expr')
@@ -330,7 +274,7 @@ if __name__ == '__main__':
     parser = CParser()
 
     textos = {"a = b + c;", "a = 6 - 2;", "a = !b != c;", "a == c;",
-              "a = b*c/d = 56;", "; ; ;", "int f; int b; int c;", "int m;", "int j, k, l;", "int s = 3;", "int a = 3; int b = 5;", "int r = 6, q = 7;", }
+              "a = b*c/d = 56;", "; ; ;", "int f; int o; int c;", "int m;", "int j, k, l;", "int s = 3;", "int a = 3; int b = 5;", "int r = 6, q = 7;", }
 
     for texto in textos:
         try:

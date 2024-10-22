@@ -1,47 +1,41 @@
-S -> def_list ';' expr_list ';'
-
-def_list -> def_list ';' def
-	 | def
-	 | epsilon
-
-def -> tipo ID
-
-expr_list -> expr_list ';' expr
-           | expr
-           | epsilon
-
-expr -> lvalue '=' opComp
-      | opComp
-
-lvalue -> lvalue '=' ID
-       | ID
-
-opComp -> opComp '==' opLogOr
-       | opComp '<=' opLogOr
-       | opComp '>=' opLogOr
-       | opComp '!=' opLogOr
-       | opLogOr
-
-opLogOr -> opLogOr '||' opLogAnd       // en C or tiene menos prioridad que and
-	| opLogAnd
-
-opLogAnd -> opLogAnd '&&' opUnario     // and menos prioridad que un op unario
-	 | opUnario
-
-opUnario ->  opUn opMultDiv
-
-opUn -> opUn '-'            // en C puede haber op unarios anidados
-    | opUn '!'
-    | '!'
-    | '-'
-
-opMultDiv -> opMultDiv '*' opSumaResta
-	  | opMultDiv '/' opSumaResta
-	  | opSumaResta
-
-opSumaResta -> opSumaResta '+' term
-	    | opSumaResta '-' term
-	    | term
-
-term -> ID
-     | NUMBER
+Rule 0     S' -> statement
+Rule 1     statement -> expr_list
+Rule 2     statement -> defi_list
+Rule 3     statement -> defi_list expr_list
+Rule 4     defi_list -> <empty>
+Rule 5     defi_list -> defi_list defi ;
+Rule 6     defi -> TYPE expr_mult
+Rule 7     defi -> TYPE id_list
+Rule 8     expr_mult -> expr
+Rule 9     expr_mult -> expr_mult , expr
+Rule 10    id_list -> id_list , ID
+Rule 11    id_list -> ID
+Rule 12    expr_list -> expr ;
+Rule 13    expr_list -> expr_list ; expr
+Rule 14    expr -> opComp
+Rule 15    expr -> lvalue ASSIGN opComp  [precedence=right, level=1]
+Rule 16    lvalue -> ID
+Rule 17    lvalue -> lvalue ASSIGN ID
+Rule 18    opComp -> opLogOr
+Rule 19    opComp -> opComp GE opLogOr  [precedence=left, level=4]
+Rule 20    opComp -> opComp LE opLogOr  [precedence=left, level=4]
+Rule 21    opComp -> opComp NE opLogOr  [precedence=left, level=4]
+Rule 22    opComp -> opComp EQ opLogOr  [precedence=left, level=4]
+Rule 23    opLogOr -> opLogAnd
+Rule 24    opLogOr -> opLogOr OR opLogAnd  [precedence=left, level=2]
+Rule 25    opLogAnd -> opUnario
+Rule 26    opLogAnd -> opLogAnd AND opUnario  [precedence=left, level=3]
+Rule 27    opUnario -> opMultDiv
+Rule 28    opUnario -> opUn opMultDiv
+Rule 29    opUn -> opUnT
+Rule 30    opUn -> opUn opUnT
+Rule 31    opUnT -> MINUS  [precedence=left, level=5]
+Rule 32    opUnT -> NOT  [precedence=right, level=7]
+Rule 33    opMultDiv -> opSumaResta
+Rule 34    opMultDiv -> opMultDiv DIVIDE opSumaResta  [precedence=left, level=6]
+Rule 35    opMultDiv -> opMultDiv MULTIPLY opSumaResta  [precedence=left, level=6]
+Rule 36    opSumaResta -> term
+Rule 37    opSumaResta -> opSumaResta MINUS term  [precedence=left, level=5]
+Rule 38    opSumaResta -> opSumaResta PLUS term  [precedence=left, level=5]
+Rule 39    term -> NUMBER
+Rule 40    term -> ID
