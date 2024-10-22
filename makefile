@@ -23,9 +23,9 @@ tests:
 	# ${PY} ${TESTSCR} tests ${BUILD_PATH}
 	${PY} src/CParser.py
 zip:
-	zip ${ZIP} makefile src
+	zip ${ZIP_PATH} makefile src
 
 clean:
-	${RM} -rf ${BUILD_PATH} ${ZIP} *~
+	${RM} -rf ${BUILD_PATH} ${ZIP} *~ *.out src/__pycache__/
 	find -type f -name '*~' -delete
 	find -type f -name '#*#' -delete
