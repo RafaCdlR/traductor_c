@@ -37,13 +37,13 @@ class CParser(Parser):
     def statement(self, p):
         return (p.defi_list, p.expr_list)
 
-    @_('defi_list')
-    def statement(self, p):
-        return (p.defi_list, [])
+    #@_('defi_list')
+    #def statement(self, p):
+    #    return (p.defi_list, [])
 
-    @_('expr_list')
-    def statement(self, p):
-        return ([], p.expr_list)
+    #@_('expr_list')
+    #def statement(self, p):
+    #    return ([], p.expr_list)
 
     # def_list (lista de definiciones, permite múltiples declaraciones)
 
