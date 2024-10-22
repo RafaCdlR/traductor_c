@@ -10,8 +10,8 @@ Rule 8     expr_mult -> expr
 Rule 9     expr_mult -> expr_mult , expr
 Rule 10    id_list -> id_list , ID
 Rule 11    id_list -> ID
-Rule 12    expr_list -> expr ;
-Rule 13    expr_list -> expr_list ; expr
+Rule 12    expr_list -> <empty>
+Rule 13    expr_list -> expr_list expr ;
 Rule 14    expr -> opComp
 Rule 15    expr -> lvalue ASSIGN opComp  [precedence=right, level=1]
 Rule 16    lvalue -> ID
