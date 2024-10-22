@@ -128,13 +128,18 @@ class CParser(Parser):
 
     # expr_list
 
-    @_('expr_list ";" expr')
+    @_('expr_list expr ";"')
     def expr_list(self, p):
-        return ('expr_list', p.expr_list, p.expr)
+        return p.expr_list + [p.expr]
 
-    @_('expr ";"')
+    @_('')
     def expr_list(self, p):
-        return ('expr', p.expr)
+        return []
+
+    #@_('expr')
+    #def expr_list(self, p):
+    #    return ('expr', p.expr)
+
 
     # expr
     @_('lvalue ASSIGN opComp')
