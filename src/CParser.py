@@ -33,13 +33,21 @@ class CParser(Parser):
             raise Exception("variable ", nombre, " ya declarada anteriormente")
 
 
-    @_('funciones TYPE ID "(" parametros ")" "{" statement retorno ";" "}"')
+   
+    
+
+    @_('funciones funcion')
     def funciones(self, p):
-        return ("funciones", p.funciones, p.TYPE, p.ID, p.parametros, p.statement)
+        return p.funciones + [p.funcion]
+
+
+    @_('TYPE ID "(" parametros ")" "{" statement retorno ";" "}"')
+    def funcion(self, p):
+        return ("funcion" , p.TYPE, p.ID, p.parametros, p.statement)
 
     @_('')
     def funciones(self, p):
-        pass
+        return []
 
     @_('parametros "," TYPE ID')
     def parametros(self, p):
@@ -335,9 +343,9 @@ if __name__ == '__main__':
               }
     '''
 
-    textos = {"int main(int a, int b) { a == c; return a; }",
-              "void x() { int b; return a; }",
-              "void y() { return x;}"
+    textos = {'''int main(int a, int b) { a == c; return a; }
+              void x() { int b; return a; }
+              void y() { return x;}'''
               }
     
     for texto in textos:
