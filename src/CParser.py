@@ -37,24 +37,36 @@ class CParser(Parser):
     def statement(self, p):
         return (p.defi_list, p.expr_list)
 
-    #@_('defi_list')
-    #def statement(self, p):
-    #    return (p.defi_list, [])
+    @_('defi_list')
+    def statement(self, p):
+        return (p.defi_list, [])
 
-    #@_('expr_list')
-    #def statement(self, p):
-    #    return ([], p.expr_list)
+    @_('expr_list')
+    def statement(self, p):
+        return ([], p.expr_list)
 
     # def_list (lista de definiciones, permite múltiples declaraciones)
 
+
+
+
+
+
+
+    
     # def_list (lista de definiciones, permite múltiples declaraciones)
     @_('defi_list defi ";"')
     def defi_list(self, p):
         return p.defi_list + [p.defi]
 
-    # @_('defi ";"')
-    # def defi_list(self, p):
-        # return [p.defi]
+    # Caso vacío
+    #@_('')
+    #def defi_list(self, p):
+    #    return []
+
+    @_('defi ";"')
+    def defi_list(self, p):
+        return [p.defi]
 
     # def (declaración individual)
     @_('TYPE id_list')
@@ -121,10 +133,6 @@ class CParser(Parser):
         # return [p.ID]
 
 
-    # Caso vacío
-    @_('')
-    def defi_list(self, p):
-        return []
 
     # expr_list
 
@@ -132,13 +140,13 @@ class CParser(Parser):
     def expr_list(self, p):
         return p.expr_list + [p.expr]
 
-    @_('')
-    def expr_list(self, p):
-        return []
-
-    #@_('expr')
+    #@_('')
     #def expr_list(self, p):
-    #    return ('expr', p.expr)
+    #    return []
+
+    @_('expr ";"')
+    def expr_list(self, p):
+        return ('expr', p.expr)
 
 
     # expr
@@ -278,9 +286,11 @@ if __name__ == '__main__':
     lexer = CLexer()
     parser = CParser()
 
-    textos = {"a = b + c;", "a = 6 - 2;", "a = !b != c;", "a == c;",
-              "a = b*c/d = 56;", "; ; ;", "int f; int o; int c;", "int m;", "int j, k, l;", "int s = 3;", "int a = 3; int b = 5;", "int r = 6, q = 7;", }
-
+    textos = {"int x <= 8;", "a = b + c;", "a = 6 - 2;", "a = !b != c;",
+              "a == c;", "a = b*c/d = 56;", "; ; ;",
+              "int f; int o; int c;", "int m;", "int j, k, l;", "int s = 3;",
+              "int a = 3; int b = 5;", "int r = 6, q = 7;", }
+    
     for texto in textos:
         try:
             print("\n\n\n\n", texto, " :")
