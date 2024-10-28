@@ -3,7 +3,7 @@ from sly import Lexer
 
 
 class CLexer(Lexer):
-    tokens = {NUMBER ,ID, EQ,  NE, LE, GE, AND, OR , PLUS , MINUS , MULTIPLY , DIVIDE , NOT , ASSIGN, TYPE }
+    tokens = {NUMBER ,ID, EQ,  NE, LE, GE, AND, OR , PLUS , MINUS , MULTIPLY , DIVIDE , NOT , ASSIGN, TYPE, RETURN }
 
     # ignorar tabs
     ignore = ' \t'
@@ -13,6 +13,7 @@ class CLexer(Lexer):
 
 
     TYPE = r'int|void'
+    RETURN = r'return'
     NUMBER = r'[0-9]+'
     ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
 

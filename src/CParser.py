@@ -32,7 +32,20 @@ class CParser(Parser):
 
             raise Exception("variable ", nombre, " ya declarada anteriormente")
 
-    # S
+
+    @_('funciones TYPE ID "(" defi_list ")" "{" statement retorno ";" "}"')
+    def funciones(self, p):
+        return ("funciones", p.funciones, p.TYPE, p.ID, p.defi_list, p.statement)
+
+    @_('')
+    def funciones(self, p):
+        pass
+
+    @_('RETURN expr')
+    def retorno(self, p):
+        return ("return", p.expr)
+
+    # Statement
     @_('defi_list expr_list')
     def statement(self, p):
         return (p.defi_list, p.expr_list)
@@ -295,10 +308,18 @@ if __name__ == '__main__':
     lexer = CLexer()
     parser = CParser()
 
+    '''
     textos = {"int x <= 8;", "a = b + c;", "a = 6 - 2;", "a = !b != c;",
               "a == c;", "a = b*c/d = 56;", "; ; ;",
               "int f; int o; int c;", "int m;", "int j, k, l;", "int s = 3;",
-              "int a = 3; int b = 5;", "int r = 6, q = 7;", "void aa;" }
+              "int a = 3; int b = 5;", "int r = 6, q = 7;", "void aa;",
+              "int a(int x) {};"
+              }
+    '''
+
+    textos = {"int main(int a;) { a == c; return a; }",
+              "void x(int a;) { return 0; }"
+              }
     
     for texto in textos:
         try:
