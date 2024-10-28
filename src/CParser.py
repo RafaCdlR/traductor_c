@@ -41,9 +41,14 @@ class CParser(Parser):
     def funciones(self, p):
         pass
 
-    @_('defi_list')
+    @_('parametros "," TYPE ID')
     def parametros(self, p):
-        return p.defi_list
+        return ("parametros", p.TYPE, p.ID)
+
+    @_('TYPE ID')
+    def parametros(self, p):
+        self.anadir_variable(p.TYPE, p.ID)
+        return (p.TYPE, p.ID)
 
     @_('')
     def parametros(self, p):
@@ -105,8 +110,12 @@ class CParser(Parser):
     #        self.anadir_variable(p.TYPE, id)
     #    return (p.TYPE, p.expr)
 
-    @_('TYPE expr_mult')
+    @_('declaracion_variables')
     def defi(self, p):
+        return ("defi", p.declaracion_variables)
+    
+    @_('TYPE expr_mult')
+    def declaracion_variables(self, p):
         lvalues = []
         
         if type(p.expr_mult[0])==tuple:#hay varias assigns
@@ -326,7 +335,7 @@ if __name__ == '__main__':
               }
     '''
 
-    textos = {"int main(int a;) { a == c; return a; }",
+    textos = {"int main(int a, int b) { a == c; return a; }",
               "void x() { int b; return a; }",
               "void y() { return x;}"
               }
