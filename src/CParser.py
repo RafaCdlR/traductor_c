@@ -18,12 +18,14 @@ class CParser(Parser):
     )
 
     # FUNCIONES AUXILIARES
-    def anadir_simbolo(self, tipo, nombre):
+    def anadir_simbolo(self, tipo, nombre , contenido = 0):
 
         if nombre not in self.simbolos:
 
             if tipo == "int":
-                self.simbolos[nombre] = 0
+                self.simbolos[nombre] = contenido
+            elif tipo == "funcion":
+                self.simbolos[nombre] = contenido
             else:
                 raise Exception("tipo no valido")
 
@@ -36,6 +38,10 @@ class CParser(Parser):
         for g in p.globales:
             print(g)
             self.anadir_simbolo(g[0],g[1])
+        
+
+        for f in p.funciones:
+            self.anadir_simbolo("funcion",f[2],f)
 
         
         return (p.globales,p.funciones)
@@ -348,7 +354,8 @@ if __name__ == '__main__':
 
               int main(int a, int b) { a == c; return a; }
               void x() { int b;  }
-              void y() {}'''
+              void y() {}
+              void y(int a){}'''
               }
 
     for texto in textos:
