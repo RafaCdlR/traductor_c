@@ -30,6 +30,19 @@ class CParser(Parser):
         else:
 
             raise Exception("variable ", nombre, " ya declarada anteriormente")
+        
+    @_('globales "$" funciones')
+    def S(self, p):
+        return (p.globales,p.funciones)
+    
+    @_('defi_list')
+    def globales(self, p):
+        return (p.defi_list)
+    
+    @_('')
+    def globales(self, p):
+        return None
+    
 
     @_('funciones funcion')
     def funciones(self, p):
@@ -323,9 +336,13 @@ if __name__ == '__main__':
               }
     '''
 
-    textos = {'''int main(int a, int b) { a == c; return a; }
-              void x() { int b; return a; }
-              void y() { return x;}'''
+    textos = {'''
+              int g1,g2;
+              
+              
+              int main(int a, int b) { a == c; return a; }
+              void x() { int b;  }
+              void y() {}'''
               }
 
     for texto in textos:
