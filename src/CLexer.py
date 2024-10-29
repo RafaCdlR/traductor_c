@@ -56,9 +56,7 @@ class CLexer(Lexer):
 
 
 
-        print(text)
         original_tokens = super().tokenize(text)
-        print("llamada")
 
 
         return original_tokens
