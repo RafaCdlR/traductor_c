@@ -1,23 +1,23 @@
 from sly import Lexer
 
 
-
 class CLexer(Lexer):
-    tokens = {NUMBER ,ID, EQ,  NE, LE, GE, AND, OR , PLUS , MINUS , MULTIPLY , DIVIDE , NOT , ASSIGN, TYPE, RETURN }
+    tokens = {NUMBER, ID, EQ,  NE, LE, GE, AND, OR, PLUS,
+              MINUS, MULTIPLY, DIVIDE, NOT, ASSIGN, TYPE, VOID, RETURN}
 
     # ignorar tabs
     ignore = ' \t'
 
     # caracteres literales
-    literals = {'(',')' ,';', ',', '{', '}'}
+    literals = {'(', ')', ';', ',', '{', '}'}
 
-
-    TYPE = r'int|void'
+    TYPE = r'int'
+    VOID = r'void'
     RETURN = r'return'
     NUMBER = r'[0-9]+'
     ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
 
-    PLUS  = r'\+'
+    PLUS = r'\+'
     MINUS = r'-'
     MULTIPLY = r'\*'
     DIVIDE = r'/'
@@ -30,7 +30,7 @@ class CLexer(Lexer):
     ASSIGN = r'='
     NOT = r'!'
 
-    @_(r'//.*')#ignorar comentarios
+    @_(r'//.*')  # ignorar comentarios
     def ignorar_comentario(self, t):
         pass
 
@@ -42,4 +42,4 @@ class CLexer(Lexer):
         print("Illegal character '%s'" % t.value[0])
         self.index += 1
 
-#prueba borrar luego
+# prueba borrar luego

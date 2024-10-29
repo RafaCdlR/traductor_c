@@ -2,7 +2,6 @@ from sly import Parser
 from CLexer import CLexer
 
 
-
 class CParser(Parser):
     # lexer
     tokens = CLexer.tokens
@@ -32,18 +31,17 @@ class CParser(Parser):
 
             raise Exception("variable ", nombre, " ya declarada anteriormente")
 
-
-   
-    
-
     @_('funciones funcion')
     def funciones(self, p):
         return p.funciones + [p.funcion]
 
-
     @_('TYPE ID "(" parametros ")" "{" statement retorno ";" "}"')
     def funcion(self, p):
-        return ("funcion" , p.TYPE, p.ID, p.parametros, p.statement)
+        return ("funcion", p.TYPE, p.ID, p.parametros, p.statement)
+
+    @_('VOID ID "(" parametros ")" "{" statement "}"')
+    def funcion(self, p):
+        return ("funcion", p.VOID, p.ID, p.parametros, p.statement)
 
     @_('')
     def funciones(self, p):
@@ -83,20 +81,15 @@ class CParser(Parser):
     def statement(self, p):
         pass
 
-
-
-
-
-
-    
     # def_list (lista de definiciones, permite múltiples declaraciones)
+
     @_('defi_list defi ";"')
     def defi_list(self, p):
         return p.defi_list + [p.defi]
 
     # Caso vacío
-    #@_('')
-    #def defi_list(self, p):
+    # @_('')
+    # def defi_list(self, p):
     #    return []
 
     @_('defi ";"')
@@ -110,9 +103,9 @@ class CParser(Parser):
             self.anadir_variable(p.TYPE, id)
         return [(p.TYPE, id) for id in p.id_list]
 
-    #def (declaración individual)
-    #@_('TYPE expr')
-    #def defi(self, p):
+    # def (declaración individual)
+    # @_('TYPE expr')
+    # def defi(self, p):
     #    lvalues = [item[1] for item in p.expr if item[0] == 'assign']
     #    for id in lvalues:
     #        self.anadir_variable(p.TYPE, id)
@@ -121,48 +114,38 @@ class CParser(Parser):
     @_('declaracion_variables')
     def defi(self, p):
         return ("defi", p.declaracion_variables)
-    
+
     @_('TYPE expr_mult')
     def declaracion_variables(self, p):
         lvalues = []
-        
-        if type(p.expr_mult[0])==tuple:#hay varias assigns
-            for p2 in p.expr_mult:
-                #print(p2)
-                if p2[0] == 'assign':
-                    lvalues.append(p2[1])#METER IDS EN LVALUES 
-        else:
-                if p.expr_mult[0] == 'assign':
-                    lvalues.append(p.expr_mult[1])#METER IDS EN LVALUES 
-                #lvalues.append(p2[1])#METER IDS EN LVALUES 
 
+        if type(p.expr_mult[0]) == tuple:  # hay varias assigns
+            for p2 in p.expr_mult:
+                # print(p2)
+                if p2[0] == 'assign':
+                    lvalues.append(p2[1])  # METER IDS EN LVALUES
+        else:
+            if p.expr_mult[0] == 'assign':
+                lvalues.append(p.expr_mult[1])  # METER IDS EN LVALUES
+            # lvalues.append(p2[1])#METER IDS EN LVALUES
 
         #  print("lvalores = ",lvalues)#PRINT PARA DEBUG
         for lv in lvalues:
 
-            self.anadir_variable(p.TYPE , lv)
+            self.anadir_variable(p.TYPE, lv)
 
         return ("expr_mult", p.TYPE, p.expr_mult)
-
-
 
     @_('expr_mult "," expr')
     def expr_mult(self, p):
         return (p.expr_mult, p.expr)
 
-
-
     @_('expr')
     def expr_mult(self, p):
         return p.expr
 
-
-
-
-
-
-
     # Lista de identificadores separados por comas
+
     @_('ID')
     def id_list(self, p):
         return [p.ID]
@@ -175,12 +158,9 @@ class CParser(Parser):
     # def id_list(self, p):
         # return [p.ID] + p.id_list
 
-
     # @_('ID')
     # def id_list(self, p):
         # return [p.ID]
-
-
 
     # expr_list
 
@@ -188,16 +168,16 @@ class CParser(Parser):
     def expr_list(self, p):
         return p.expr_list + [p.expr]
 
-    #@_('')
-    #def expr_list(self, p):
+    # @_('')
+    # def expr_list(self, p):
     #    return []
 
     @_('expr ";"')
     def expr_list(self, p):
         return ('expr', p.expr)
 
-
     # expr
+
     @_('lvalue ASSIGN opComp')
     def expr(self, p):
         return ('assign', p.lvalue, p.opComp)
@@ -347,7 +327,7 @@ if __name__ == '__main__':
               void x() { int b; return a; }
               void y() { return x;}'''
               }
-    
+
     for texto in textos:
         try:
             print("\n\n\n\n", texto, " :")
