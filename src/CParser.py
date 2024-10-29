@@ -6,7 +6,7 @@ class CParser(Parser):
     # lexer
     tokens = CLexer.tokens
     debugfile = 'parser.out'
-    variables = dict()
+    simbolos = dict()
     precedence = (
         ('right', ASSIGN),
         ('left', OR),
@@ -18,31 +18,36 @@ class CParser(Parser):
     )
 
     # FUNCIONES AUXILIARES
-    def anadir_variable(self, tipo, nombre):
+    def anadir_simbolo(self, tipo, nombre):
 
-        if nombre not in self.variables:
+        if nombre not in self.simbolos:
 
             if tipo == "int":
-                self.variables[nombre] = 0
+                self.simbolos[nombre] = 0
             else:
                 raise Exception("tipo no valido")
 
         else:
 
             raise Exception("variable ", nombre, " ya declarada anteriormente")
-        
+
     @_('globales "$" funciones')
     def S(self, p):
+        for g in p.globales:
+            print(g)
+            self.anadir_simbolo(g[0],g[1])
+
+        
         return (p.globales,p.funciones)
-    
+
     @_('defi_list')
     def globales(self, p):
-        return (p.defi_list)
-    
+        return p.defi_list
+
     @_('')
     def globales(self, p):
         return None
-    
+
 
     @_('funciones funcion')
     def funciones(self, p):
@@ -66,7 +71,7 @@ class CParser(Parser):
 
     @_('TYPE ID')
     def parametros(self, p):
-        self.anadir_variable(p.TYPE, p.ID)
+        #self.anadir_variable(p.TYPE, p.ID)
         return (p.TYPE, p.ID)
 
     @_('')
@@ -107,13 +112,13 @@ class CParser(Parser):
 
     @_('defi ";"')
     def defi_list(self, p):
-        return [p.defi]
+        return p.defi
 
     # def (declaración individual)
     @_('TYPE id_list')
     def defi(self, p):
-        for id in p.id_list:
-            self.anadir_variable(p.TYPE, id)
+        #for id in p.id_list:
+        #    self.anadir_variable(p.TYPE, id)
         return [(p.TYPE, id) for id in p.id_list]
 
     # def (declaración individual)
@@ -130,6 +135,7 @@ class CParser(Parser):
 
     @_('TYPE expr_mult')
     def declaracion_variables(self, p):
+        '''
         lvalues = []
 
         if type(p.expr_mult[0]) == tuple:  # hay varias assigns
@@ -145,7 +151,7 @@ class CParser(Parser):
         #  print("lvalores = ",lvalues)#PRINT PARA DEBUG
         for lv in lvalues:
 
-            self.anadir_variable(p.TYPE, lv)
+            self.anadir_variable(p.TYPE, lv)'''
 
         return ("expr_mult", p.TYPE, p.expr_mult)
 
@@ -338,8 +344,8 @@ if __name__ == '__main__':
 
     textos = {'''
               int g1,g2;
-              
-              
+
+
               int main(int a, int b) { a == c; return a; }
               void x() { int b;  }
               void y() {}'''
@@ -354,8 +360,8 @@ if __name__ == '__main__':
         except Exception as err:
             print(f"Error de compilación: {err}")
 
-    print("tabla de variables :")
+    print("tabla de simbolos :")
 
-    for clave, valor in parser.variables.items():
+    for clave, valor in parser.simbolos.items():
 
         print(type(valor), " ", clave, " = ", valor)
