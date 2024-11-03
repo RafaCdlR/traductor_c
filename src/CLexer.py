@@ -17,7 +17,7 @@ class CLexer(Lexer):
     PRINTF = r'printf'
     RETURN = r'return'
     NUMBER = r'[0-9]+'
-    STRING = r'\".*?\"'  # fundamental el patrón perezoso aquí
+    STRING = r'\"(\\.|[^\\"])*\"'  # Excluye caracteres especiales
     ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
 
     PLUS = r'\+'
@@ -32,6 +32,8 @@ class CLexer(Lexer):
     OR = r'\|\|'
     ASSIGN = r'='
     NOT = r'!'
+
+
 
     @_(r'//.*')  # ignorar comentarios
     def ignorar_comentario(self, t):

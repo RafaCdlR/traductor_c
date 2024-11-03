@@ -17,7 +17,28 @@ class CParser(Parser):
         ('right', NOT),
     )
 
-    # FUNCIONES AUXILIARES
+    ###########################################################################
+    ##################### FUNCIONES AUXILIARES ################################
+    ###########################################################################
+
+    def anadir_simbolo(self, tipo, nombre, contenido=0):
+        if isinstance(nombre, list):
+            for n in nombre:
+                self.anadir_simbolo_individual(tipo, n, contenido)
+        else:
+            self.anadir_simbolo_individual(tipo, nombre, contenido)
+
+    def anadir_simbolo_individual(self, tipo, nombre, contenido=0):
+        if nombre not in self.simbolos:
+            if tipo == "int" or tipo == "funcion":
+                self.simbolos[nombre] = contenido
+            else:
+                raise Exception("tipo no valido")
+        else:
+            raise Exception(f"variable {nombre} ya declarada anteriormente")
+
+    
+    '''
     def anadir_simbolo(self, tipo, nombre , contenido = 0):
 
         if nombre not in self.simbolos:
@@ -32,6 +53,11 @@ class CParser(Parser):
         else:
 
             raise Exception("variable ", nombre, " ya declarada anteriormente")
+    '''
+
+    ###########################################################################
+    ##################### FIN DE FUNCIONES AUXILIARES #########################
+    ###########################################################################
 
     @_('globales "$" funciones')
     def S(self, p):
@@ -171,13 +197,22 @@ class CParser(Parser):
 
     # Lista de identificadores separados por comas
 
+    #############################################################
+    ##################### ID_LIST ###############################
+    #############################################################
+
     @_('ID')
     def id_list(self, p):
         return [p.ID]
 
     @_('id_list "," ID')
     def id_list(self, p):
-        return [p.ID] + p.id_list
+        if isinstance(p.id_list, tuple):
+            return list(p.id_list) + [p.ID]
+        else:
+            return [p.id_list] + [p.ID]
+        
+        #return [p.ID] + p.id_list
 
     # @_('ID "," id_list')
     # def id_list(self, p):
@@ -186,6 +221,10 @@ class CParser(Parser):
     # @_('ID')
     # def id_list(self, p):
         # return [p.ID]
+
+    #############################################################
+    ##################### FIN DE ID_LIST ########################
+    #############################################################
 
     # expr_list
 
@@ -217,6 +256,22 @@ class CParser(Parser):
 
     @_('STRING "," variables_a_imprimir')
     def printf_args(self, p):
+        print("Cadena:", p.STRING)
+        
+        texto = p.STRING[1:-1]  # Elimina las comillas dobles de los extremos
+
+        # Detectar y procesar especificadores de formato
+        import re
+        especificadores_formato = re.findall(r'%[diufFeEgGxXoscp]', texto)
+        print("Especificadores formato detectados:", especificadores_formato)
+        num_especificadores = len(especificadores_formato)
+        print("Num de especif. form. detectados:", num_especificadores)
+        num_variables_a_imprimir = len(p.variables_a_imprimir)
+        print("Num de variables a imprimir:", num_variables_a_imprimir)
+
+        if(num_especificadores != num_variables_a_imprimir):
+            raise Exception("El número de especificadores de formato y el número de variables a imprimir son distintos.")
+
         return (p.STRING, p.variables_a_imprimir)
 
     @_('STRING')
@@ -225,19 +280,36 @@ class CParser(Parser):
 
     @_('operaciones_a_imprimir')
     def variables_a_imprimir(self, p):
-        return p.operaciones_a_imprimir
+        if isinstance(p.operaciones_a_imprimir, tuple):
+            return list(p.operaciones_a_imprimir)
+        else:
+            return [p.operaciones_a_imprimir]
+
+        # return p.operaciones_a_imprimir
 
     @_('id_list')
     def variables_a_imprimir(self, p):
-        return p.id_list
+        if isinstance(p.id_list, tuple):
+            return list(p.id_list)
+        else:
+            return [p.id_list]
+        
+        # return p.id_list
 
     @_('operaciones_a_imprimir "," opComp')
     def operaciones_a_imprimir(self, p):
-        return (p.operaciones_a_imprimir, p.opComp)
+        if isinstance(p.operaciones_a_imprimir, tuple):
+            return list(p.operaciones_a_imprimir) + [p.opComp]
+        else:
+            return [p.operaciones_a_imprimir] + [p.opComp]
+        
+        # return (p.operaciones_a_imprimir, p.opComp)
 
     @_('opComp')
     def operaciones_a_imprimir(self, p):
-        return p.opComp
+        return [p.opComp]
+
+        # return p.opComp
 
     ##########################################################
     ################### PRINTF_FIN ###########################
@@ -389,7 +461,7 @@ if __name__ == '__main__':
 
 
               int main(int a, int b) { a == c; return a; }
-              void x() { int b; printf("Adios", b+c); }
+              void x() { int b; printf("Adios %d", b+c); }
               void y(int a){}'''
               }
 
