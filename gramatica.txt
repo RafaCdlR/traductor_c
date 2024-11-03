@@ -1,41 +1,59 @@
-Rule 0     S' -> statement
-Rule 1     statement -> expr_list
-Rule 2     statement -> defi_list
-Rule 3     statement -> defi_list expr_list
-Rule 4     defi_list -> <empty>
-Rule 5     defi_list -> defi_list defi ;
-Rule 6     defi -> TYPE expr_mult
-Rule 7     defi -> TYPE id_list
-Rule 8     expr_mult -> expr
-Rule 9     expr_mult -> expr_mult , expr
-Rule 10    id_list -> id_list , ID
-Rule 11    id_list -> ID
-Rule 12    expr_list -> <empty>
-Rule 13    expr_list -> expr_list expr ;
-Rule 14    expr -> opComp
-Rule 15    expr -> lvalue ASSIGN opComp  [precedence=right, level=1]
-Rule 16    lvalue -> ID
-Rule 17    lvalue -> lvalue ASSIGN ID
-Rule 18    opComp -> opLogOr
-Rule 19    opComp -> opComp GE opLogOr  [precedence=left, level=4]
-Rule 20    opComp -> opComp LE opLogOr  [precedence=left, level=4]
-Rule 21    opComp -> opComp NE opLogOr  [precedence=left, level=4]
-Rule 22    opComp -> opComp EQ opLogOr  [precedence=left, level=4]
-Rule 23    opLogOr -> opLogAnd
-Rule 24    opLogOr -> opLogOr OR opLogAnd  [precedence=left, level=2]
-Rule 25    opLogAnd -> opUnario
-Rule 26    opLogAnd -> opLogAnd AND opUnario  [precedence=left, level=3]
-Rule 27    opUnario -> opMultDiv
-Rule 28    opUnario -> opUn opMultDiv
-Rule 29    opUn -> opUnT
-Rule 30    opUn -> opUn opUnT
-Rule 31    opUnT -> MINUS  [precedence=left, level=5]
-Rule 32    opUnT -> NOT  [precedence=right, level=7]
-Rule 33    opMultDiv -> opSumaResta
-Rule 34    opMultDiv -> opMultDiv DIVIDE opSumaResta  [precedence=left, level=6]
-Rule 35    opMultDiv -> opMultDiv MULTIPLY opSumaResta  [precedence=left, level=6]
-Rule 36    opSumaResta -> term
-Rule 37    opSumaResta -> opSumaResta MINUS term  [precedence=left, level=5]
-Rule 38    opSumaResta -> opSumaResta PLUS term  [precedence=left, level=5]
-Rule 39    term -> NUMBER
-Rule 40    term -> ID
+Rule 0     S' -> S
+Rule 1     S -> globales $ funciones
+Rule 2     globales -> <empty>
+Rule 3     globales -> defi_list
+Rule 4     funciones -> <empty>
+Rule 5     funciones -> funciones funcion
+Rule 6     funcion -> VOID ID ( parametros ) { statement }
+Rule 7     funcion -> TYPE ID ( parametros ) { statement retorno ; }
+Rule 8     parametros -> <empty>
+Rule 9     parametros -> TYPE ID
+Rule 10    parametros -> parametros , TYPE ID
+Rule 11    retorno -> RETURN expr
+Rule 12    statement -> <empty>
+Rule 13    statement -> expr_list
+Rule 14    statement -> defi_list
+Rule 15    statement -> defi_list expr_list
+Rule 16    defi_list -> defi ;
+Rule 17    defi_list -> defi_list defi ;
+Rule 18    defi -> declaracion_variables
+Rule 19    defi -> TYPE id_list
+Rule 20    declaracion_variables -> TYPE expr_mult
+Rule 21    expr_mult -> expr
+Rule 22    expr_mult -> expr_mult , expr
+Rule 23    id_list -> id_list , ID
+-->Rule 24    id_list -> ID
+Rule 25    expr_list -> expr ;
+Rule 26    expr_list -> expr_list expr ;
+Rule 27    expr -> opComp
+Rule 28    expr -> lvalue ASSIGN opComp  [precedence=right, level=1]
+-->Rule 29    lvalue -> ID
+Rule 30    lvalue -> lvalue ASSIGN ID
+Rule 31    opComp -> opLogOr
+Rule 32    opComp -> opComp GE opLogOr  [precedence=left, level=4]
+Rule 33    opComp -> opComp LE opLogOr  [precedence=left, level=4]
+Rule 34    opComp -> opComp NE opLogOr  [precedence=left, level=4]
+Rule 35    opComp -> opComp EQ opLogOr  [precedence=left, level=4]
+Rule 36    opLogOr -> opLogAnd
+Rule 37    opLogOr -> opLogOr OR opLogAnd  [precedence=left, level=2]
+Rule 38    opLogAnd -> opUnario
+Rule 39    opLogAnd -> opLogAnd AND opUnario  [precedence=left, level=3]
+Rule 40    opUnario -> opMultDiv
+Rule 41    opUnario -> opUn opMultDiv
+Rule 42    opUn -> opUnT
+Rule 43    opUn -> opUn opUnT
+Rule 44    opUnT -> MINUS  [precedence=left, level=5]
+Rule 45    opUnT -> NOT  [precedence=right, level=7]
+Rule 46    opMultDiv -> opSumaResta
+Rule 47    opMultDiv -> opMultDiv DIVIDE opSumaResta  [precedence=left, level=6]
+Rule 48    opMultDiv -> opMultDiv MULTIPLY opSumaResta  [precedence=left, level=6]
+Rule 49    opSumaResta -> term
+Rule 50    opSumaResta -> opSumaResta MINUS term  [precedence=left, level=5]
+Rule 51    opSumaResta -> opSumaResta PLUS term  [precedence=left, level=5]
+Rule 52    term -> NUMBER
+-->Rule 53    term -> ID
+
+
+un id_list siempre va precedido de un tipo y puede hacer llamadas recursivas a sí misma para tener una longitud no definida, en cambio, lvalue siempre es el principio de una expresión por lo que siempre irá precedida de un ;
+
+el problema es que cuando se encuentra que está en una ',' y lo siguiente es un ID no sabe si ese ID pertenece a la producción de id_list o a la de term y lo mismo sucede con lvalue, cuando se encuentra que está en un ';' y lo siguiente es un ID, no sabe si se encuentra en un lvalue o en un term

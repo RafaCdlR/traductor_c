@@ -349,7 +349,7 @@ if __name__ == '__main__':
     '''
 
     textos = {'''
-              int g1,g2;
+              int g1, g2;
 
 
               int main(int a, int b) { a == c; return a; }
