@@ -207,6 +207,42 @@ class CParser(Parser):
     def expr(self, p):
         return ('assign', p.lvalue, p.opComp)
 
+    ##########################################################
+    ################### PRINTF ###############################
+    ##########################################################
+
+    @_('PRINTF "(" printf_args ")"')
+    def expr(self, p):
+        return ("printf", p.printf_args)
+
+    @_('STRING "," variables_a_imprimir')
+    def printf_args(self, p):
+        return (p.STRING, p.variables_a_imprimir)
+
+    @_('STRING')
+    def printf_args(self, p):
+        return p.STRING
+
+    @_('operaciones_a_imprimir')
+    def variables_a_imprimir(self, p):
+        return p.operaciones_a_imprimir
+
+    @_('id_list')
+    def variables_a_imprimir(self, p):
+        return p.id_list
+
+    @_('operaciones_a_imprimir "," opComp')
+    def operaciones_a_imprimir(self, p):
+        return (p.operaciones_a_imprimir, p.opComp)
+
+    @_('opComp')
+    def operaciones_a_imprimir(self, p):
+        return p.opComp
+
+    ##########################################################
+    ################### PRINTF_FIN ###########################
+    ##########################################################
+
     @_('opComp')
     def expr(self, p):
         return p.opComp
@@ -353,8 +389,7 @@ if __name__ == '__main__':
 
 
               int main(int a, int b) { a == c; return a; }
-              void x() { int b;  }
-              void y() {}
+              void x() { int b; printf("Adios", b+c); }
               void y(int a){}'''
               }
 

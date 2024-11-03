@@ -25,7 +25,20 @@ Rule 23    id_list -> id_list , ID
 -->Rule 24    id_list -> ID
 Rule 25    expr_list -> expr ;
 Rule 26    expr_list -> expr_list expr ;
-Rule 27    expr -> opComp
+
+
+----------------------NUEVO----------------------------------
+REGLA X    expr -> PRINTF '(' printf_args ')'
+REGLA X	   printf_args -> STRING ',' variables_a_imprimir
+REGLA X	   printf_args -> STRING
+REGLA X	   variables_a_imprimir -> id_list
+REGLA X	   variables_a_imprimir -> operaciones_a_imprimir
+REGLA X	   operaciones_a_imprimir -> operaciones_a_imprimir ',' opComp
+REGLA X	   operaciones_a_imprimir -> opComp  # siempre precedido de ',' -> no conflicto!
+----------------------NUEVO----------------------------------
+
+
+Rule 27    expr -> opComp  # precedido de ';' o de ASSIGN -> no conflicto!
 Rule 28    expr -> lvalue ASSIGN opComp  [precedence=right, level=1]
 -->Rule 29    lvalue -> ID
 Rule 30    lvalue -> lvalue ASSIGN ID

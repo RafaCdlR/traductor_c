@@ -3,18 +3,21 @@ import re
 
 class CLexer(Lexer):
     tokens = {NUMBER, ID, EQ,  NE, LE, GE, AND, OR, PLUS,
-              MINUS, MULTIPLY, DIVIDE, NOT, ASSIGN, TYPE, VOID, RETURN}
+              MINUS, MULTIPLY, DIVIDE, NOT, ASSIGN, TYPE, VOID, RETURN,
+              PRINTF, STRING}
 
     # ignorar tabs
     ignore = ' \t'
 
     # caracteres literales
-    literals = {'(', ')', ';', ',', '{', '}','$'}
+    literals = {'(', ')', ';', ',', '{', '}', '$'}
 
     TYPE = r'int'
     VOID = r'void'
+    PRINTF = r'printf'
     RETURN = r'return'
     NUMBER = r'[0-9]+'
+    STRING = r'\".*?\"'  # fundamental el patrón perezoso aquí
     ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
 
     PLUS = r'\+'
