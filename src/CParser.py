@@ -456,6 +456,8 @@ if __name__ == '__main__':
               }
     '''
 
+    # prueba a poner printf("Hola"); despues de a==c;
+    
     textos = {'''
               int g1, g2;
 
