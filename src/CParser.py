@@ -503,5 +503,3 @@ if __name__ == '__main__':
     for clave, valor in parser.simbolos.items():
 
         print(type(valor), " ", clave, " = ", valor)
-
-    print(Nodoprueba())
