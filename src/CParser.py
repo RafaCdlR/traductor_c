@@ -1,5 +1,6 @@
 from sly import Parser
 from CLexer import CLexer
+import re
 
 
 class CParser(Parser):
@@ -37,7 +38,6 @@ class CParser(Parser):
         else:
             raise Exception(f"variable {nombre} ya declarada anteriormente")
 
-    
     '''
     def anadir_simbolo(self, tipo, nombre , contenido = 0):
 
@@ -63,14 +63,12 @@ class CParser(Parser):
     def S(self, p):
         for g in p.globales:
             print(g)
-            self.anadir_simbolo(g[0],g[1])
-        
+            self.anadir_simbolo(g[0], g[1])
 
         for f in p.funciones:
-            self.anadir_simbolo("funcion",f[2],f)
+            self.anadir_simbolo("funcion", f[2], f)
 
-        
-        return (p.globales,p.funciones)
+        return (p.globales, p.funciones)
 
     @_('defi_list')
     def globales(self, p):
@@ -79,7 +77,6 @@ class CParser(Parser):
     @_('')
     def globales(self, p):
         return None
-
 
     @_('funciones funcion')
     def funciones(self, p):
@@ -103,7 +100,7 @@ class CParser(Parser):
 
     @_('TYPE ID')
     def parametros(self, p):
-        #self.anadir_variable(p.TYPE, p.ID)
+        # self.anadir_variable(p.TYPE, p.ID)
         return (p.TYPE, p.ID)
 
     @_('')
@@ -149,7 +146,7 @@ class CParser(Parser):
     # def (declaración individual)
     @_('TYPE id_list')
     def defi(self, p):
-        #for id in p.id_list:
+        # for id in p.id_list:
         #    self.anadir_variable(p.TYPE, id)
         return [(p.TYPE, id) for id in p.id_list]
 
@@ -211,8 +208,8 @@ class CParser(Parser):
             return list(p.id_list) + [p.ID]
         else:
             return [p.id_list] + [p.ID]
-        
-        #return [p.ID] + p.id_list
+
+        # return [p.ID] + p.id_list
 
     # @_('ID "," id_list')
     # def id_list(self, p):
@@ -257,11 +254,10 @@ class CParser(Parser):
     @_('STRING "," variables_a_imprimir')
     def printf_args(self, p):
         print("Cadena:", p.STRING)
-        
+
         texto = p.STRING[1:-1]  # Elimina las comillas dobles de los extremos
 
         # Detectar y procesar especificadores de formato
-        import re
         especificadores_formato = re.findall(r'%[diufFeEgGxXoscp]', texto)
         print("Especificadores formato detectados:", especificadores_formato)
         num_especificadores = len(especificadores_formato)
@@ -269,8 +265,9 @@ class CParser(Parser):
         num_variables_a_imprimir = len(p.variables_a_imprimir)
         print("Num de variables a imprimir:", num_variables_a_imprimir)
 
-        if(num_especificadores != num_variables_a_imprimir):
-            raise Exception("El número de especificadores de formato y el número de variables a imprimir son distintos.")
+        if (num_especificadores != num_variables_a_imprimir):
+            raise Exception(
+                "El número de especificadores de formato y el número de variables a imprimir son distintos.")
 
         return (p.STRING, p.variables_a_imprimir)
 
@@ -293,7 +290,7 @@ class CParser(Parser):
             return list(p.id_list)
         else:
             return [p.id_list]
-        
+
         # return p.id_list
 
     @_('operaciones_a_imprimir "," opComp')
@@ -302,7 +299,7 @@ class CParser(Parser):
             return list(p.operaciones_a_imprimir) + [p.opComp]
         else:
             return [p.operaciones_a_imprimir] + [p.opComp]
-        
+
         # return (p.operaciones_a_imprimir, p.opComp)
 
     @_('opComp')
@@ -457,7 +454,7 @@ if __name__ == '__main__':
     '''
 
     # prueba a poner printf("Hola"); despues de a==c;
-    
+
     textos = {'''
               int g1, g2;
 
