@@ -1,7 +1,6 @@
 from sly import Parser
 from CLexer import CLexer
-import re
-
+from clasesnodos import *
 
 class CParser(Parser):
     # lexer
@@ -38,6 +37,7 @@ class CParser(Parser):
         else:
             raise Exception(f"variable {nombre} ya declarada anteriormente")
 
+    
     '''
     def anadir_simbolo(self, tipo, nombre , contenido = 0):
 
@@ -63,12 +63,14 @@ class CParser(Parser):
     def S(self, p):
         for g in p.globales:
             print(g)
-            self.anadir_simbolo(g[0], g[1])
+            self.anadir_simbolo(g[0],g[1])
+        
 
         for f in p.funciones:
-            self.anadir_simbolo("funcion", f[2], f)
+            self.anadir_simbolo("funcion",f[2],f)
 
-        return (p.globales, p.funciones)
+        
+        return (p.globales,p.funciones)
 
     @_('defi_list')
     def globales(self, p):
@@ -77,6 +79,7 @@ class CParser(Parser):
     @_('')
     def globales(self, p):
         return None
+
 
     @_('funciones funcion')
     def funciones(self, p):
@@ -100,7 +103,7 @@ class CParser(Parser):
 
     @_('TYPE ID')
     def parametros(self, p):
-        # self.anadir_variable(p.TYPE, p.ID)
+        #self.anadir_variable(p.TYPE, p.ID)
         return (p.TYPE, p.ID)
 
     @_('')
@@ -146,7 +149,7 @@ class CParser(Parser):
     # def (declaración individual)
     @_('TYPE id_list')
     def defi(self, p):
-        # for id in p.id_list:
+        #for id in p.id_list:
         #    self.anadir_variable(p.TYPE, id)
         return [(p.TYPE, id) for id in p.id_list]
 
@@ -208,8 +211,8 @@ class CParser(Parser):
             return list(p.id_list) + [p.ID]
         else:
             return [p.id_list] + [p.ID]
-
-        # return [p.ID] + p.id_list
+        
+        #return [p.ID] + p.id_list
 
     # @_('ID "," id_list')
     # def id_list(self, p):
@@ -235,7 +238,7 @@ class CParser(Parser):
 
     @_('expr ";"')
     def expr_list(self, p):
-        return ('expr', p.expr)
+        return [('expr', p.expr)]
 
     # expr
 
@@ -254,10 +257,11 @@ class CParser(Parser):
     @_('STRING "," variables_a_imprimir')
     def printf_args(self, p):
         print("Cadena:", p.STRING)
-
+        
         texto = p.STRING[1:-1]  # Elimina las comillas dobles de los extremos
 
         # Detectar y procesar especificadores de formato
+        import re
         especificadores_formato = re.findall(r'%[diufFeEgGxXoscp]', texto)
         print("Especificadores formato detectados:", especificadores_formato)
         num_especificadores = len(especificadores_formato)
@@ -265,9 +269,8 @@ class CParser(Parser):
         num_variables_a_imprimir = len(p.variables_a_imprimir)
         print("Num de variables a imprimir:", num_variables_a_imprimir)
 
-        if (num_especificadores != num_variables_a_imprimir):
-            raise Exception(
-                "El número de especificadores de formato y el número de variables a imprimir son distintos.")
+        if(num_especificadores != num_variables_a_imprimir):
+            raise Exception("El número de especificadores de formato y el número de variables a imprimir son distintos.")
 
         return (p.STRING, p.variables_a_imprimir)
 
@@ -290,7 +293,7 @@ class CParser(Parser):
             return list(p.id_list)
         else:
             return [p.id_list]
-
+        
         # return p.id_list
 
     @_('operaciones_a_imprimir "," opComp')
@@ -299,7 +302,7 @@ class CParser(Parser):
             return list(p.operaciones_a_imprimir) + [p.opComp]
         else:
             return [p.operaciones_a_imprimir] + [p.opComp]
-
+        
         # return (p.operaciones_a_imprimir, p.opComp)
 
     @_('opComp')
@@ -381,7 +384,7 @@ class CParser(Parser):
     # opLogOr
     @_('opLogOr OR opLogAnd')
     def opLogOr(self, p):
-        return ('or', p.opLogOr, p.opLogAnd)
+        return NodoopLogOr(p.opLogOr, p.opLogAnd)
 
     @_('opLogAnd')
     def opLogOr(self, p):
@@ -390,16 +393,19 @@ class CParser(Parser):
     # opLogAnd
     @_('opLogAnd AND opUnario')
     def opLogAnd(self, p):
-        return ('and', p.opLogAnd, p.opUnario)
+        return NodoopLogAnd(p.opLogAnd, p.opUnario)
+
+    
 
     @_('opUnario')
     def opLogAnd(self, p):
         return p.opUnario
-
+    
     # opUnario
     @_('opUn opMultDiv')
     def opUnario(self, p):
-        return p.opUn * p.opMultDiv
+        return NodoopUnario(p.opUn,p.opMultDiv)
+
 
     # @_('opUn NOT')
     # def opUn(self, p):
@@ -422,11 +428,11 @@ class CParser(Parser):
     # opMultDiv
     @_('opMultDiv MULTIPLY opSumaResta')
     def opMultDiv(self, p):
-        return ('multiply', p.opMultDiv, p.opSumaResta)
+        return NodoMultDiv(p.opMultDiv,'*', p.opSumaResta)
 
     @_('opMultDiv DIVIDE opSumaResta')
     def opMultDiv(self, p):
-        return ('divide', p.opMultDiv, p.opSumaResta)
+        return NodoMultDiv( p.opMultDiv,'/',p.opSumaResta)
 
     @_('opSumaResta')
     def opMultDiv(self, p):
@@ -436,11 +442,11 @@ class CParser(Parser):
     @_('opSumaResta PLUS term')
     def opSumaResta(self, p):
         # print("soy una suma ")
-        return ('plus', p.opSumaResta, p.term)
+         return Nodosumaresta(p.opSumaResta,"+", p.term)
 
     @_('opSumaResta MINUS term')
     def opSumaResta(self, p):
-        return ('minus', p.opSumaResta, p.term)
+        return Nodosumaresta(p.opSumaResta,"-", p.term)
 
     @_('term')
     def opSumaResta(self, p):
@@ -449,13 +455,13 @@ class CParser(Parser):
     # term rules (variables or numbers)
     @_('ID')
     def term(self, p):
-        print("estoy en id")
-        return ('id', p.ID)
+        
+        return Nodotermino(p.ID)
 
     @_('NUMBER')
     def term(self, p):
         # print("soy un numero")
-        return ('num', int(p.NUMBER))
+        return Nodotermino(p.NUMBER)
 
 
 if __name__ == '__main__':
@@ -472,24 +478,25 @@ if __name__ == '__main__':
     '''
 
     # prueba a poner printf("Hola"); despues de a==c;
-
+    
     textos = {'''
               int g1, g2;
 
 
-              int main(int a, int b) { a == c; return a; }
-              void x() { int b; printf("Adios %d", b+c); }
+              int main(int a, int b) { a+c ;printf("hola"); return 1; }
+              void x() { int b; }
               void y(int a){}'''
               }
+              
 
     for texto in textos:
-        try:
+        #try:
             print("\n\n\n\n", texto, " :")
             tokens = lexer.tokenize(texto)
             result = parser.parse(tokens)
             print(result)
-        except Exception as err:
-            print(f"Error de compilación: {err}")
+        #except Exception as err:
+            #print(f"Error de compilación: {err}")
 
     print("tabla de simbolos :")
 

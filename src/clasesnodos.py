@@ -1,4 +1,4 @@
-class Nodo:
+class Nodo():
     
     def cadena(self):
         return ""
@@ -7,6 +7,7 @@ class Nodo:
         pass
 
     def __str__(self):
+        print("se ha llamado a cadena")
         return self.cadena()
 
 
@@ -34,7 +35,7 @@ class Nodosumaresta(Nodo):
     operador = ""
 
     def __init__(self , left  , right =""  , operador ="" ):
-        assert( operador == '+' or operador == '-' or operador == "" )
+        
         self.left = left
         self.right = right
         self.operador = operador
@@ -52,7 +53,7 @@ class NodoMultDiv(Nodo):
     operador = ""
 
     def __init__(self , left  , right =""  , operador ="" ):
-        assert( operador == '*' or operador == '/' or operador == "" )
+        
         self.left = left
         self.right = right
         self.operador = operador
@@ -66,7 +67,7 @@ class NodoMultDiv(Nodo):
 
 
 
-
+'''
 class NodoopUn(Nodo):
     operador = ""
     def __init__(self,operador):
@@ -78,7 +79,7 @@ class NodoopUn(Nodo):
     
     def escribe(self):
         print(self.cadena())
-
+'''
 
 class NodoopUnario(Nodo):
     operador = ""
@@ -99,17 +100,34 @@ class NodoopUnario(Nodo):
 class NodoopLogAnd(Nodo):
     operador = "&&"
     right = ""
-
-    def __init__(self,right):
+    left = ""
+    def __init__(self,left,right):
         
-        
+        self.left = left
         self.right = right
 
     def cadena(self):
-        return f"{self.operador.cadena()}{self.right.cadena()}"
+        return f"{self.left.cadena()}{self.operador}{self.right.cadena()}"
     
     def escribe(self):
         print(self.cadena())
+
+
+class NodoopLogOr(Nodo):
+    operador = "||"
+    right = ""
+    left = ""
+    def __init__(self,left,right):
+        
+        self.left = left
+        self.right = right
+
+    def cadena(self):
+        return f"{self.left.cadena()}{self.operador}{self.right.cadena()}"
+    
+    def escribe(self):
+        print(self.cadena())
+
 
 
 
@@ -126,3 +144,16 @@ class NodoOpComp(Nodo):
 
     def escribe(self):
         print(self.cadena())
+
+
+
+class Nodoprueba(Nodo):
+
+    def cadena(self):
+        return "hola"
+    
+
+
+if __name__ == '__main__':
+    a = Nodoprueba()
+    print(a)
