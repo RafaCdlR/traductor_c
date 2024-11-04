@@ -7,7 +7,10 @@ class Nodo():
         pass
 
     def __str__(self):
-        print("se ha llamado a cadena")
+        
+        return self.cadena()
+    
+    def __repr__(self):
         return self.cadena()
 
 
@@ -34,7 +37,7 @@ class Nodosumaresta(Nodo):
     right = ""
     operador = ""
 
-    def __init__(self , left  , right =""  , operador ="" ):
+    def __init__(self , left, operador ="" , right =""  ):
         
         self.left = left
         self.right = right
@@ -52,7 +55,7 @@ class NodoMultDiv(Nodo):
     right = ""
     operador = ""
 
-    def __init__(self , left  , right =""  , operador ="" ):
+    def __init__(self , left  , operador ="", right =""   ):
         
         self.left = left
         self.right = right
@@ -146,14 +149,3 @@ class NodoOpComp(Nodo):
         print(self.cadena())
 
 
-
-class Nodoprueba(Nodo):
-
-    def cadena(self):
-        return "hola"
-    
-
-
-if __name__ == '__main__':
-    a = Nodoprueba()
-    print(a)
