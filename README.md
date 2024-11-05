@@ -2,4 +2,4 @@
 
 Usar `make tests` para las pruebas.
 
-No se acepta una expresión precedida de un ';' .
+No se aceptan varios ';' seguidos .
