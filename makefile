@@ -20,8 +20,8 @@ all:
 
 tests:
 	mkdir -p ${BUILD_PATH}
-	# ${PY} ${TESTSCR} tests ${BUILD_PATH}
-	${PY} src/CParser.py
+	${PY} ${TESTSCR} tests
+	# ${PY} src/CParser.py
 zip:
 	zip ${ZIP_PATH} makefile src
 

@@ -6,6 +6,7 @@ import os
 
 def main(argv):
     cLexer = CLexer()
+    cParser = CParser()
     cTokens = cLexer.tokens
 
     if len(argv) != 3:
@@ -15,11 +16,7 @@ def main(argv):
     ifile = os.path.abspath("tests/" + argv[1])
     ofile = os.path.abspath("tests/" + argv[2])
 
-    # for tok in cLexer.tokenize("int a"):
-    #     print('type=%r, value=%r' % (tok.type, tok.value))
-    lexer = CLexer()
-    parser = CParser()
-
+    # for tok in cLexer.tokenize("int a"): print('type=%r, value=%r' % (tok.type, tok.value)) lexer = CLexer() parser = CParser()
     text = ''
     with open(ifile, 'r') as file:
         text = file.read()
@@ -28,8 +25,8 @@ def main(argv):
 
     for line in text:
         print("\n\n\n\n", line, " :")
-        tokens = lexer.tokenize(line)
-        result = parser.parse(tokens)
+        tokens = cLexer.tokenize(line)
+        result = cParser.parse(tokens)
         print(result)
 
 

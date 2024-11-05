@@ -6,12 +6,12 @@ print("Arguments: ")
 for i in sys.argv:
     print(f"Arg: {i}")
 
-if len(sys.argv) != 3:
+if len(sys.argv) != 2:
     print('No test dir specified')
     exit(1)
 
 dirstr = sys.argv[1]
-target = sys.argv[2]
+target = "../build/"
 
 # test dir to absolute path
 dirstr = os.path.abspath(dirstr)
@@ -22,7 +22,7 @@ print(f"Target: {target}")
 
 directory = os.fsencode(dirstr)
 
-print("\n\n----Test files----")
+("\n\n----Test files----")
 for file in os.listdir(directory):
     print(f"Test file: {os.fsdecode(file)}")
 
