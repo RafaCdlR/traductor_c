@@ -132,7 +132,7 @@ class CParser(Parser):
 
     @_('defi_list defi ";"')
     def defi_list(self, p):
-        return p.defi_list + [p.defi]
+        return p.defi_list + p.defi
 
     # Caso vacío
     # @_('')
@@ -198,17 +198,31 @@ class CParser(Parser):
     ##################### ID_LIST ###############################
     #############################################################
 
-    @_('ID')
+    @_('id_list "," MULTIPLY ID')#PUNTERO
     def id_list(self, p):
-        return [p.ID]
+        if isinstance(p.id_list, list):
+            return p.id_list + [('*',p.ID)]
+        else:
+            return [p.id_list] + [('*',p.ID)]
+
 
     @_('id_list "," ID')
     def id_list(self, p):
-        if isinstance(p.id_list, tuple):
-            return list(p.id_list) + [p.ID]
+        if isinstance(p.id_list, list):
+            return p.id_list + [p.ID]
         else:
             return [p.id_list] + [p.ID]
+        
 
+
+    @_('ID')
+    def id_list(self, p):
+        
+        return [p.ID]
+        
+    @_('MULTIPLY ID')#PUNTERO
+    def id_list(self, p):
+        return [("*",p.ID)]
         # return [p.ID] + p.id_list
 
     # @_('ID "," id_list')
@@ -479,7 +493,8 @@ if __name__ == '__main__':
     # prueba a poner printf("Hola"); despues de a==c;
 
     textos = {'''
-              int g1, g2;
+              int g1, g2 ,*g3;
+              int *g4;
 
 
               int main(int a, int b) { a+c ;printf("hola"); return 1; }
