@@ -1,6 +1,7 @@
 from sly import Parser
 from CLexer import CLexer
 from clasesnodos import *
+import re
 
 class CParser(Parser):
     # lexer
@@ -42,7 +43,7 @@ class CParser(Parser):
     def anadir_simbolo(self, tipo, nombre , contenido = 0):
 
         if nombre not in self.simbolos:
-
+vv
             if tipo == "int":
                 self.simbolos[nombre] = contenido
             elif tipo == "funcion":
@@ -261,7 +262,6 @@ class CParser(Parser):
         texto = p.STRING[1:-1]  # Elimina las comillas dobles de los extremos
 
         # Detectar y procesar especificadores de formato
-        import re
         especificadores_formato = re.findall(r'%[diufFeEgGxXoscp]', texto)
         print("Especificadores formato detectados:", especificadores_formato)
         num_especificadores = len(especificadores_formato)
