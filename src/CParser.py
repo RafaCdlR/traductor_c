@@ -43,7 +43,6 @@ class CParser(Parser):
     def anadir_simbolo(self, tipo, nombre , contenido = 0):
 
         if nombre not in self.simbolos:
-vv
             if tipo == "int":
                 self.simbolos[nombre] = contenido
             elif tipo == "funcion":
@@ -256,10 +255,7 @@ vv
     def printf_args(self, p):
         print("Cadena:", p.STRING)
 
-<<<<<<< HEAD
-=======
         '''
->>>>>>> 4b546d9217d564c81fc63b5c3bb5d1b0a366a4cc
         texto = p.STRING[1:-1]  # Elimina las comillas dobles de los extremos
 
         # Detectar y procesar especificadores de formato
@@ -271,15 +267,12 @@ vv
         print(p.variables_a_imprimir)
         print("Num de variables a imprimir:", num_variables_a_imprimir)
 
-<<<<<<< HEAD
         if (num_especificadores != num_variables_a_imprimir):
             raise Exception(
                 "El número de especificadores de formato y el número de variables a imprimir son distintos.")
-=======
         if(num_especificadores != num_variables_a_imprimir):
             raise Exception("El número de especificadores de formato y el número de variables a imprimir son distintos.")
         '''
->>>>>>> 4b546d9217d564c81fc63b5c3bb5d1b0a366a4cc
 
         return (p.STRING, p.variables_a_imprimir)
 
