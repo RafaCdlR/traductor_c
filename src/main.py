@@ -1,7 +1,8 @@
 from CLexer import CLexer
 import sys
-from Cparser import CParser
+from CParser import CParser
 import os
+
 
 def main(argv):
     cLexer = CLexer()
@@ -26,10 +27,11 @@ def main(argv):
     print(f"File {ifile}: \n{text}")
 
     for line in text:
-        print("\n\n\n\n", line," :")
+        print("\n\n\n\n", line, " :")
         tokens = lexer.tokenize(line)
         result = parser.parse(tokens)
         print(result)
+
 
 if __name__ == '__main__':
     main(sys.argv)

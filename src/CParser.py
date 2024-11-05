@@ -3,6 +3,7 @@ from CLexer import CLexer
 from clasesnodos import *
 import re
 
+
 class CParser(Parser):
     # lexer
     tokens = CLexer.tokens
@@ -38,7 +39,6 @@ class CParser(Parser):
         else:
             raise Exception(f"variable {nombre} ya declarada anteriormente")
 
-    
     '''
     def anadir_simbolo(self, tipo, nombre , contenido = 0):
 
@@ -56,22 +56,20 @@ vv
             raise Exception("variable ", nombre, " ya declarada anteriormente")
     '''
 
-    #--------------------------------------------------------------------------
-    #-------------------- FIN DE FUNCIONES AUXILIARES -------------------------
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # -------------------- FIN DE FUNCIONES AUXILIARES -------------------------
+    # --------------------------------------------------------------------------
 
     @_('globales "$" funciones')
     def S(self, p):
         for g in p.globales:
             print(g)
-            self.anadir_simbolo(g[0],g[1])
-        
+            self.anadir_simbolo(g[0], g[1])
 
         for f in p.funciones:
-            self.anadir_simbolo("funcion",f[2],f)
+            self.anadir_simbolo("funcion", f[2], f)
 
-        
-        return (p.globales,p.funciones)
+        return (p.globales, p.funciones)
 
     @_('defi_list')
     def globales(self, p):
@@ -80,7 +78,6 @@ vv
     @_('')
     def globales(self, p):
         return None
-
 
     @_('funciones funcion')
     def funciones(self, p):
@@ -104,7 +101,7 @@ vv
 
     @_('TYPE ID')
     def parametros(self, p):
-        #self.anadir_variable(p.TYPE, p.ID)
+        # self.anadir_variable(p.TYPE, p.ID)
         return (p.TYPE, p.ID)
 
     @_('')
@@ -150,7 +147,7 @@ vv
     # def (declaración individual)
     @_('TYPE id_list')
     def defi(self, p):
-        #for id in p.id_list:
+        # for id in p.id_list:
         #    self.anadir_variable(p.TYPE, id)
         return [(p.TYPE, id) for id in p.id_list]
 
@@ -212,8 +209,8 @@ vv
             return list(p.id_list) + [p.ID]
         else:
             return [p.id_list] + [p.ID]
-        
-        #return [p.ID] + p.id_list
+
+        # return [p.ID] + p.id_list
 
     # @_('ID "," id_list')
     # def id_list(self, p):
@@ -223,9 +220,9 @@ vv
     # def id_list(self, p):
         # return [p.ID]
 
-    #------------------------------------------------------------
-    #-------------------- FIN DE ID_LIST ------------------------
-    #------------------------------------------------------------
+    # ------------------------------------------------------------
+    # -------------------- FIN DE ID_LIST ------------------------
+    # ------------------------------------------------------------
 
     # expr_list
 
@@ -258,7 +255,7 @@ vv
     @_('STRING "," variables_a_imprimir')
     def printf_args(self, p):
         print("Cadena:", p.STRING)
-        
+
         texto = p.STRING[1:-1]  # Elimina las comillas dobles de los extremos
 
         # Detectar y procesar especificadores de formato
@@ -269,8 +266,9 @@ vv
         num_variables_a_imprimir = len(p.variables_a_imprimir)
         print("Num de variables a imprimir:", num_variables_a_imprimir)
 
-        if(num_especificadores != num_variables_a_imprimir):
-            raise Exception("El número de especificadores de formato y el número de variables a imprimir son distintos.")
+        if (num_especificadores != num_variables_a_imprimir):
+            raise Exception(
+                "El número de especificadores de formato y el número de variables a imprimir son distintos.")
 
         return (p.STRING, p.variables_a_imprimir)
 
@@ -293,7 +291,7 @@ vv
             return list(p.id_list)
         else:
             return [p.id_list]
-        
+
         # return p.id_list
 
     @_('operaciones_a_imprimir "," opComp')
@@ -302,7 +300,7 @@ vv
             return list(p.operaciones_a_imprimir) + [p.opComp]
         else:
             return [p.operaciones_a_imprimir] + [p.opComp]
-        
+
         # return (p.operaciones_a_imprimir, p.opComp)
 
     @_('opComp')
@@ -311,9 +309,9 @@ vv
 
         # return p.opComp
 
-    #---------------------------------------------------------
-    #------------------ PRINTF_FIN ---------------------------
-    #---------------------------------------------------------
+    # ---------------------------------------------------------
+    # ------------------ PRINTF_FIN ---------------------------
+    # ---------------------------------------------------------
 
     @_('opComp')
     def expr(self, p):
@@ -377,9 +375,9 @@ vv
     def opComp(self, p):
         return p.opLogOr
 
-    #---------------------------------------------------------
-    #--------------- OP COMPARACIÓN_FIN ----------------------
-    #---------------------------------------------------------
+    # ---------------------------------------------------------
+    # --------------- OP COMPARACIÓN_FIN ----------------------
+    # ---------------------------------------------------------
 
     # opLogOr
     @_('opLogOr OR opLogAnd')
@@ -395,17 +393,14 @@ vv
     def opLogAnd(self, p):
         return NodoopLogAnd(p.opLogAnd, p.opUnario)
 
-    
-
     @_('opUnario')
     def opLogAnd(self, p):
         return p.opUnario
-    
+
     # opUnario
     @_('opUn opMultDiv')
     def opUnario(self, p):
-        return NodoopUnario(p.opUn,p.opMultDiv)
-
+        return NodoopUnario(p.opUn, p.opMultDiv)
 
     # @_('opUn NOT')
     # def opUn(self, p):
@@ -428,11 +423,11 @@ vv
     # opMultDiv
     @_('opMultDiv MULTIPLY opSumaResta')
     def opMultDiv(self, p):
-        return NodoMultDiv(p.opMultDiv,'*', p.opSumaResta)
+        return NodoMultDiv(p.opMultDiv, '*', p.opSumaResta)
 
     @_('opMultDiv DIVIDE opSumaResta')
     def opMultDiv(self, p):
-        return NodoMultDiv( p.opMultDiv,'/',p.opSumaResta)
+        return NodoMultDiv(p.opMultDiv, '/', p.opSumaResta)
 
     @_('opSumaResta')
     def opMultDiv(self, p):
@@ -442,11 +437,11 @@ vv
     @_('opSumaResta PLUS term')
     def opSumaResta(self, p):
         # print("soy una suma ")
-         return Nodosumaresta(p.opSumaResta,"+", p.term)
+        return Nodosumaresta(p.opSumaResta, "+", p.term)
 
     @_('opSumaResta MINUS term')
     def opSumaResta(self, p):
-        return Nodosumaresta(p.opSumaResta,"-", p.term)
+        return Nodosumaresta(p.opSumaResta, "-", p.term)
 
     @_('term')
     def opSumaResta(self, p):
@@ -455,7 +450,7 @@ vv
     # term rules (variables or numbers)
     @_('ID')
     def term(self, p):
-        
+
         return Nodotermino(p.ID)
 
     @_('NUMBER')
@@ -478,7 +473,7 @@ if __name__ == '__main__':
     '''
 
     # prueba a poner printf("Hola"); despues de a==c;
-    
+
     textos = {'''
               int g1, g2;
 
@@ -487,16 +482,15 @@ if __name__ == '__main__':
               void x() { int b; }
               void y(int a){}'''
               }
-              
 
     for texto in textos:
-        #try:
-            print("\n\n\n\n", texto, " :")
-            tokens = lexer.tokenize(texto)
-            result = parser.parse(tokens)
-            print(result)
-        #except Exception as err:
-            #print(f"Error de compilación: {err}")
+        # try:
+        print("\n\n\n\n", texto, " :")
+        tokens = lexer.tokenize(texto)
+        result = parser.parse(tokens)
+        print(result)
+        # except Exception as err:
+        # print(f"Error de compilación: {err}")
 
     print("tabla de simbolos :")
 
