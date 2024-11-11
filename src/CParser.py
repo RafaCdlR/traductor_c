@@ -1,7 +1,6 @@
 from sly import Parser
 from CLexer import CLexer
 from clasesnodos import *
-import re
 
 
 class CParser(Parser):
@@ -396,6 +395,10 @@ class CParser(Parser):
     def lvalue(self, p):
         return p.ID
 
+    @_('"*" ID')
+    def lvalue(self, p):
+        return ('*', p.ID)
+
     # opComp (comparaciones)
     ##########################################################
     ################### OP_COMPARACIÓN #######################
@@ -515,13 +518,16 @@ class CParser(Parser):
     # term rules (variables or numbers)
     @_('ID')
     def term(self, p):
-
         return Nodotermino(p.ID)
 
     @_('NUMBER')
     def term(self, p):
         # print("soy un numero")
         return Nodotermino(p.NUMBER)
+
+    @_('"&" ID')
+    def term(self, p):
+        return Nodotermino('&', p.ID)
 
 
 if __name__ == '__main__':
@@ -544,8 +550,15 @@ if __name__ == '__main__':
               int *g4;
               int array[100];
 
+              int main(int *a, int b) {
+                  int *PUNT;
+                  int ar[50];
 
-              int main(int *a, int b) { int *PUNT; int ar[50]; scanf("%d", &b); return 1; }
+                  scanf("%d", &b);
+
+                  return 1;
+              }
+
               void x() { int b, c; printf("--> %d %d", b, c, d); }
               void y(int a){}'''
               }
