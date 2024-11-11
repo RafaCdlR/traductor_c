@@ -1,7 +1,7 @@
 from sly import Parser
 from CLexer import CLexer
 from clasesnodos import *
-import re
+
 
 
 class CParser(Parser):
