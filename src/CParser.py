@@ -495,6 +495,8 @@ if __name__ == '__main__':
     textos = {'''
               int g1, g2 ,*g3;
               int *g4;
+              int d + e;
+              
 
 
               int main(int a, int b) { a+c ;printf("hola"); return 1; }
