@@ -96,7 +96,7 @@ class CParser(Parser):
 
     @_('parametros "," TYPE ID')
     def parametros(self, p):
-        return ("parametros", p.TYPE, p.ID)
+        return ("parametros",p.parametros, p.TYPE, p.ID)
 
     @_('TYPE ID')
     def parametros(self, p):
@@ -106,7 +106,7 @@ class CParser(Parser):
 
     @_('parametros "," TYPE MULTIPLY ID')
     def parametros(self, p):
-        return ("parametros", ('*',p.TYPE), p.ID)
+        return ("parametros",p.parametros, ('*',p.TYPE), p.ID)
 
     @_('TYPE MULTIPLY ID')
     def parametros(self, p):
