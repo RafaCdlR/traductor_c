@@ -3,7 +3,6 @@ from CLexer import CLexer
 from clasesnodos import *
 
 
-
 class CParser(Parser):
     # lexer
     tokens = CLexer.tokens
@@ -31,14 +30,16 @@ class CParser(Parser):
             self.anadir_simbolo_individual(tipo, nombre, contenido)
 
     def anadir_simbolo_individual(self, tipo, nombre, contenido=0):
-        if nombre not in self.simbolos:
-            if tipo == "int" or tipo == "funcion":
-                self.simbolos[nombre] = contenido
+        try:
+            if nombre not in self.simbolos:
+                if tipo == "int" or tipo == "funcion":
+                    self.simbolos[nombre] = contenido
+                else:
+                    raise Exception("tipo no valido")
             else:
-                raise Exception("tipo no valido")
-        else:
-            raise Exception(f"variable {nombre} ya declarada anteriormente")
-
+                raise Exception(f"variable {nombre} ya declarada anteriormente")
+        except:
+            pass
     '''
     def anadir_simbolo(self, tipo, nombre , contenido = 0):
 
@@ -211,43 +212,74 @@ class CParser(Parser):
     ##################### ID_LIST ###############################
     #############################################################
 
-    @_('id_list "," MULTIPLY ID')#PUNTERO
+    '''
+    @_('id_list "," MULTIPLY id_array')#PUNTERO
     def id_list(self, p):
         if isinstance(p.id_list, list):
-            return p.id_list + [('*',p.ID)]
+            return p.id_list + [('*',p.id_array)]
         else:
-            return [p.id_list] + [('*',p.ID)]
-
-
+            return [p.id_list] + [('*',p.id_array)]
+    '''
+    '''
     @_('id_list "," ID')
     def id_list(self, p):
         if isinstance(p.id_list, list):
             return p.id_list + [p.ID]
         else:
             return [p.id_list] + [p.ID]
-        
-    @_('id_list "," ID "[" NUMBER "]"')
+    
+    '''
+
+
+    @_('id_list "," id_array')
     def id_list(self, p):
         if isinstance(p.id_list, list):
-            return p.id_list + [p.ID]
+            return p.id_list + [p.id_array]
         else:
-            return [p.id_list] + [(p.ID,p.NUMBER)]
-
+            return [p.id_list] + [p.id.array]
+        
+    
+    '''
     @_('ID')
     def id_list(self, p):
         
         return [p.ID]
-    
-    @_('ID "[" NUMBER "]"')
-    def id_list(self, p):
-        
-        return [(p.ID,p.NUMBER)]
-        
-    @_('MULTIPLY ID')#PUNTERO
-    def id_list(self, p):
-        return [("*",p.ID)]
-        # return [p.ID] + p.id_list
+    '''
 
+    
+
+    @_('id_array')
+    def id_list(self, p):
+        
+        return p.id_array    
+
+    @_('MULTIPLY id_array')#PUNTERO
+    def id_array(self, p):
+        return [("*",p.id_array)]
+        # return [p.ID] + p.id_list
+    
+    @_('ID array')
+    def id_array(self, p):
+        
+        return [(p.ID,p.array)]
+        
+    
+    
+    @_('array "[" NUMBER "]"')
+    def array(self, p):
+
+        return p.array + [p.NUMBER]
+
+    @_('"[" NUMBER "]"')
+    def array(self, p):
+
+        return[p.NUMBER]
+    
+    @_("")
+    def array(self, p):
+
+        pass
+    
     # @_('ID "," id_list')
     # def id_list(self, p):
         # return [p.ID] + p.id_list
@@ -255,7 +287,6 @@ class CParser(Parser):
     # @_('ID')
     # def id_list(self, p):
         # return [p.ID]
-
     # ------------------------------------------------------------
     # -------------------- FIN DE ID_LIST ------------------------
     # ------------------------------------------------------------
@@ -396,6 +427,10 @@ class CParser(Parser):
     def lvalue(self, p):
         return p.ID
 
+    @_('"*" ID')
+    def lvalue(self, p):
+        return ('*', p.ID)
+
     # opComp (comparaciones)
     ##########################################################
     ################### OP_COMPARACIÓN #######################
@@ -515,13 +550,16 @@ class CParser(Parser):
     # term rules (variables or numbers)
     @_('ID')
     def term(self, p):
-
         return Nodotermino(p.ID)
 
     @_('NUMBER')
     def term(self, p):
         # print("soy un numero")
         return Nodotermino(p.NUMBER)
+
+    @_('"&" ID')
+    def term(self, p):
+        return Nodotermino('&', p.ID)
 
 
 if __name__ == '__main__':
@@ -544,8 +582,15 @@ if __name__ == '__main__':
               int *g4;
               int array[100];
 
+              int main(int *a, int b) {
+                  int *PUNT;
+                  int ar[50];
 
-              int main(int *a, int b) { int *PUNT; int ar[50]; scanf("%d", &b); return 1; }
+                  scanf("%d", &b);
+
+                  return 1;
+              }
+
               void x() { int b, c; printf("--> %d %d", b, c, d); }
               void y(int a){}'''
               }
