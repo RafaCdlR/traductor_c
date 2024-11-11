@@ -32,7 +32,7 @@ class CLexer(Lexer):
     OR = r'\|\|'
     ASSIGN = r'='
     NOT = r'!'
-
+    
 
 
     @_(r'//.*')  # ignorar comentarios

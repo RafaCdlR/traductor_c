@@ -102,6 +102,19 @@ class CParser(Parser):
     def parametros(self, p):
         # self.anadir_variable(p.TYPE, p.ID)
         return (p.TYPE, p.ID)
+    
+
+    @_('parametros "," TYPE MULTIPLY ID')
+    def parametros(self, p):
+        return ("parametros", ('*',p.TYPE), p.ID)
+
+    @_('TYPE MULTIPLY ID')
+    def parametros(self, p):
+        # self.anadir_variable(p.TYPE, p.ID)
+        return (('*',p.TYPE), p.ID)
+
+
+
 
     @_('')
     def parametros(self, p):
@@ -495,11 +508,9 @@ if __name__ == '__main__':
     textos = {'''
               int g1, g2 ,*g3;
               int *g4;
-              int d + e;
-              
 
 
-              int main(int a, int b) { a+c ;printf("hola"); return 1; }
+              int main(int *a, int b) { int *PUNT; return 1; }
               void x() { int b, c; printf("--> %d %d", b, c, d); }
               void y(int a){}'''
               }
