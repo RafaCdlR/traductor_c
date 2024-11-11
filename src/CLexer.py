@@ -10,7 +10,7 @@ class CLexer(Lexer):
     ignore = ' \t'
 
     # caracteres literales
-    literals = {'(', ')', ';', ',', '{', '}', '$'}
+    literals = {'(', ')', ';', ',', '{', '}', '$','[',']'}
 
     TYPE = r'int'
     VOID = r'void'

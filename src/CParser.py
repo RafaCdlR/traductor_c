@@ -226,12 +226,22 @@ class CParser(Parser):
         else:
             return [p.id_list] + [p.ID]
         
-
+    @_('id_list "," ID "[" NUMBER "]"')
+    def id_list(self, p):
+        if isinstance(p.id_list, list):
+            return p.id_list + [p.ID]
+        else:
+            return [p.id_list] + [(p.ID,p.NUMBER)]
 
     @_('ID')
     def id_list(self, p):
         
         return [p.ID]
+    
+    @_('ID "[" NUMBER "]"')
+    def id_list(self, p):
+        
+        return [(p.ID,p.NUMBER)]
         
     @_('MULTIPLY ID')#PUNTERO
     def id_list(self, p):
@@ -508,9 +518,10 @@ if __name__ == '__main__':
     textos = {'''
               int g1, g2 ,*g3;
               int *g4;
+              int array[100];
 
 
-              int main(int *a, int b) { int *PUNT; return 1; }
+              int main(int *a, int b) { int *PUNT;int ar[50]; return 1; }
               void x() { int b, c; printf("--> %d %d", b, c, d); }
               void y(int a){}'''
               }
