@@ -354,6 +354,30 @@ class CParser(Parser):
     # ------------------ PRINTF_FIN ---------------------------
     # ---------------------------------------------------------
 
+    ###########################################################################
+    ############################### SCANF #####################################
+    ###########################################################################
+
+    @_('SCANF "(" scanf_args ")"')
+    def expr(self, p):
+        return ("scanf", p.scanf_args)
+
+    @_('STRING "," variables_referenciadas')
+    def scanf_args(self, p):
+        return (p.STRING, p.variables_referenciadas)
+
+    @_('variables_referenciadas "," "&" ID')
+    def variables_referenciadas(self, p):
+        return (p.variables_referenciadas, ('&', p.ID))
+
+    @_('"&" ID')
+    def variables_referenciadas(self, p):
+        return (p.ID)
+
+    #--------------------------------------------------------------------------
+    #------------------------------ SCANF_FIN ---------------------------------
+    #--------------------------------------------------------------------------
+
     @_('opComp')
     def expr(self, p):
         return p.opComp
@@ -521,7 +545,7 @@ if __name__ == '__main__':
               int array[100];
 
 
-              int main(int *a, int b) { int *PUNT;int ar[50]; return 1; }
+              int main(int *a, int b) { int *PUNT; int ar[50]; scanf("%d", &b); return 1; }
               void x() { int b, c; printf("--> %d %d", b, c, d); }
               void y(int a){}'''
               }

@@ -4,17 +4,18 @@ import re
 class CLexer(Lexer):
     tokens = {NUMBER, ID, EQ,  NE, LE, GE, AND, OR, PLUS,
               MINUS, MULTIPLY, DIVIDE, NOT, ASSIGN, TYPE, VOID, RETURN,
-              PRINTF, STRING}
+              PRINTF, STRING, SCANF}
 
     # ignorar tabs
     ignore = ' \t'
 
     # caracteres literales
-    literals = {'(', ')', ';', ',', '{', '}', '$','[',']'}
+    literals = {'(', ')', ';', ',', '{', '}', '$','[',']', '&'}
 
     TYPE = r'int'
     VOID = r'void'
     PRINTF = r'printf'
+    SCANF = r'scanf'
     RETURN = r'return'
     NUMBER = r'[0-9]+'
     STRING = r'\"(\\.|[^\\"])*\"'  # Excluye caracteres especiales
