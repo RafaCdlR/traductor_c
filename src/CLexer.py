@@ -4,7 +4,7 @@ import re
 class CLexer(Lexer):
     tokens = {NUMBER, ID, EQ,  NE, LE, GE, AND, OR, PLUS,
               MINUS, MULTIPLY, DIVIDE, NOT, ASSIGN, TYPE, VOID, RETURN,
-              PRINTF, STRING, SCANF}
+              PRINTF, STRING, SCANF, IF, ELSE}
 
     # ignorar tabs
     ignore = ' \t'
@@ -16,6 +16,8 @@ class CLexer(Lexer):
     VOID = r'void'
     PRINTF = r'printf'
     SCANF = r'scanf'
+    IF = r'if'
+    ELSE = r'else'
     RETURN = r'return'
     NUMBER = r'[0-9]+'
     STRING = r'\"(\\.|[^\\"])*\"'  # Excluye caracteres especiales

@@ -413,6 +413,34 @@ class CParser(Parser):
     #------------------------------ SCANF_FIN ---------------------------------
     #--------------------------------------------------------------------------
 
+    ###########################################################################
+    ############################### IF_ELSE ###################################
+    ###########################################################################
+
+    @_('expr_list block_expr')
+    def expr_list(self, p):
+        return (p.expr_list, p.block_expr)
+
+    @_('block_expr')
+    def expr_list(self, p):
+        return (p.block_expr)
+
+    @_('IF "(" opComp ")" "{" expr_list "}" cont_cond')
+    def block_expr(self, p):
+        return ("if", p.opComp, p.expr_list, p.cont_cond)
+
+    @_('ELSE "{" expr_list "}"')
+    def cont_cond(self, p):
+        return ("else", p.expr_list)
+
+    @_('')
+    def cont_cond(self, p):
+        pass
+
+    #--------------------------------------------------------------------------
+    #----------------------------- IF_ELSE_FIN --------------------------------
+    #--------------------------------------------------------------------------
+    
     @_('opComp')
     def expr(self, p):
         return p.opComp
@@ -591,6 +619,9 @@ if __name__ == '__main__':
                   int ar[50];
 
                   scanf("%d", &b);
+
+                  if( a == b ) { a+1; }
+                  else { b + 2; }
 
                   return 1;
               }
