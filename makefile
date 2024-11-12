@@ -12,7 +12,7 @@ BUILD_PATH=build
 ZIP_PATH=entrega.zip
 
 
-.PHONY: all tests clean zip
+.PHONY: all tests clean zip clean-all
 .SILENT: all
 
 all:
@@ -20,12 +20,15 @@ all:
 
 tests:
 	mkdir -p ${BUILD_PATH}
-	${PY} ${TESTSCR} tests
+	${PY} ${TESTSCR} ../tests
 	# ${PY} src/CParser.py
 zip:
 	zip ${ZIP_PATH} makefile src
 
 clean:
-	${RM} -rf ${BUILD_PATH} ${ZIP} *~ *.out src/__pycache__/
+	${RM} -rf ${BUILD_PATH} ${ZIP} *~ src/__pycache__/
 	find -type f -name '*~' -delete
 	find -type f -name '#*#' -delete
+
+clean-all: clean
+	find -type f -name '*.out' -delete
