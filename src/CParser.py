@@ -16,6 +16,7 @@ class CParser(Parser):
         ('left', PLUS, MINUS),
         ('left', MULTIPLY, DIVIDE),
         ('right', NOT),
+        ('left', '['), 
     )
 
     ###########################################################################
@@ -257,6 +258,12 @@ class CParser(Parser):
     def id_array(self, p):
         return [("*",p.id_array)]
         # return [p.ID] + p.id_list
+
+    @_('ID')
+    def id_array(self, p):
+        
+        return [p.ID]
+    
     
     @_('ID array')
     def id_array(self, p):
@@ -275,10 +282,7 @@ class CParser(Parser):
 
         return[p.NUMBER]
     
-    @_("")
-    def array(self, p):
-
-        pass
+    
     
     # @_('ID "," id_list')
     # def id_list(self, p):
@@ -580,7 +584,7 @@ if __name__ == '__main__':
     textos = {'''
               int g1, g2 ,*g3;
               int *g4;
-              int array[100];
+              int array[100],array2[2][3][4],*p,*arraypunt[20];
 
               int main(int *a, int b) {
                   int *PUNT;
