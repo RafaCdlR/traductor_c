@@ -21,7 +21,7 @@ def main(argv):
     with open(ifile, 'r') as file:
         text = file.read()
 
-    print(f"File {ifile}: \n{text}")
+    # print(f"File {ifile}: \n{text}")
 
     print("\n\n\n\n", text, " :")
     tokens = cLexer.tokenize(text)
