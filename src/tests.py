@@ -27,5 +27,5 @@ for file in os.listdir(directory):
     print(f"Test file: {os.fsdecode(file)}")
 
 for file in os.listdir(directory):
-    args = [sys.argv[0], os.fsdecode(file), target]
+    args = [sys.argv[0], 'tests/' + os.fsdecode(file), 'tests/' + target]
     main(args)
