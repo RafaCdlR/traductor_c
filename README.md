@@ -1,4 +1,3 @@
-# Traductor C
 
 Usar `make tests` para las pruebas.
 

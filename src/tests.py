@@ -13,7 +13,6 @@ if len(sys.argv) != 2:
 dirstr = sys.argv[1]
 target = "../build/"
 
-# test dir to absolute path
 dirstr = os.path.abspath(dirstr)
 target = os.path.abspath(target)
 

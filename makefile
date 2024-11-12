@@ -26,7 +26,7 @@ zip:
 	zip ${ZIP_PATH} makefile src
 
 clean:
-	${RM} -rf ${BUILD_PATH} ${ZIP} *~ src/__pycache__/
+	${RM} -rf ${BUILD_PATH} *.zip src/__pycache__/
 	find -type f -name '*~' -delete
 	find -type f -name '#*#' -delete
 

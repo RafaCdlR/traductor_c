@@ -53,7 +53,6 @@ class CLexer(Lexer):
 
 
     def tokenize(self, text):
-# Llamada al `tokenize` original usando `super()`
         pattern = rf'({self.TYPE}|{self.VOID})\s+({self.ID})\s*\('
 
         match = re.search(pattern,text)
@@ -70,4 +69,3 @@ class CLexer(Lexer):
         return original_tokens
         
 
-# prueba borrar luego
