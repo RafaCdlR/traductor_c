@@ -12,7 +12,7 @@ BUILD_PATH=build
 ZIP_PATH=entrega.zip
 
 
-.PHONY: all tests clean zip clean-all
+.PHONY: all tests clean zip
 .SILENT: all
 
 all:
@@ -26,9 +26,6 @@ zip:
 	zip ${ZIP_PATH} makefile src
 
 clean:
-	${RM} -rf ${BUILD_PATH} ${ZIP} *~ src/__pycache__/
+	${RM} -rf ${BUILD_PATH} ${ZIP} *~ *.out src/__pycache__/
 	find -type f -name '*~' -delete
 	find -type f -name '#*#' -delete
-
-clean-all: clean
-	find -type f -name '*.out' -delete
