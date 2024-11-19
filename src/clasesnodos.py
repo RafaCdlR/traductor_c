@@ -17,19 +17,28 @@ class Nodo():
 
 class Nodotermino(Nodo):
     valor = None #valor numerico
-    def __init__(self, v):
-        self.valor = v
+    def __init__(self, v, simbolo=None, offset=None):
+        if(simbolo == '*'):
+            self.valor = v
+            self.desreferencia = True
+        elif(simbolo == '&'):
+            self.valor = v
+            self.desreferencia = False
+        elif(simbolo == 'a'):
+            self.valor = v
+            self.desreferencia = True
+            self.desplazamiento = offset
+        else:
+            self.valor = v
+            self.desreferencia = False
 
 
     def cadena(self):
-        return f"{self.valor}" #devuelve cadena a imprimir
+        return f"{self.valor}" # devuelve cadena a imprimir
 
     def escribe(self):
         print(self.cadena())
 
-        
-
-    
 
 
 class Nodosumaresta(Nodo):
