@@ -149,3 +149,20 @@ class NodoOpComp(Nodo):
         print(self.cadena())
 
 
+class Nododeclaracion(Nodo):
+
+    def __init__(self,nombre,tipo,espuntero = False,array = []):
+        self.nombre = nombre
+        self.tipo = tipo
+        self.espuntero = espuntero
+        self.array = array
+
+    def cadena(self):
+        p = ""
+        if self.espuntero:
+            p = "* "
+        
+        return f"{self.tipo}{p} {self.nombre} {self.array}"
+    
+    def escribe(self):
+        print(self.cadena())

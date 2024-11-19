@@ -23,7 +23,7 @@ class CParser(Parser):
     ##################### FUNCIONES AUXILIARES ################################
     ###########################################################################
 
-    def anadir_simbolo(self, tipo, nombre, contenido=0):
+    def anadir_simbolo(self, tipo, nombre, contenido=0 , globales = []):
         if isinstance(nombre, list):
             for n in nombre:
                 self.anadir_simbolo_individual(tipo, n, contenido)
@@ -33,7 +33,7 @@ class CParser(Parser):
     def anadir_simbolo_individual(self, tipo, nombre, contenido=0):
         try:
             if nombre not in self.simbolos:
-                if tipo == "int" or tipo == "funcion":
+                if tipo == "int" or tipo == "funcion" or tipo == "int* ":
                     self.simbolos[nombre] = contenido
                 else:
                     raise Exception("tipo no valido")
@@ -64,8 +64,11 @@ class CParser(Parser):
     @_('globales "$" funciones')
     def S(self, p):
         for g in p.globales:
+            punt = ""
+            if g.espuntero:
+                punt = "* "
             print(g)
-            self.anadir_simbolo(g[0], g[1])
+            self.anadir_simbolo(g.tipo + punt,punt+ g.nombre + str(g.array))
 
         for f in p.funciones:
             self.anadir_simbolo("funcion", f[2], f)
@@ -147,7 +150,17 @@ class CParser(Parser):
 
     @_('defi_list defi ";"')
     def defi_list(self, p):
-        return p.defi_list + p.defi
+        if not isinstance(p.defi_list,list):
+            defi_list = [p.defi_list]
+        else:
+            defi_list = p.defi_list
+
+        if not isinstance(p.defi,list):
+            defi = [p.defi]
+        else:
+            defi = p.defi
+
+        return defi_list + defi
 
     # Caso vacío
     # @_('')
@@ -163,7 +176,15 @@ class CParser(Parser):
     def defi(self, p):
         # for id in p.id_list:
         #    self.anadir_variable(p.TYPE, id)
-        return [(p.TYPE, id) for id in p.id_list]
+
+        if isinstance(p.id_list,list):
+            for d in p.id_list: #PONER TIPO
+                d.tipo = p.TYPE
+        
+        else:
+            p.id_list.tipo = p.TYPE
+
+        return p.id_list
 
     # def (declaración individual)
     # @_('TYPE expr')
@@ -237,7 +258,7 @@ class CParser(Parser):
         if isinstance(p.id_list, list):
             return p.id_list + [p.id_array]
         else:
-            return [p.id_list] + [p.id.array]
+            return [p.id_list] + [p.id_array]
         
     
     '''
@@ -256,19 +277,21 @@ class CParser(Parser):
 
     @_('MULTIPLY id_array')#PUNTERO
     def id_array(self, p):
-        return [("*",p.id_array)]
+        p.id_array.espuntero = True
+
+        return p.id_array
         # return [p.ID] + p.id_list
 
     @_('ID')
     def id_array(self, p):
         
-        return [p.ID]
+        return Nododeclaracion(p.ID,"int",False,[])
     
     
     @_('ID array')
     def id_array(self, p):
         
-        return [(p.ID,p.array)]
+        return Nododeclaracion(p.ID,"int",False,p.array)
         
     
     
