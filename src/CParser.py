@@ -612,9 +612,19 @@ class CParser(Parser):
         # print("soy un numero")
         return Nodotermino(p.NUMBER)
 
+    @_('"*" ID')
+    def term(self, p):
+        return Nodotermino(p.ID, '*')
+
+
     @_('"&" ID')
     def term(self, p):
-        return Nodotermino('&', p.ID)
+         return Nodotermino(p.ID, '&')
+    
+    @_('ID "[" term "]"')
+    def term(self, p):
+        return Nodotermino(p.ID, 'a', p.term)
+    
 
 
 if __name__ == '__main__':
