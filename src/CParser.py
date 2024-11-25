@@ -81,7 +81,7 @@ class CParser(Parser):
             punt = ""
             if g.espuntero:
                 punt = "* "
-            print(g)
+            #print(g)
             self.anadir_simbolo(g.tipo + punt,punt+ g.nombre + str(g.array))
 
         for f in p.funciones:
@@ -480,9 +480,7 @@ class CParser(Parser):
     
     @_('opComp')
     def expr(self, p):
-        pila = deque()
-        self.bajar_arbo(p.opComp,pila)
-        print("-------------------")
+    
     
         return p.opComp
 
@@ -568,6 +566,12 @@ class CParser(Parser):
 
     @_('opUnario')
     def opLogAnd(self, p):
+        #pila = deque()
+        #self.bajar_arbo(p.opUnario,pila)
+       # while pila:
+        #    pila.pop().escribe()
+
+        #print("-------------------")
         return p.opUnario
     
 
@@ -596,12 +600,7 @@ class CParser(Parser):
 
     @_('opSumaResta')
     def opUnario(self, p):
-        pila = deque()
-        self.bajar_arbo(p.opSumaResta,pila)
-        while pila:
-            pila.pop().escribe()
-
-        print("-------------------")
+        
         return p.opSumaResta
 
     # opSumaResta
@@ -660,6 +659,23 @@ class CParser(Parser):
     
 
 
+
+global tabla
+tabla = []
+
+def declarar_variables_globales(result):
+    
+    for r in result[0]:
+        tabla.append(((r.tipo),(r.espuntero),(r.nombre),(r.array)))
+    print("EXPERIMENTO TABLA GLOBALES")
+    for a in tabla:
+        print(a)
+
+
+
+    
+
+
 if __name__ == '__main__':
     lexer = CLexer()
     parser = CParser()
@@ -683,10 +699,14 @@ if __name__ == '__main__':
               int main(int *a, int b) {
                   int c;
               
-                    c = (g1+g2)*b-5+7/10;
+                    c = a+b-(c+d);
 
                   return 1;
               }
+
+              int x2(){
+              int js;
+              return 1;}
                 '''
               }
             
@@ -696,6 +716,7 @@ if __name__ == '__main__':
         tokens = lexer.tokenize(texto)
         result = parser.parse(tokens)
         print(result)
+        declarar_variables_globales(result)
         # except Exception as err:
         # print(f"Error de compilación: {err}")
 
