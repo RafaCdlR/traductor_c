@@ -318,8 +318,6 @@ class CParser(Parser):
     def expr_list(self, p):
         return [('expr', p.expr)]
 
-    
-
     ##########################################################
     ################### PRINTF ###############################
     ##########################################################
@@ -348,7 +346,8 @@ class CParser(Parser):
             raise Exception(
                 "El número de especificadores de formato y el número de variables a imprimir son distintos.")
         if(num_especificadores != num_variables_a_imprimir):
-            raise Exception("El número de especificadores de formato y el número de variables a imprimir son distintos.")
+            raise Exception(
+                "El número de especificadores de formato y el número de variables a imprimir son distintos.")
         '''
 
         return (p.STRING, p.variables_a_imprimir)
@@ -442,16 +441,9 @@ class CParser(Parser):
     def cont_cond(self, p):
         pass
 
-<<<<<<< HEAD
     # -------------------------------------------------------------------------
     # ----------------------------- IF_ELSE_FIN -------------------------------
     # -------------------------------------------------------------------------
-
-=======
-    #--------------------------------------------------------------------------
-    #----------------------------- IF_ELSE_FIN --------------------------------
-    #--------------------------------------------------------------------------
-
 
     ###########################################################################
     ################################# EXPR ####################################
@@ -460,8 +452,7 @@ class CParser(Parser):
     @_('lvalue ASSIGN opComp')
     def expr(self, p):
         return ('assign', p.lvalue, p.opComp)
-    
->>>>>>> refs/remotes/origin/main
+
     @_('opComp')
     def expr(self, p):
         return p.opComp
@@ -474,7 +465,7 @@ class CParser(Parser):
 
     # @_('')
     # def expr(self, p):
-        # pass
+    # pass
 
     # lvalue
 
@@ -490,9 +481,9 @@ class CParser(Parser):
     def lvalue(self, p):
         return ('*', p.ID)
 
-    #--------------------------------------------------------------------------
-    #-------------------------------- EXPR_FIN --------------------------------
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    # -------------------------------- EXPR_FIN -------------------------------
+    # -------------------------------------------------------------------------
 
     # opComp (comparaciones)
     ##########################################################
@@ -631,13 +622,10 @@ class CParser(Parser):
     @_('ID "[" term "]"')
     def term(self, p):
         return Nodotermino(p.ID, 'a', p.term)
-<<<<<<< HEAD
-=======
 
     @_('"(" expr ")"')
     def term(self, p):
         return p.expr
->>>>>>> refs/remotes/origin/main
 
 
 # --------------- Main ---------------------
