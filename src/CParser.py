@@ -1,6 +1,7 @@
 from sly import Parser
 from CLexer import CLexer
 from clasesnodos import *
+from collections import deque
 
 
 class CParser(Parser):
@@ -41,6 +42,19 @@ class CParser(Parser):
                 raise Exception(f"variable {nombre} ya declarada anteriormente")
         except:
             pass
+
+
+    def bajar_arbo( self,nod ,pila , prof = 0   ):
+
+        if (not isinstance(nod,Nodotermino)):   
+
+            #nod.escribe()
+            pila.append(nod)
+            self.bajar_arbo(nod.left , pila)
+            self.bajar_arbo(nod.right,pila)
+
+
+
     '''
     def anadir_simbolo(self, tipo, nombre , contenido = 0):
 
@@ -466,6 +480,10 @@ class CParser(Parser):
     
     @_('opComp')
     def expr(self, p):
+        pila = deque()
+        self.bajar_arbo(p.opComp,pila)
+        print("-------------------")
+    
         return p.opComp
 
     # @_('')
@@ -551,11 +569,16 @@ class CParser(Parser):
     @_('opUnario')
     def opLogAnd(self, p):
         return p.opUnario
+    
+
+ 
+
 
     # opUnario
-    @_('opUn opMultDiv')
+    @_('opUn opSumaResta')
     def opUnario(self, p):
-        return NodoopUnario(p.opUn, p.opMultDiv)
+
+        return NodoopUnario(p.opUn, p.opSumaResta)
 
     # @_('opUn NOT')
     # def opUn(self, p):
@@ -569,37 +592,43 @@ class CParser(Parser):
     def opUn(self, p):
         return '-'
 
-    # opMultDiv
-
-    @_('opMultDiv')
-    def opUnario(self, p):
-        return p.opMultDiv
-
-    # opMultDiv
-    @_('opMultDiv MULTIPLY opSumaResta')
-    def opMultDiv(self, p):
-        return NodoMultDiv(p.opMultDiv, '*', p.opSumaResta)
-
-    @_('opMultDiv DIVIDE opSumaResta')
-    def opMultDiv(self, p):
-        return NodoMultDiv(p.opMultDiv, '/', p.opSumaResta)
+    # opSumaResta
 
     @_('opSumaResta')
-    def opMultDiv(self, p):
+    def opUnario(self, p):
+        pila = deque()
+        self.bajar_arbo(p.opSumaResta,pila)
+        while pila:
+            pila.pop().escribe()
+
+        print("-------------------")
         return p.opSumaResta
 
     # opSumaResta
-    @_('opSumaResta PLUS term')
+    @_('opSumaResta PLUS opMultDiv')
     def opSumaResta(self, p):
-        # print("soy una suma ")
-        return Nodosumaresta(p.opSumaResta, "+", p.term)
+        return NodoMultDiv(p.opSumaResta, '+', p.opMultDiv)
 
-    @_('opSumaResta MINUS term')
+    @_('opSumaResta MINUS opMultDiv')
     def opSumaResta(self, p):
-        return Nodosumaresta(p.opSumaResta, "-", p.term)
+        return NodoMultDiv(p.opSumaResta, '-', p.opMultDiv)
+
+    @_('opMultDiv')
+    def opSumaResta(self, p):
+        return p.opMultDiv
+
+    # opMultDiv
+    @_('opMultDiv MULTIPLY term')
+    def opMultDiv(self, p):
+        # print("soy una suma ")
+        return Nodosumaresta(p.opMultDiv, "*", p.term)
+
+    @_('opMultDiv DIVIDE term')
+    def opMultDiv(self, p):
+        return Nodosumaresta(p.opMultDiv, "/", p.term)
 
     @_('term')
-    def opSumaResta(self, p):
+    def opMultDiv(self, p):
         return p.term
 
     # term rules (variables or numbers)
@@ -645,24 +674,18 @@ if __name__ == '__main__':
     textos = {'''
               int g1, g2 ,*g3;
               int *g4;
-              int array[100],array2[2][3][4],*p,*arraypunt[20];
+              
 
               int main(int *a, int b) {
-                  int *PUNT;
-                  int ar[50];
-
-                  scanf("%d", &b);
-
-                  if( a == b ) { a+1; }
-                  else { b + 2; }
+                  int c;
+              
+                    g1+g2*b-5+7/10;
 
                   return 1;
               }
-
-              void x() { int b, c; printf("--> %d %d", b, c, d); }
-              void y(int a){}'''
+                '''
               }
-
+            
     for texto in textos:
         # try:
         print("\n\n\n\n", texto, " :")
