@@ -16,14 +16,14 @@ class CParser(Parser):
         ('left', PLUS, MINUS),
         ('left', MULTIPLY, DIVIDE),
         ('right', NOT),
-        ('left', '['), 
+        ('left', '['),
     )
 
     ###########################################################################
     ##################### FUNCIONES AUXILIARES ################################
     ###########################################################################
 
-    def anadir_simbolo(self, tipo, nombre, contenido=0 , globales = []):
+    def anadir_simbolo(self, tipo, nombre, contenido=0, globales=[]):
         if isinstance(nombre, list):
             for n in nombre:
                 self.anadir_simbolo_individual(tipo, n, contenido)
@@ -38,8 +38,9 @@ class CParser(Parser):
                 else:
                     raise Exception("tipo no valido")
             else:
-                raise Exception(f"variable {nombre} ya declarada anteriormente")
-        except:
+                raise Exception(
+                    f"variable {nombre} ya declarada anteriormente")
+        except Exception:
             pass
     '''
     def anadir_simbolo(self, tipo, nombre , contenido = 0):
@@ -57,9 +58,9 @@ class CParser(Parser):
             raise Exception("variable ", nombre, " ya declarada anteriormente")
     '''
 
-    # --------------------------------------------------------------------------
-    # -------------------- FIN DE FUNCIONES AUXILIARES -------------------------
-    # --------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    # -------------------- FIN DE FUNCIONES AUXILIARES ------------------------
+    # -------------------------------------------------------------------------
 
     @_('globales "$" funciones')
     def S(self, p):
@@ -68,7 +69,7 @@ class CParser(Parser):
             if g.espuntero:
                 punt = "* "
             print(g)
-            self.anadir_simbolo(g.tipo + punt,punt+ g.nombre + str(g.array))
+            self.anadir_simbolo(g.tipo + punt, punt + g.nombre + str(g.array))
 
         for f in p.funciones:
             self.anadir_simbolo("funcion", f[2], f)
@@ -101,25 +102,21 @@ class CParser(Parser):
 
     @_('parametros "," TYPE ID')
     def parametros(self, p):
-        return ("parametros",p.parametros, p.TYPE, p.ID)
+        return ("parametros", p.parametros, p.TYPE, p.ID)
 
     @_('TYPE ID')
     def parametros(self, p):
         # self.anadir_variable(p.TYPE, p.ID)
         return (p.TYPE, p.ID)
-    
 
     @_('parametros "," TYPE MULTIPLY ID')
     def parametros(self, p):
-        return ("parametros",p.parametros, ('*',p.TYPE), p.ID)
+        return ("parametros", p.parametros, ('*', p.TYPE), p.ID)
 
     @_('TYPE MULTIPLY ID')
     def parametros(self, p):
         # self.anadir_variable(p.TYPE, p.ID)
-        return (('*',p.TYPE), p.ID)
-
-
-
+        return (('*', p.TYPE), p.ID)
 
     @_('')
     def parametros(self, p):
@@ -150,12 +147,12 @@ class CParser(Parser):
 
     @_('defi_list defi ";"')
     def defi_list(self, p):
-        if not isinstance(p.defi_list,list):
+        if not isinstance(p.defi_list, list):
             defi_list = [p.defi_list]
         else:
             defi_list = p.defi_list
 
-        if not isinstance(p.defi,list):
+        if not isinstance(p.defi, list):
             defi = [p.defi]
         else:
             defi = p.defi
@@ -177,10 +174,10 @@ class CParser(Parser):
         # for id in p.id_list:
         #    self.anadir_variable(p.TYPE, id)
 
-        if isinstance(p.id_list,list):
-            for d in p.id_list: #PONER TIPO
+        if isinstance(p.id_list, list):
+            for d in p.id_list:  # PONER TIPO
                 d.tipo = p.TYPE
-        
+
         else:
             p.id_list.tipo = p.TYPE
 
@@ -249,9 +246,7 @@ class CParser(Parser):
             return p.id_list + [p.ID]
         else:
             return [p.id_list] + [p.ID]
-    
     '''
-
 
     @_('id_list "," id_array')
     def id_list(self, p):
@@ -259,23 +254,19 @@ class CParser(Parser):
             return p.id_list + [p.id_array]
         else:
             return [p.id_list] + [p.id_array]
-        
-    
+
     '''
     @_('ID')
     def id_list(self, p):
-        
         return [p.ID]
     '''
 
-    
-
     @_('id_array')
     def id_list(self, p):
-        
-        return p.id_array    
 
-    @_('MULTIPLY id_array')#PUNTERO
+        return p.id_array
+
+    @_('MULTIPLY id_array')  # PUNTERO
     def id_array(self, p):
         p.id_array.espuntero = True
 
@@ -284,17 +275,14 @@ class CParser(Parser):
 
     @_('ID')
     def id_array(self, p):
-        
-        return Nododeclaracion(p.ID,"int",False,[])
-    
-    
+
+        return Nododeclaracion(p.ID, "int", False, [])
+
     @_('ID array')
     def id_array(self, p):
-        
-        return Nododeclaracion(p.ID,"int",False,p.array)
-        
-    
-    
+
+        return Nododeclaracion(p.ID, "int", False, p.array)
+
     @_('array "[" NUMBER "]"')
     def array(self, p):
 
@@ -303,10 +291,8 @@ class CParser(Parser):
     @_('"[" NUMBER "]"')
     def array(self, p):
 
-        return[p.NUMBER]
-    
-    
-    
+        return [p.NUMBER]
+
     # @_('ID "," id_list')
     # def id_list(self, p):
         # return [p.ID] + p.id_list
@@ -432,9 +418,9 @@ class CParser(Parser):
     def variables_referenciadas(self, p):
         return (p.ID)
 
-    #--------------------------------------------------------------------------
-    #------------------------------ SCANF_FIN ---------------------------------
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    # ------------------------------ SCANF_FIN --------------------------------
+    # -------------------------------------------------------------------------
 
     ###########################################################################
     ############################### IF_ELSE ###################################
@@ -460,10 +446,10 @@ class CParser(Parser):
     def cont_cond(self, p):
         pass
 
-    #--------------------------------------------------------------------------
-    #----------------------------- IF_ELSE_FIN --------------------------------
-    #--------------------------------------------------------------------------
-    
+    # -------------------------------------------------------------------------
+    # ----------------------------- IF_ELSE_FIN -------------------------------
+    # -------------------------------------------------------------------------
+
     @_('opComp')
     def expr(self, p):
         return p.opComp
@@ -616,16 +602,16 @@ class CParser(Parser):
     def term(self, p):
         return Nodotermino(p.ID, '*')
 
-
     @_('"&" ID')
     def term(self, p):
-         return Nodotermino(p.ID, '&')
-    
+        return Nodotermino(p.ID, '&')
+
     @_('ID "[" term "]"')
     def term(self, p):
         return Nodotermino(p.ID, 'a', p.term)
-    
 
+
+# --------------- Main ---------------------
 
 if __name__ == '__main__':
     lexer = CLexer()
