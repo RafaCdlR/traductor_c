@@ -654,6 +654,10 @@ class CParser(Parser):
     def term(self, p):
         return Nodotermino(p.ID, 'a', p.term)
     
+    @_('"(" expr ")"')
+    def term(self, p):
+        return p.expr
+    
 
 
 if __name__ == '__main__':
@@ -679,7 +683,7 @@ if __name__ == '__main__':
               int main(int *a, int b) {
                   int c;
               
-                    g1+g2*b-5+7/10;
+                    c = (g1+g2)*b-5+7/10;
 
                   return 1;
               }
