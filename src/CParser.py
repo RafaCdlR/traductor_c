@@ -46,19 +46,21 @@ class CParser(Parser):
             pass
 
     
-    def bajar_arbo( self,nod  , prof = 0   ):
+    def bajar_arbo( self,nod  , prof, cadena ):
 
-        if (not isinstance(nod,Nodotermino)):   
+        if (not isinstance(nod,(Nodotermino,Nodocadena)) ):   
 
             #nod.escribe()
             #pila.append(nod)
-            aux1 = self.bajar_arbo(nod.left ,prof+1)
-            aux2 = self.bajar_arbo(nod.right,prof+1)
+            aux1 = self.bajar_arbo(nod.left ,prof+1 , cadena)
+            aux2 = self.bajar_arbo(nod.right,prof+1 , cadena)
 
-            print("aux = ",aux1 , nod.operador , aux2 , " en prof ", prof)
+            #print("aux = ",aux1 , nod.operador , aux2 , " en prof ", prof)
+            cadena.append( f"aux = {aux1}{nod.operador}{aux2} ;")
             return "aux"
 
         else:
+            #cadena.append( f"{nod.cadena()}")
             return nod.cadena() 
 
     '''
@@ -542,9 +544,14 @@ class CParser(Parser):
 
     @_('opComp')
     def operacion(self,p):
-
-
-        return p.opComp
+        print("opcomp ",p.opComp)
+        cadena = []
+        self.bajar_arbo(p.opComp,0,cadena)
+        cadena = "".join(cadena)
+        print(cadena)
+        print("--------")
+        #return p.opComp #prueba para traduccion
+        return Nodocadena(cadena)
 
 
 
@@ -704,19 +711,8 @@ if __name__ == '__main__':
               int g1, g2 ,*g3;
               
               int main(int *a, int b) {
-                  int *PUNT;
-                  int ar[50];
-                  g1 = g1 + (g2 + g1);
-                  
-
-                  if( a == b ) { a+1; }
-                  else { b + 2; }
-                    scanf("%d", &b);
-                  
-                    g1+g2*b-5+7/10;
-                    c = a+b-(c+d);
-
-                  return 1;
+                  a+c*d+(f*g+i);
+                return 1;
               }
 
               int x2(){
