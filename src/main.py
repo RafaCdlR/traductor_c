@@ -27,8 +27,12 @@ def main(argv):
     result = cParser.parse(tokens)
     print(result)
 
+    # Generación de código
+    cab = f".file\t{ifile}\n"
+    asm = cab + cParser.asm
+
     with open(ofile, 'w') as file:
-        file.write(result)
+        file.write(asm)
 
 
 if __name__ == '__main__':
