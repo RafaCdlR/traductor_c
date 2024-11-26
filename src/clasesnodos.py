@@ -147,14 +147,15 @@ class NodoopLogOr(Nodo):
 
 
 class NodoOpComp(Nodo):
+    
 
     def __init__(self, left, op, right):
         self.left = left
-        self.op = op
+        self.operador = op
         self.right = right
 
     def cadena(self):
-        return f"{self.left.cadena()}{self.op}{self.right.cadena()}"
+        return f"{self.left.cadena()}{self.operador}{self.right.cadena()}"
 
     def escribe(self):
         print(self.cadena())
