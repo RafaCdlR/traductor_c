@@ -45,14 +45,21 @@ class CParser(Parser):
         except Exception:
             pass
 
-    def bajar_arbo(self, nod, pila, prof=0):
+    
+    def bajar_arbo( self,nod  , prof = 0   ):
 
-        if (not isinstance(nod, Nodotermino)):
+        if (not isinstance(nod,Nodotermino)):   
 
-            # nod.escribe()
-            pila.append(nod)
-            self.bajar_arbo(nod.left, pila)
-            self.bajar_arbo(nod.right, pila)
+            #nod.escribe()
+            #pila.append(nod)
+            aux1 = self.bajar_arbo(nod.left ,prof+1)
+            aux2 = self.bajar_arbo(nod.right,prof+1)
+
+            print("aux = ",aux1 , nod.operador , aux2 , " en prof ", prof)
+            return "aux"
+
+        else:
+            return nod.cadena() 
 
     '''
     def anadir_simbolo(self, tipo, nombre , contenido = 0):
@@ -325,7 +332,13 @@ class CParser(Parser):
 
     @_('expr_list expr ";"')
     def expr_list(self, p):
+
+        if (not isinstance(p.expr_list,list)):
+            return [p.expr_list] + [p.expr]
+    
         return p.expr_list + [p.expr]
+        
+        
 
     # @_('')
     # def expr_list(self, p):
@@ -391,20 +404,20 @@ class CParser(Parser):
 
         # return p.id_list
 
-    @_('operaciones_a_imprimir "," opComp')
+    @_('operaciones_a_imprimir "," operacion')
     def operaciones_a_imprimir(self, p):
         if isinstance(p.operaciones_a_imprimir, tuple):
-            return list(p.operaciones_a_imprimir) + [p.opComp]
+            return list(p.operaciones_a_imprimir) + [p.operacion]
         else:
-            return [p.operaciones_a_imprimir] + [p.opComp]
+            return [p.operaciones_a_imprimir] + [p.operacion]
 
-        # return (p.operaciones_a_imprimir, p.opComp)
+        # return (p.operaciones_a_imprimir, p.operacion)
 
-    @_('opComp')
+    @_('operacion')
     def operaciones_a_imprimir(self, p):
-        return [p.opComp]
+        return [p.operacion]
 
-        # return p.opComp
+        # return p.operacion
 
     # ---------------------------------------------------------
     # ------------------ PRINTF_FIN ---------------------------
@@ -446,9 +459,9 @@ class CParser(Parser):
     def expr_list(self, p):
         return (p.block_expr)
 
-    @_('IF "(" opComp ")" "{" expr_list "}" cont_cond')
+    @_('IF "(" operacion ")" "{" expr_list "}" cont_cond')
     def block_expr(self, p):
-        return ("if", p.opComp, p.expr_list, p.cont_cond)
+        return ("if", p.operacion, p.expr_list, p.cont_cond)
 
     @_('ELSE "{" expr_list "}"')
     def cont_cond(self, p):
@@ -466,17 +479,14 @@ class CParser(Parser):
     ################################# EXPR ####################################
     ###########################################################################
 
-    @_('lvalue ASSIGN opComp')
+    @_('lvalue ASSIGN operacion')
     def expr(self, p):
-        return ('assign', p.lvalue, p.opComp)
+        return ('assign', p.lvalue, p.operacion)
 
-    @_('opComp')
+    @_('operacion')
     def expr(self, p):
-        pila = deque()
-        self.bajar_arbo(p.opComp, pila)
-        print("-------------------")
 
-        return p.opComp
+        return p.operacion
 
     '''
     @_('"(" expr ")"')
@@ -506,29 +516,38 @@ class CParser(Parser):
     # -------------------------------- EXPR_FIN -------------------------------
     # -------------------------------------------------------------------------
 
-    # opComp (comparaciones)
+    # operacion (comparaciones)
     ##########################################################
     ################### OP_COMPARACIÓN #######################
     ##########################################################
 
     '''
-    # opComp (comparaciones)
-    @_('opComp EQ opLogOr')
-    def opComp(self, p):
-        return ('eq', p.opComp, p.opLogOr)
+    # operacion (comparaciones)
+    @_('operacion EQ opLogOr')
+    def operacion(self, p):
+        return ('eq', p.operacion, p.opLogOr)
 
-    @_('opComp NE opLogOr')
-    def opComp(self, p):
-        return ('ne', p.opComp, p.opLogOr)
+    @_('operacion NE opLogOr')
+    def operacion(self, p):
+        return ('ne', p.operacion, p.opLogOr)
 
-    @_('opComp LE opLogOr')
-    def opComp(self, p):
-        return ('le', p.opComp, p.opLogOr)
+    @_('operacion LE opLogOr')
+    def operacion(self, p):
+        return ('le', p.operacion, p.opLogOr)
 
-    @_('opComp GE opLogOr')
-    def opComp(self, p):
-        return ('ge', p.opComp, p.opLogOr)
+    @_('operacion GE opLogOr')
+    def operacion(self, p):
+        return ('ge', p.operacion, p.opLogOr)
     '''
+
+    @_('opComp')
+    def operacion(self,p):
+
+
+        return p.opComp
+
+
+
 
     @_('opComp EQ opLogOr')
     def opComp(self, p):
@@ -601,12 +620,6 @@ class CParser(Parser):
 
     @_('opSumaResta')
     def opUnario(self, p):
-        pila = deque()
-        self.bajar_arbo(p.opSumaResta, pila)
-        while pila:
-            pila.pop().escribe()
-
-        print("-------------------")
         return p.opSumaResta
 
     # opSumaResta
@@ -667,17 +680,7 @@ global tabla
 tabla = []
 
 
-def declarar_variables_globales(result):
 
-    for r in result[0]:
-        tabla.append(((r.tipo), (r.espuntero), (r.nombre), (r.array)))
-    print("EXPERIMENTO TABLA GLOBALES")
-    for a in tabla:
-        print(a)
-
-    @_('"(" expr ")"')
-    def term(self, p):
-        return p.expr
 
 
 # --------------- Main ---------------------
@@ -699,16 +702,17 @@ if __name__ == '__main__':
 
     textos = {'''
               int g1, g2 ,*g3;
-              int *g4;
+              
               int main(int *a, int b) {
                   int *PUNT;
                   int ar[50];
                   g1 = g1 + (g2 + g1);
-                  scanf("%d", &b);
+                  
 
                   if( a == b ) { a+1; }
                   else { b + 2; }
-                  int c;
+                    scanf("%d", &b);
+                  
                     g1+g2*b-5+7/10;
                     c = a+b-(c+d);
 
@@ -726,7 +730,7 @@ if __name__ == '__main__':
         tokens = lexer.tokenize(texto)
         result = parser.parse(tokens)
         print(result)
-        declarar_variables_globales(result)
+        
         # except Exception as err:
         # print(f"Error de compilación: {err}")
 

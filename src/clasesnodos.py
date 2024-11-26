@@ -177,3 +177,12 @@ class Nododeclaracion(Nodo):
     
     def escribe(self):
         print(self.cadena())
+
+
+class Nodocadena(Nodo):
+    def __init__(self,nombre):
+        self.nombre = nombre
+
+    def cadena(self):
+        return self.nombre
+
