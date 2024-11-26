@@ -44,17 +44,14 @@ class CParser(Parser):
         except Exception:
             pass
 
+    def bajar_arbo(self, nod, pila, prof=0):
 
-    def bajar_arbo( self,nod ,pila , prof = 0   ):
+        if (not isinstance(nod, Nodotermino)):
 
-        if (not isinstance(nod,Nodotermino)):   
-
-            #nod.escribe()
+            # nod.escribe()
             pila.append(nod)
-            self.bajar_arbo(nod.left , pila)
-            self.bajar_arbo(nod.right,pila)
-
-
+            self.bajar_arbo(nod.left, pila)
+            self.bajar_arbo(nod.right, pila)
 
     '''
     def anadir_simbolo(self, tipo, nombre , contenido = 0):
@@ -470,9 +467,9 @@ class CParser(Parser):
     @_('opComp')
     def expr(self, p):
         pila = deque()
-        self.bajar_arbo(p.opComp,pila)
+        self.bajar_arbo(p.opComp, pila)
         print("-------------------")
-    
+
         return p.opComp
 
     '''
@@ -568,12 +565,9 @@ class CParser(Parser):
     @_('opUnario')
     def opLogAnd(self, p):
         return p.opUnario
-    
-
- 
-
 
     # opUnario
+
     @_('opUn opSumaResta')
     def opUnario(self, p):
 
@@ -596,7 +590,7 @@ class CParser(Parser):
     @_('opSumaResta')
     def opUnario(self, p):
         pila = deque()
-        self.bajar_arbo(p.opSumaResta,pila)
+        self.bajar_arbo(p.opSumaResta, pila)
         while pila:
             pila.pop().escribe()
 
@@ -677,30 +671,21 @@ if __name__ == '__main__':
     textos = {'''
               int g1, g2 ,*g3;
               int *g4;
-              
-
               int main(int *a, int b) {
-<<<<<<< HEAD
                   int *PUNT;
                   int ar[50];
-    
                   g1 = g1 + (g2 + g1);
-              
                   scanf("%d", &b);
 
                   if( a == b ) { a+1; }
                   else { b + 2; }
-=======
                   int c;
-              
                     g1+g2*b-5+7/10;
->>>>>>> refs/remotes/origin/main
 
                   return 1;
               }
                 '''
               }
-            
     for texto in textos:
         # try:
         print("\n\n\n\n", texto, " :")
