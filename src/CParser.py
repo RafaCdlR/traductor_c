@@ -79,8 +79,13 @@ class CParser(Parser):
             punt = ""
             if g.espuntero:
                 punt = "* "
+<<<<<<< HEAD
             print(g)
             self.anadir_simbolo(g.tipo + punt, punt + g.nombre + str(g.array))
+=======
+            #print(g)
+            self.anadir_simbolo(g.tipo + punt,punt+ g.nombre + str(g.array))
+>>>>>>> 54ad796a7e97442b1bb658be0d41e4a962dc0ca7
 
         for f in p.funciones:
             self.anadir_simbolo("funcion", f[2], f)
@@ -466,10 +471,15 @@ class CParser(Parser):
 
     @_('opComp')
     def expr(self, p):
+<<<<<<< HEAD
         pila = deque()
         self.bajar_arbo(p.opComp, pila)
         print("-------------------")
 
+=======
+    
+    
+>>>>>>> 54ad796a7e97442b1bb658be0d41e4a962dc0ca7
         return p.opComp
 
     '''
@@ -564,6 +574,12 @@ class CParser(Parser):
 
     @_('opUnario')
     def opLogAnd(self, p):
+        #pila = deque()
+        #self.bajar_arbo(p.opUnario,pila)
+       # while pila:
+        #    pila.pop().escribe()
+
+        #print("-------------------")
         return p.opUnario
 
     # opUnario
@@ -589,12 +605,16 @@ class CParser(Parser):
 
     @_('opSumaResta')
     def opUnario(self, p):
+<<<<<<< HEAD
         pila = deque()
         self.bajar_arbo(p.opSumaResta, pila)
         while pila:
             pila.pop().escribe()
 
         print("-------------------")
+=======
+        
+>>>>>>> 54ad796a7e97442b1bb658be0d41e4a962dc0ca7
         return p.opSumaResta
 
     # opSumaResta
@@ -645,6 +665,31 @@ class CParser(Parser):
     @_('ID "[" term "]"')
     def term(self, p):
         return Nodotermino(p.ID, 'a', p.term)
+<<<<<<< HEAD
+=======
+    
+    @_('"(" expr ")"')
+    def term(self, p):
+        return p.expr
+    
+
+
+
+global tabla
+tabla = []
+
+def declarar_variables_globales(result):
+    
+    for r in result[0]:
+        tabla.append(((r.tipo),(r.espuntero),(r.nombre),(r.array)))
+    print("EXPERIMENTO TABLA GLOBALES")
+    for a in tabla:
+        print(a)
+
+
+
+    
+>>>>>>> 54ad796a7e97442b1bb658be0d41e4a962dc0ca7
 
     @_('"(" expr ")"')
     def term(self, p):
@@ -680,10 +725,19 @@ if __name__ == '__main__':
                   if( a == b ) { a+1; }
                   else { b + 2; }
                   int c;
+<<<<<<< HEAD
                     g1+g2*b-5+7/10;
+=======
+              
+                    c = a+b-(c+d);
+>>>>>>> 54ad796a7e97442b1bb658be0d41e4a962dc0ca7
 
                   return 1;
               }
+
+              int x2(){
+              int js;
+              return 1;}
                 '''
               }
     for texto in textos:
@@ -692,6 +746,7 @@ if __name__ == '__main__':
         tokens = lexer.tokenize(texto)
         result = parser.parse(tokens)
         print(result)
+        declarar_variables_globales(result)
         # except Exception as err:
         # print(f"Error de compilación: {err}")
 
