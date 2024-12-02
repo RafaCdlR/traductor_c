@@ -46,21 +46,49 @@ class CParser(Parser):
             pass
 
     
-    def bajar_arbo( self,nod  , prof, cadena ):
+    def bajar_arbo( self,nod  , prof, cadena , der = False ):
+        
+        if (not isinstance(nod,(Nodotermino,Nodocadena)) ):   
+
+            #nod.escribe()
+            #pila.append(nod)
+            aux1 = self.bajar_arbo(nod.left ,prof+1 , cadena,der)
+            aux2 = self.bajar_arbo(nod.right,prof+1 , cadena,True)
+
+            
+            aux = "ebx" if der else "eax"
+            #print(type(nod) , "profundidad = " , prof)
+            
+            cadena.append( f"{aux} = {aux1}{nod.operador}{aux2} ;\n")
+            return aux
+
+        else:
+            return nod.cadena()
+        
+
+
+
+    def bajar_arbo2( self,nod  , prof, cadena , der = False ):
+
+        aux = "der" if der else "izq"
+            
+        print(type(nod),nod.cadena(),aux , "prof = ",prof)
+        
+
 
         if (not isinstance(nod,(Nodotermino,Nodocadena)) ):   
 
             #nod.escribe()
             #pila.append(nod)
-            aux1 = self.bajar_arbo(nod.left ,prof+1 , cadena)
-            aux2 = self.bajar_arbo(nod.right,prof+1 , cadena)
+            aux1 = self.bajar_arbo2(nod.left ,prof+1 , cadena,False)
+            aux2 = self.bajar_arbo2(nod.right,prof+1 , cadena,True)
+            
+            
 
-            #print("aux = ",aux1 , nod.operador , aux2 , " en prof ", prof)
-            cadena.append( f"aux = {aux1}{nod.operador}{aux2} ;")
-            return "aux"
 
-        else:
-            return nod.cadena()
+
+
+
 
     def push_asm(self, str):
         self.asm += "\n" + str
@@ -385,11 +413,26 @@ class CParser(Parser):
 
     @_('lvalue ASSIGN operacion')
     def expr(self, p):
+
+        cadena = []
+        #self.bajar_arbo2(p.operacion,0,cadena)
+        #print("\n\n-----\n\n")
+        self.bajar_arbo(p.operacion,0,cadena)
+        
+        cadena = "".join(cadena)
+        if len(cadena) > 2:
+            print(cadena)
+            
+            #return p.opComp #prueba para traduccion
+        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+
+
+        print("-----------")
         return ('assign', p.lvalue, p.operacion)
 
     @_('operacion')
     def expr(self, p):
-
+        print("expresion")
         return p.operacion
 
     @_('lvalue ASSIGN ID')
@@ -475,6 +518,7 @@ class CParser(Parser):
 
     @_('operacion')
     def operaciones_a_imprimir(self, p):
+        
         return [p.operacion]
 
 
@@ -546,14 +590,9 @@ class CParser(Parser):
 
     @_('opComp')
     def operacion(self,p):
-        print("opcomp ",p.opComp)
-        cadena = []
-        self.bajar_arbo(p.opComp,0,cadena)
-        cadena = "".join(cadena)
-        print(cadena)
-        print("--------")
-        #return p.opComp #prueba para traduccion
-        return Nodocadena(cadena)
+        
+        
+        return p.opComp
 
 
     @_('opComp EQ opLogOr')
@@ -628,11 +667,11 @@ class CParser(Parser):
     # opSumaResta
     @_('opSumaResta PLUS opMultDiv')
     def opSumaResta(self, p):
-        return NodoMultDiv(p.opSumaResta, '+', p.opMultDiv)
+        return Nodosumaresta(p.opSumaResta, '+', p.opMultDiv)
 
     @_('opSumaResta MINUS opMultDiv')
     def opSumaResta(self, p):
-        return NodoMultDiv(p.opSumaResta, '-', p.opMultDiv)
+        return Nodosumaresta(p.opSumaResta, '-', p.opMultDiv)
 
     @_('opMultDiv')
     def opSumaResta(self, p):
@@ -642,11 +681,11 @@ class CParser(Parser):
     @_('opMultDiv MULTIPLY term')
     def opMultDiv(self, p):
         # print("soy una suma ")
-        return Nodosumaresta(p.opMultDiv, "*", p.term)
+        return NodoMultDiv(p.opMultDiv, "*", p.term)
 
     @_('opMultDiv DIVIDE term')
     def opMultDiv(self, p):
-        return Nodosumaresta(p.opMultDiv, "/", p.term)
+        return NodoMultDiv(p.opMultDiv, "/", p.term)
 
     @_('term')
     def opMultDiv(self, p):
@@ -715,24 +754,10 @@ if __name__ == '__main__':
               int g1, g2 ,*g3;
 
               int main(int *a, int b) {
-                  int *PUNT;
-                  int ar[50];
-                  g1 = g1 + (g2 + g1);
 
-
-                  if( a == b ) { a+1; }
-                  else { b + 2; }
-                    scanf("%d", &b);
-
-                    g1+g2*b-5+7/10;
-                    c = a+b-(c+d);
-
+                    g1 = 5*(a1 + a2) - (a3 * a4 - 15);
                   return 1;
               }
-
-              int x2(){
-              int js;
-              return 1;}
                 '''
               }
     for texto in textos:
