@@ -1,9 +1,3 @@
-class variable:
-    name: str
-    type: str
-    init: int = None
-
-
 # name es el nombre del fichero fuente
 # crea el inicio del programa
 def inicio_programa(name):
@@ -46,3 +40,5 @@ def translate_funcion(name, param_number, code, ret_type):
     str += "\tmovl %ebp, %esp\n\tpopl %ebp"
 
     return str
+
+# Recibe el
