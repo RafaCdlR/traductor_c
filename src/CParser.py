@@ -59,7 +59,7 @@ class CParser(Parser):
             aux = "ebx" if der else "eax"
             #print(type(nod) , "profundidad = " , prof)
             
-            cadena.append( f"{aux} = {aux1}{nod.operador}{aux2} ;\n")
+            cadena.append( f"{aux} = {aux1}{nod.operador}{aux2} ;")
             return aux
 
         else:
@@ -117,6 +117,9 @@ class CParser(Parser):
 
         for f in p.funciones:
             self.anadir_simbolo("funcion", f[2], f)
+
+        print("\nASM\n===================================================\n\n")
+        print(self.asm)
 
         return (p.globales, p.funciones)
 
@@ -428,7 +431,7 @@ class CParser(Parser):
 
 
         print("-----------")
-        return ('assign', p.lvalue, p.operacion)
+        return ('assign', p.lvalue, cadena)
 
     @_('operacion')
     def expr(self, p):
@@ -755,7 +758,7 @@ if __name__ == '__main__':
 
               int main(int *a, int b) {
 
-                    g1 = 5*(a1 + a2) - (a3 * a4 - 15);
+                    g1 = 5*((a1 + a2)/10) - (a3 * a4 - 15);
                   return 1;
               }
                 '''

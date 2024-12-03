@@ -12,6 +12,12 @@ class Nodo():
     
     def __repr__(self):
         return self.cadena()
+    
+
+
+
+class nodofuncion(Nodo):
+
 
 
 
