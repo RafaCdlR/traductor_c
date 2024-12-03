@@ -18,6 +18,16 @@ class Nodo():
 
 class nodofuncion(Nodo):
 
+    def __init__(self,tipo,nombre, parametros , cuerpo):
+        self.tipo = tipo
+        self.nombre = nombre
+        self.parametros = parametros
+        self.cuerpo = cuerpo
+
+    def cadena(self):
+        return f"{self.nombre}( {self.parametros} )" + "{" + f" {self.cuerpo} " + "}\n"  # devuelve cadena a imprimir
+    def escribe(self):
+        print(self.cadena())
 
 
 class Nodotermino(Nodo):
