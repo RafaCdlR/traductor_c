@@ -17,15 +17,31 @@ class Nodo():
 
 
 class nodofuncion(Nodo):
+    
+
+    #pushear ebp(base antes de la funcion)
+    #luego copiar esp a ebp
+    #al final volver a copiar la primera posicion de la base de la pila a ebp (base anterior) (ret)
 
     def __init__(self,tipo,nombre, parametros , cuerpo):
+        pila = dict()
         self.tipo = tipo
         self.nombre = nombre
         self.parametros = parametros
-        self.cuerpo = cuerpo
+        self.cuerpo =  cuerpo
+        self.ensamblador = rf" pushl %ebp \n movl %esp, %ebp\n"
+
+        contador = 8
+        for var in parametros:
+            print(var)
+            pila[var[1]] = f"{contador}(%ebp)"
+            contador += 4
+
+
+
 
     def cadena(self):
-        return f"{self.nombre}( {self.parametros} )" + "{" + f" {self.cuerpo} " + "}\n"  # devuelve cadena a imprimir
+        return f"{self.nombre}( {self.parametros} )" + "{ " + f" {self.cuerpo} " + " }\n"  # devuelve cadena a imprimir
     def escribe(self):
         print(self.cadena())
 
