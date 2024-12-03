@@ -1,5 +1,16 @@
+# Diccionario utilitario para traducir operadores a instrucciones en
+# ensamblador
+operdict = {
+    '+': 'addl',
+    '-': 'subl',
+    '*': 'mull',
+    '/': 'divl'
+}
+
 # name es el nombre del fichero fuente
 # crea el inicio del programa
+
+
 def inicio_programa(name):
     return f".file {name}"
 
@@ -8,11 +19,13 @@ def inicio_programa(name):
 # value es el valor inicial, por defecto none (sin inicialización)
 # Devuelve el ensamblador correspondiente a la reserva de variables globales
 def translate_global(id, value=None):
-    str = f".globl {id}\n\t"
+    stri = f".globl {id}\n\t"
     if not value:
-        str += f".zero\t{4}"
+        stri += f".zero\t{4}"
     else:
-        str += f".long\t{value}"
+        stri += f".long\t{value}"
+
+    return stri
 
 
 # name es el nombre (string)
@@ -23,22 +36,43 @@ def translate_global(id, value=None):
 # Produce el código de una función alrededor del código ya generado
 # recibido por el argumento "code".
 # No genera el código del return
-def translate_funcion(name, param_number, code, ret_type):
+def translate_funcion_def(name, param_number, code, ret_type):
     fname = f"{ret_type}_{name}"
 
-    str = f".globl {fname}\n"
-    str += f"{fname}:\n"
+    stri = f".globl {fname}\n"
+    stri += f"{fname}:\n"
     # Prólogo de la función
-    str += "\tpushl %ebp\n\tmovl %esp, %ebp\n"
+    stri += "\tpushl %ebp\n\tmovl %esp, %ebp\n"
 
-    str += f"\tsubl ${4*param_number}, %esp\n"
+    stri += f"\tsubl ${4*param_number}, %esp\n"
 
     for line in code.splitlines():
-        str += f"\t{line}\n"
+        stri += f"\t{line}\n"
 
     # epílogo de la función
-    str += "\tmovl %ebp, %esp\n\tpopl %ebp"
+    stri += "\tmovl %ebp, %esp\n\tpopl %ebp"
 
-    return str
+    return stri
 
-# Recibe el
+
+# oper = '+', '-', '*', '/'
+# oper es la operación a realizar
+# si off1 es int, se tratará como el offset de la variable 1, si no se tratará
+# como el puntero global
+# si off2 es int, se tratará como el offset de la variable 2, si no se tratará
+# como el puntero global
+def translate_oper(off1, off2, oper: str):
+
+    stri = f'{operdict[oper]} %eax, %ebx'
+    if type(off1 == int):
+        off1 = f'-{off1}(%ebp)'
+    if type(off2 == int):
+        off2 = f'-{off2}(%ebp)'
+
+    return f'movl {off1}, %ebx\nmovl {off2}, %eax\n' + stri
+
+
+# Para casos donde hace falta acceder a pila u obtener alguna dirección, es
+# más sencillo acceder a la operación directamente y traducirlo
+def raw_oper(oper: str):
+    return f'{operdict[oper]} %eax, %ebx'
