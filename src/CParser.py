@@ -105,6 +105,9 @@ class CParser(Parser):
             print("Funcion : \n\n ",f,"\n\n")
             self.anadir_simbolo(f.tipo,f.nombre,f.cuerpo)
 
+            #empujar codigo de la funciion
+            self.push_asm(f.ensamblador)
+
         print("\nASM\n===================================================\n\n")
         print(self.asm)
         print("\n\nFIN ASM\n==========================================================\n")
@@ -146,7 +149,7 @@ class CParser(Parser):
     @_('TYPE ID "(" parametros ")" "{" statement retorno ";" "}"')
     def funcion(self, p):
 
-        return nodofuncion(p.TYPE,p.ID,p.parametros[1:],p.statement)
+        return nodofuncion(p.TYPE,p.ID,p.parametros,p.statement)
         #return ("funcion", p.TYPE, p.ID, p.parametros, p.statement)
 
     @_('VOID ID "(" parametros ")" "{" statement "}"')
@@ -171,23 +174,25 @@ class CParser(Parser):
 
     @_('parametros "," TYPE ID')
     def parametros(self, p):
-        return ("parametros", p.parametros, (p.TYPE, p.ID))
+        return  p.parametros + [(p.TYPE, p.ID)]
 
     @_('TYPE ID')
     def parametros(self, p):
-        return (p.TYPE, p.ID)
+        return [(p.TYPE, p.ID)]
 
     @_('parametros "," TYPE MULTIPLY ID')
     def parametros(self, p):
-        return ("parametros", p.parametros, (('*', p.TYPE), p.ID))
+        
+        return  p.parametros + [(('*', p.TYPE), p.ID)]
 
     @_('TYPE MULTIPLY ID')
     def parametros(self, p):
-        return (('*', p.TYPE), p.ID)
+        print(p.ID,"sdijahndsaidhsa")
+        return [(('*', p.TYPE), p.ID)]
 
     @_('')
     def parametros(self, p):
-        pass
+        return []
 
     @_('RETURN expr')
     def retorno(self, p):
@@ -729,9 +734,9 @@ if __name__ == '__main__':
 
     textos = {'''
               int g1, g2 ,*g3;
-
-              int main(int *a, int b) {
-
+            
+              int main(int *a, int b , int c) {
+                    int d = 10;
                     g1 = 5*((a1 + a2)/10) - (a3 * a4 - 15);
                   return 1;
               }

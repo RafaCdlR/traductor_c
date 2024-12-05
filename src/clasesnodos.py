@@ -29,13 +29,47 @@ class nodofuncion(Nodo):
         self.nombre = nombre
         self.parametros = parametros
         self.cuerpo =  cuerpo
-        self.ensamblador = rf" pushl %ebp \n movl %esp, %ebp\n"
+        
+        self.ensamblador = f'''
+.text \n 
+.globl {nombre} \n 
+.type {nombre}, @function \n 
+{nombre}:  \n 
+pushl %ebp \n 
+movl %esp, %ebp\n'''
 
-        contador = 8
+        contador = 0
+        print("funcion : ",nombre,"\n\n")
         for var in parametros:
-            print(var)
+            print(var[1])
+
+            if var[1] in pila:#MANEJO DE ERRORES
+                
+                raise ValueError(f"Error: variable repetida {var[1]} en la función {nombre}")
+            
+
+
             pila[var[1]] = f"{contador}(%ebp)"
+            
             contador += 4
+
+        #restar la memoria de los parametros:
+        self.ensamblador += f"subl ${contador} %esp\n"
+        
+
+
+
+
+
+
+
+
+
+        #final
+        
+
+        
+        print("\n\nfin funcion",nombre)
 
 
 
