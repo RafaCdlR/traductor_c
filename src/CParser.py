@@ -404,7 +404,7 @@ class CParser(Parser):
         print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
         print("-----------")
-        return ('assign', p.lvalue, cadena)
+        return Nodoasignacion( cadena ,p.lvalue, True)
 
     @_('operacion')
     def expr(self, p):
@@ -413,7 +413,7 @@ class CParser(Parser):
 
     @_('lvalue ASSIGN ID')
     def lvalue(self, p):
-        return ('assign_lvalue', p.lvalue, p.ID)
+        return Nodoasignacion( p.ID ,p.lvalue, False)
 
     @_('ID')
     def lvalue(self, p):
@@ -736,7 +736,7 @@ if __name__ == '__main__':
               int g1, g2 ,*g3;
             
               int main(int *a, int b , int c) {
-                    int d = 10;
+                    
                     g1 = 5*((a1 + a2)/10) - (a3 * a4 - 15);
                   return 1;
               }

@@ -238,6 +238,28 @@ class Nododeclaracion(Nodo):
     def escribe(self):
         print(self.cadena())
 
+class Nodoasignacion(Nodo):
+    #dest = origen;
+    def __init__(self, orig , dest , esoperacion):
+        self.dest = dest
+        self.orig = orig
+        self.esoperacion = esoperacion
+
+    def cadena(self):
+        if self.esoperacion:
+            cad = self.orig + f" mov1 $eax$ ${self.dest}$\n"
+        else:
+            cad = f"mov1 ${self.orig}$ ${self.dest}$;"
+
+
+
+        return cad
+
+    def escribe(self):
+        print(self.cadena())
+
+
+
 
 class Nodocadena(Nodo):
     def __init__(self, nombre):
