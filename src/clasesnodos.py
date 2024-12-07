@@ -262,8 +262,13 @@ class Nodoasignacion(Nodo):
 
     def cadena(self):
         
-        cad = self.orig + f" mov1 $eax$ ${self.dest[-1]}$\n"
-        
+        if self.esoperacion:
+            cad = self.orig + f"mov1 $eax$ ${self.dest[-1]}$\n"
+        else:
+            cad = f"mov1 ${self.orig}$ ${self.dest[-1]}$\n"
+
+
+
         ant = self.dest[-1]
         for id  in self.dest[-2::-1]:
             cad += f"mov1 ${ant}$ ${id}$\n"

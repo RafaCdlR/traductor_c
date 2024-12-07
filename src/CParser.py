@@ -390,21 +390,27 @@ class CParser(Parser):
 
     @_('lvalue ASSIGN operacion')
     def expr(self, p):
-
+        esoperacion = True
         cadena = []
         # self.bajar_arbo2(p.operacion,0,cadena)
         # print("\n\n-----\n\n")
-        self.bajar_arbo(p.operacion, 0, cadena)
+        if not isinstance(p.operacion , Nodotermino):
+            self.bajar_arbo(p.operacion, 0, cadena)
 
-        cadena = "".join(cadena)
-        if len(cadena) > 2:
-            print(cadena)
+            cadena = "".join(cadena)
+            if len(cadena) > 2:
+                print(cadena)
 
-            # return p.opComp #prueba para traduccion
-        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+                # return p.opComp #prueba para traduccion
+            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
-        print("-----------")
-        return Nodoasignacion( cadena ,p.lvalue, True)
+            print("-----------")
+
+        else:
+            esoperacion = False
+            cadena = p.operacion.cadena()
+
+        return Nodoasignacion( cadena ,p.lvalue, esoperacion)
 
     @_('operacion')
     def expr(self, p):
