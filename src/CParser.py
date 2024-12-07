@@ -58,7 +58,7 @@ class CParser(Parser):
             aux = "ebx" if der else "eax"
             #print(type(nod) , "profundidad = " , prof)
             
-            cadena.append( f"{aux} = ${aux1}${nod.operador}${aux2}$ ;")
+            cadena.append( f"{aux} = ${aux1}${nod.operador}${aux2}$ \n")
             return aux
 
         else:
@@ -376,7 +376,7 @@ class CParser(Parser):
 
     @_('expr ";"')
     def expr_list(self, p):
-        return [('expr', p.expr)]
+        return [p.expr]
 
     ###########################################################################
     # -------------------------------------------------------------------------
@@ -408,20 +408,23 @@ class CParser(Parser):
 
     @_('operacion')
     def expr(self, p):
-        print("expresion")
+        
         return p.operacion
 
     @_('lvalue ASSIGN ID')
     def lvalue(self, p):
-        return Nodoasignacion( p.ID ,p.lvalue, False)
+
+
+        return p.lvalue + [p.ID]
+        
 
     @_('ID')
     def lvalue(self, p):
-        return p.ID
+        return [p.ID]
 
     @_('"*" ID')
     def lvalue(self, p):
-        return ('*', p.ID)
+        return [('*', p.ID)]
 
     ###########################################################################
     # -------------------------------------------------------------------------
@@ -738,6 +741,7 @@ if __name__ == '__main__':
               int main(int *a, int b , int c) {
                     
                     g1 = 5*((a1 + a2)/10) - (a3 * a4 - 15);
+                    g2 = g1 = c = b;
                   return 1;
               }
                 '''

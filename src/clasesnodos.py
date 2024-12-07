@@ -55,9 +55,24 @@ movl %esp, %ebp\n'''
 
         #restar la memoria de los parametros:
         self.ensamblador += f"subl ${contador} %esp\n"
+
+        #declaraciones 
+        for ins in self.cuerpo[0]:
+
+            if isinstance(ins,Nodo):
+                self.ensamblador += ins.cadena()
+            else:
+                self.ensamblador += f"\n FALTA NODO : {ins} \n"
         
 
+        #instrucciones
+        for ins in self.cuerpo[1]:
 
+            if isinstance(ins,Nodo):
+                self.ensamblador += ins.cadena()
+            else:
+                self.ensamblador += f"\n FALTA NODO : {ins} \n"
+            
 
 
 
@@ -246,11 +261,13 @@ class Nodoasignacion(Nodo):
         self.esoperacion = esoperacion
 
     def cadena(self):
-        if self.esoperacion:
-            cad = self.orig + f" mov1 $eax$ ${self.dest}$\n"
-        else:
-            cad = f"mov1 ${self.orig}$ ${self.dest}$;"
-
+        
+        cad = self.orig + f" mov1 $eax$ ${self.dest[-1]}$\n"
+        
+        ant = self.dest[-1]
+        for id  in self.dest[-2::-1]:
+            cad += f"mov1 ${ant}$ ${id}$\n"
+            ant = id
 
 
         return cad
