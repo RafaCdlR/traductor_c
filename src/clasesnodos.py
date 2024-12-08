@@ -1,3 +1,51 @@
+
+
+def bajar_arbo( nod, prof, cadena, der=False):
+        aux = "%ebx" if der else "%eax"
+
+        if (not isinstance(nod, (Nodotermino, Nodocadena))):
+
+            
+            pila1 = bajar_arbo(nod.left, prof+1, cadena, False)
+
+
+
+            pila2 = bajar_arbo(nod.right, prof+1, cadena, True)
+
+
+            cadena += "\n#  " + nod.cadena() + " \n\n"
+            if pila1:#sacar de la pila si fuera necesario
+                cadena += rf"popl %eax"+"\n"
+            if pila2:
+                cadena += rf"popl %ebx"+"\n"
+
+            if nod.operador == '*':
+                cadena += "imull %ebx, %eax\npushl %eax \n\n"
+                
+            elif nod.operador == '/':
+                cadena += "cdq \nidivl %ebx\npushl %eax \n\n"
+
+
+            elif nod.operador == '+':
+                cadena += "addl %ebx, %eax \npushl %eax \n\n"
+            
+            elif nod.operador == '-':
+                cadena += "subl %ebx, %eax \npushl %eax \n\n"
+
+            
+            
+            return True
+
+        else:
+            cadena += f"movl ${nod.cadena()}$, {aux}\n"
+            return False
+
+
+
+
+
+
+
 class Nodo():
 
     def cadena(self):
@@ -15,9 +63,39 @@ class Nodo():
     
 
 class nodoreturn(Nodo):
-    def __init__(self,cad , esoperacion = False):
-        self.cad = cad
-        self.esoperacion = esoperacion
+    def __init__(self,operacion = ""):
+        
+
+        self.esoperacion = True
+
+        if operacion == "":
+            cadena = ""
+
+        else:
+            cadena = []
+            cadena += "\n# " +operacion.cadena()+"\n\n"
+            # self.bajar_arbo2(p.operacion,0,cadena)
+            # print("\n\n-----\n\n")
+            if not isinstance(operacion , Nodotermino):#si no es un id recorre arbol
+                self.bajar_arbo(operacion, 0, cadena)
+
+                cadena = "".join(cadena)
+
+
+            else:
+                self.esoperacion = False
+                cadena = operacion.cadena()
+
+
+
+        self.cad = cadena
+       
+
+
+
+
+
+
     def cadena(self):
         cad = ""
         if self.cad != "":#si la cadena esta vacia es un void y solo se hace la parte final
@@ -272,9 +350,25 @@ class Nododeclaracion(Nodo):
 
 class Nodoasignacion(Nodo):
     #dest = origen;
-    def __init__(self, orig , dest , esoperacion):
+    def __init__(self, operacion , dest , ):
         self.dest = dest
-        self.orig = orig
+
+        esoperacion = True
+        cadena = []
+        cadena += "\n# " +operacion.cadena()+"\n\n"
+        # self.bajar_arbo2(p.operacion,0,cadena)
+        # print("\n\n-----\n\n")
+        if not isinstance(operacion , Nodotermino):#si no es un id recorre arbol
+            bajar_arbo(operacion, 0, cadena)
+
+            cadena = "".join(cadena)
+
+
+        else:
+            esoperacion = False
+            cadena = operacion.cadena()
+
+        self.orig = cadena
         self.esoperacion = esoperacion
 
     def cadena(self):

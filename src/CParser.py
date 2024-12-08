@@ -46,64 +46,7 @@ class CParser(Parser):
         except Exception:
             pass
 
-    def bajar_arbo_ant(self, nod, prof, cadena, der=False):
-
-        if (not isinstance(nod, (Nodotermino, Nodocadena))):
-
-            # nod.escribe()
-            # pila.append(nod)
-            aux1 = self.bajar_arbo(nod.left, prof+1, cadena, der)
-            aux2 = self.bajar_arbo(nod.right, prof+1, cadena, True)
-
-            aux = "ebx" if der else "eax"
-            #print(type(nod) , "profundidad = " , prof)
-            
-            cadena.append( f"{aux} = ${aux1}${nod.operador}${aux2}$ \n")
-            return aux
-
-        else:
-            return nod.cadena()
-
-    def bajar_arbo(self, nod, prof, cadena, der=False):
-        aux = "%ebx" if der else "%eax"
-
-        if (not isinstance(nod, (Nodotermino, Nodocadena))):
-
-            
-            pila1 = self.bajar_arbo(nod.left, prof+1, cadena, False)
-
-
-
-            pila2 = self.bajar_arbo(nod.right, prof+1, cadena, True)
-
-
-            cadena += "\n#  " + nod.cadena() + " \n\n"
-            if pila1:#sacar de la pila si fuera necesario
-                cadena += rf"popl %eax"+"\n"
-            if pila2:
-                cadena += rf"popl %ebx"+"\n"
-
-            if nod.operador == '*':
-                cadena += "imull %ebx, %eax\npushl %eax \n\n"
-                
-            elif nod.operador == '/':
-                cadena += "cdq \nidivl %ebx\npushl %eax \n\n"
-
-
-            elif nod.operador == '+':
-                cadena += "addl %ebx, %eax \npushl %eax \n\n"
-            
-            elif nod.operador == '-':
-                cadena += "subl %ebx, %eax \npushl %eax \n\n"
-
-            
-            
-            return True
-
-        else:
-            cadena += f"movl ${nod.cadena()}$, {aux}\n"
-            return False
-
+   
     def push_asm(self, str):
         self.asm += "\n" + str
 
@@ -228,23 +171,10 @@ class CParser(Parser):
     @_('RETURN operacion')
     def retorno(self, p):
 
-        esoperacion = True
-        cadena = []
-        cadena += "\n# " +p.operacion.cadena()+"\n\n"
-        # self.bajar_arbo2(p.operacion,0,cadena)
-        # print("\n\n-----\n\n")
-        if not isinstance(p.operacion , Nodotermino):#si no es un id recorre arbol
-            self.bajar_arbo(p.operacion, 0, cadena)
-
-            cadena = "".join(cadena)
-
-
-        else:
-            esoperacion = False
-            cadena = p.operacion.cadena()
+        
 
         
-        return nodoreturn(cadena,esoperacion)
+        return nodoreturn(p.operacion)
 
     ###########################################################################
     # -------------------------------------------------------------------------
@@ -438,22 +368,9 @@ class CParser(Parser):
 
     @_('lvalue ASSIGN operacion')
     def expr(self, p):
-        esoperacion = True
-        cadena = []
-        cadena += "\n# " +p.operacion.cadena()+"\n\n"
-        # self.bajar_arbo2(p.operacion,0,cadena)
-        # print("\n\n-----\n\n")
-        if not isinstance(p.operacion , Nodotermino):#si no es un id recorre arbol
-            self.bajar_arbo(p.operacion, 0, cadena)
+       
 
-            cadena = "".join(cadena)
-
-
-        else:
-            esoperacion = False
-            cadena = p.operacion.cadena()
-
-        return Nodoasignacion( cadena ,p.lvalue, esoperacion)
+        return Nodoasignacion( p.operacion ,p.lvalue)
 
     @_('operacion')
     def expr(self, p):
