@@ -46,7 +46,7 @@ class CParser(Parser):
         except Exception:
             pass
 
-    def bajar_arbo(self, nod, prof, cadena, der=False):
+    def bajar_arbo_ant(self, nod, prof, cadena, der=False):
 
         if (not isinstance(nod, (Nodotermino, Nodocadena))):
 
@@ -64,18 +64,45 @@ class CParser(Parser):
         else:
             return nod.cadena()
 
-    def bajar_arbo2(self, nod, prof, cadena, der=False):
-
-        aux = "der" if der else "izq"
-
-        print(type(nod), nod.cadena(), aux, "prof = ", prof)
+    def bajar_arbo(self, nod, prof, cadena, der=False):
+        aux = "%ebx" if der else "%eax"
 
         if (not isinstance(nod, (Nodotermino, Nodocadena))):
 
-            # nod.escribe()
-            # pila.append(nod)
-            aux1 = self.bajar_arbo2(nod.left, prof+1, cadena, False)
-            aux2 = self.bajar_arbo2(nod.right, prof+1, cadena, True)
+            
+            pila1 = self.bajar_arbo(nod.left, prof+1, cadena, False)
+
+
+
+            pila2 = self.bajar_arbo(nod.right, prof+1, cadena, True)
+
+
+            cadena += "\n#  " + nod.cadena() + " \n\n"
+            if pila1:#sacar de la pila si fuera necesario
+                cadena += rf"popl %eax"+"\n"
+            if pila2:
+                cadena += rf"popl %ebx"+"\n"
+
+            if nod.operador == '*':
+                cadena += "imull %ebx, %eax\npushl %eax \n\n"
+                
+            elif nod.operador == '/':
+                cadena += "cdq \nidivl %ebx\npushl %eax \n\n"
+
+
+            elif nod.operador == '+':
+                cadena += "addl %ebx, %eax \npushl %eax \n\n"
+            
+            elif nod.operador == '-':
+                cadena += "subl %ebx, %eax \npushl %eax \n\n"
+
+            
+            
+            return True
+
+        else:
+            cadena += f"movl ${nod.cadena()}$, {aux}\n"
+            return False
 
     def push_asm(self, str):
         self.asm += "\n" + str
@@ -110,6 +137,10 @@ class CParser(Parser):
 
         print("\nASM\n===================================================\n\n")
         print(self.asm)
+
+        with open("asm.txt", "w") as archivo:
+            archivo.write(self.asm)
+
         print("\n\nFIN ASM\n==========================================================\n")
 
         return (p.globales, p.funciones)
@@ -149,7 +180,7 @@ class CParser(Parser):
     @_('TYPE ID "(" parametros ")" "{" statement retorno ";" "}"')
     def funcion(self, p):
 
-        return nodofuncion(p.TYPE,p.ID,p.parametros,p.statement)
+        return nodofuncion(p.TYPE,p.ID,p.parametros,p.statement , p.retorno)
         #return ("funcion", p.TYPE, p.ID, p.parametros, p.statement)
 
     @_('VOID ID "(" parametros ")" "{" statement "}"')
@@ -194,9 +225,26 @@ class CParser(Parser):
     def parametros(self, p):
         return []
 
-    @_('RETURN expr')
+    @_('RETURN operacion')
     def retorno(self, p):
-        return ("return", p.expr)
+
+        esoperacion = True
+        cadena = []
+        cadena += "\n# " +p.operacion.cadena()+"\n\n"
+        # self.bajar_arbo2(p.operacion,0,cadena)
+        # print("\n\n-----\n\n")
+        if not isinstance(p.operacion , Nodotermino):#si no es un id recorre arbol
+            self.bajar_arbo(p.operacion, 0, cadena)
+
+            cadena = "".join(cadena)
+
+
+        else:
+            esoperacion = False
+            cadena = p.operacion.cadena()
+
+        
+        return nodoreturn(cadena,esoperacion)
 
     ###########################################################################
     # -------------------------------------------------------------------------
@@ -392,19 +440,14 @@ class CParser(Parser):
     def expr(self, p):
         esoperacion = True
         cadena = []
+        cadena += "\n# " +p.operacion.cadena()+"\n\n"
         # self.bajar_arbo2(p.operacion,0,cadena)
         # print("\n\n-----\n\n")
-        if not isinstance(p.operacion , Nodotermino):
+        if not isinstance(p.operacion , Nodotermino):#si no es un id recorre arbol
             self.bajar_arbo(p.operacion, 0, cadena)
 
             cadena = "".join(cadena)
-            if len(cadena) > 2:
-                print(cadena)
 
-                # return p.opComp #prueba para traduccion
-            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-
-            print("-----------")
 
         else:
             esoperacion = False
@@ -743,10 +786,15 @@ if __name__ == '__main__':
 
     textos = {'''
               int g1, g2 ,*g3;
+
+              int funcion1(int a){
+                a = b;
+              return 1;
+              }
             
               int main(int *a, int b , int c) {
                     
-                    g1 = 5*((a1 + a2)/10) - (a3 * a4 - 15);
+                    g1 = 5*a1 + a2/10 - a3 * a4 - 15;
                     g2 = g1 = c = b;
                   return 1;
               }

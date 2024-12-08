@@ -1,0 +1,111 @@
+
+.globl g1
+.globl g2
+.globl g3
+
+.text 
+ 
+.globl funcion1 
+ 
+.type funcion1, @function 
+ 
+funcion1:  
+ 
+pushl %ebp 
+ 
+movl %esp, %ebp
+subl $4 %esp
+
+#Nodoasignacion
+
+mov1 $b$ $a$
+
+# el return : 
+
+mov1 $1$ $eax$
+movl %ebp, %esp  
+popl %ebp 
+ret  
+
+
+.text 
+ 
+.globl main 
+ 
+.type main, @function 
+ 
+main:  
+ 
+pushl %ebp 
+ 
+movl %esp, %ebp
+subl $12 %esp
+
+#Nodoasignacion
+
+
+# 5*a1+a2/10-a3*a4-15
+
+movl $5$, %eax
+movl $a1$, %ebx
+
+#  5*a1 
+
+imull %ebx, %eax
+pushl %eax 
+
+movl $a2$, %eax
+movl $10$, %ebx
+
+#  a2/10 
+
+cdq 
+idivl %ebx
+pushl %eax 
+
+
+#  5*a1+a2/10 
+
+popl %eax
+popl %ebx
+addl %ebx, %eax 
+pushl %eax 
+
+movl $a3$, %eax
+movl $a4$, %ebx
+
+#  a3*a4 
+
+imull %ebx, %eax
+pushl %eax 
+
+
+#  5*a1+a2/10-a3*a4 
+
+popl %eax
+popl %ebx
+subl %ebx, %eax 
+pushl %eax 
+
+movl $15$, %ebx
+
+#  5*a1+a2/10-a3*a4-15 
+
+popl %eax
+subl %ebx, %eax 
+pushl %eax 
+
+mov1 $eax$ $g1$
+
+#Nodoasignacion
+
+mov1 $b$ $c$
+mov1 $c$ $g1$
+mov1 $g1$ $g2$
+
+# el return : 
+
+mov1 $1$ $eax$
+movl %ebp, %esp  
+popl %ebp 
+ret  

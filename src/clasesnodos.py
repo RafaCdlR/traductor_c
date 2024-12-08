@@ -14,6 +14,22 @@ class Nodo():
         return self.cadena()
     
 
+class nodoreturn(Nodo):
+    def __init__(self,cad , esoperacion = False):
+        self.cad = cad
+        self.esoperacion = esoperacion
+    def cadena(self):
+        cad = ""
+        if self.cad != "":#si la cadena esta vacia es un void y solo se hace la parte final
+                
+            
+            if self.esoperacion:
+                cad = self.cad + f"mov1 $eax$ ${cad}$\n"
+            else:
+                cad = f"mov1 ${self.cad}$ $eax$\n"
+
+        return cad + "movl %ebp, %esp  \npopl %ebp \nret  \n"
+
 
 
 class nodofuncion(Nodo):
@@ -23,7 +39,7 @@ class nodofuncion(Nodo):
     #luego copiar esp a ebp
     #al final volver a copiar la primera posicion de la base de la pila a ebp (base anterior) (ret)
 
-    def __init__(self,tipo,nombre, parametros , cuerpo):
+    def __init__(self,tipo,nombre, parametros , cuerpo , retorno = nodoreturn("")):
         pila = dict()
         self.tipo = tipo
         self.nombre = nombre
@@ -68,6 +84,7 @@ movl %esp, %ebp\n'''
         #instrucciones
         for ins in self.cuerpo[1]:
 
+            self.ensamblador += "\n#" +type(ins).__name__+ "\n\n"
             if isinstance(ins,Nodo):
                 self.ensamblador += ins.cadena()
             else:
@@ -78,10 +95,10 @@ movl %esp, %ebp\n'''
 
 
 
+        self.ensamblador += "\n# el return : \n\n"#comentario del return
 
-
-        #final
-        
+        #final el return
+        self.ensamblador += retorno.cadena()
 
         
         print("\n\nfin funcion",nombre)
@@ -279,6 +296,7 @@ class Nodoasignacion(Nodo):
 
     def escribe(self):
         print(self.cadena())
+
 
 
 
