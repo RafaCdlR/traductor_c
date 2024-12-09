@@ -132,10 +132,10 @@ class nodofuncion(Nodo):
 pushl %ebp \n 
 movl %esp, %ebp\n'''
 
-        contador = 0
+        contador = 8
         print("funcion : ",nombre,"\n\n")
         for var in parametros:
-            print(var[1])
+            print(var)
 
             if var[1] in pila:#MANEJO DE ERRORES
                 
@@ -149,15 +149,24 @@ movl %esp, %ebp\n'''
 
         #restar la memoria de los parametros:
         self.ensamblador += f"subl ${contador} %esp\n"
-
+        contador = -4
         #declaraciones 
-        for ins in self.cuerpo[0]:
+        for dec in self.cuerpo[0]:
+            print(dec)
+            if isinstance(dec,Nododeclaracion):
+                self.ensamblador += dec.cadena()
 
-            if isinstance(ins,Nodo):
-                self.ensamblador += ins.cadena()
+                tam = 1
+                for n in dec.array:#sumar las dimensiones para el tamaño del array
+                    tam *= n
+
+                
+                pila[dec.nombre] = f"{contador}(%ebp)"
+                contador -= 4*tam
             else:
-                self.ensamblador += f"\n FALTA NODO : {ins} \n"
+                self.ensamblador += f"\n FALTA NODO : {dec} \n"
         
+        print(pila)
 
         #instrucciones
         for ins in self.cuerpo[1]:
@@ -332,7 +341,7 @@ class NodoOpComp(Nodo):
 
 class Nododeclaracion(Nodo):
 
-    def __init__(self, nombre, tipo, espuntero=False, array=[]):
+    def __init__(self, nombre, tipo, espuntero=False, array=[1]):
         self.nombre = nombre
         self.tipo = tipo
         self.espuntero = espuntero

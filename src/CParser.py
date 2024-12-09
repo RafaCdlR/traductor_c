@@ -66,25 +66,25 @@ class CParser(Parser):
             punt = ""
             if g.espuntero:
                 punt = "* "
-            print(g)
+            #print(g)
             # print(g)
             self.anadir_simbolo(g.tipo + punt, punt + g.nombre + str(g.array))
             self.push_asm(f".globl {g.nombre}")
 
         for f in p.funciones:
-            print("Funcion : \n\n ",f,"\n\n")
+            #print("Funcion : \n\n ",f,"\n\n")
             self.anadir_simbolo(f.tipo,f.nombre,f.cuerpo)
 
             #empujar codigo de la funciion
             self.push_asm(f.ensamblador)
 
-        print("\nASM\n===================================================\n\n")
-        print(self.asm)
+        #print("\nASM\n===================================================\n\n")
+        #print(self.asm)
 
         with open("asm.txt", "w") as archivo:
             archivo.write(self.asm)
 
-        print("\n\nFIN ASM\n==========================================================\n")
+       # print("\n\nFIN ASM\n==========================================================\n")
 
         return (p.globales, p.funciones)
 
@@ -161,7 +161,7 @@ class CParser(Parser):
 
     @_('TYPE MULTIPLY ID')
     def parametros(self, p):
-        print(p.ID,"sdijahndsaidhsa")
+        #print(p.ID,"sdijahndsaidhsa")
         return [(('*', p.TYPE), p.ID)]
 
     @_('')
@@ -317,7 +317,7 @@ class CParser(Parser):
     @_('ID')
     def id_array(self, p):
 
-        return Nododeclaracion(p.ID, "int", False, [])
+        return Nododeclaracion(p.ID, "int", False, [1])
 
     @_('ID array')
     def id_array(self, p):
@@ -327,12 +327,12 @@ class CParser(Parser):
     @_('array "[" NUMBER "]"')
     def array(self, p):
 
-        return p.array + [p.NUMBER]
+        return p.array + [int(p.NUMBER)]
 
     @_('"[" NUMBER "]"')
     def array(self, p):
 
-        return [p.NUMBER]
+        return [int(p.NUMBER)]
 
     ###########################################################################
     # -------------------------------------------------------------------------
@@ -710,6 +710,8 @@ if __name__ == '__main__':
               }
             
               int main(int *a, int b , int c) {
+                int bc[12][43];
+              int cb;
                     
                     g1 = 5*a1 + a2/10 - a3 * a4 - 15;
                     g2 = g1 = c = b;
@@ -722,7 +724,7 @@ if __name__ == '__main__':
         print("\n\n\n\n", texto, " :")
         tokens = lexer.tokenize(texto)
         result = parser.parse(tokens)
-        print(result)
+        #print(result)
 
         # except Exception as err:
         # print(f"Error de compilación: {err}")
@@ -730,8 +732,8 @@ if __name__ == '__main__':
     print("tabla de simbolos :")
 
     for clave, valor in parser.simbolos.items():
-
-        print(type(valor), " ", clave, " = ", valor)
+        pass
+        #print(type(valor), " ", clave, " = ", valor)
 
 
 ###########################################################################
