@@ -24,4 +24,3 @@ void x() {
   int b, c;
   printf("--> %d %d", b, c);
 }
-void y(int a) {}
