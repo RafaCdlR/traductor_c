@@ -129,8 +129,8 @@ class CParser(Parser):
     @_('VOID ID "(" parametros ")" "{" statement "}"')
     def funcion(self, p):
 
-        return nodofuncion(p.TYPE,p.ID,p.parametros,p.statement)
-        return ("funcion", p.VOID, p.ID, p.parametros, p.statement)
+        return nodofuncion(p.VOID, p.ID,p.parametros,p.statement)
+        # return ("funcion", p.VOID, p.ID, p.parametros, p.statement)
 
     @_('')
     def funciones(self, p):
