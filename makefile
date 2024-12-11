@@ -27,8 +27,16 @@ zip:
 
 clean:
 	${RM} -rf ${BUILD_PATH} *.zip src/__pycache__/
+	${RM} *.txt *.out
 	find -type f -name '*~' -delete
 	find -type f -name '#*#' -delete
+	clear
+
+ejecutar:
+	${PY} src/CParser.py
+
+probar:
+	${PY} src/main.py tests/cosasc.c traducido.txt
 
 clean-all: clean
 	find -type f -name '*.out' -delete
