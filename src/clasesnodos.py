@@ -5,11 +5,12 @@ def bajar_arbo( nod, prof, cadena, der=False):
 
         if (not isinstance(nod, (Nodotermino, Nodocadena))):
 
-            
-            pila1 = bajar_arbo(nod.left, prof+1, cadena, False)
+            if(not isinstance(nod, NodoopUnario)):
+               pila1 = bajar_arbo(nod.left, prof+1, cadena, False)
+            else:
+               pila1 = None
 
-
-
+               
             pila2 = bajar_arbo(nod.right, prof+1, cadena, True)
 
 
@@ -122,7 +123,7 @@ class nodofuncion(Nodo):
         self.tipo = tipo
         self.nombre = nombre
         self.parametros = parametros
-        self.cuerpo =  cuerpo
+        self.cuerpo = cuerpo
         
         self.ensamblador = f'''
 .text \n 
@@ -150,10 +151,11 @@ movl %esp, %ebp\n'''
         #restar la memoria de los parametros:
         self.ensamblador += f"subl ${contador} %esp\n"
         contador = -4
-        #declaraciones 
+        #declaraciones
+        '''
         for dec in self.cuerpo[0]:
             print(dec)
-            if isinstance(dec,Nododeclaracion):
+            if isinstance(dec, Nododeclaracion):
                 self.ensamblador += dec.cadena()
 
                 tam = 1
@@ -165,7 +167,39 @@ movl %esp, %ebp\n'''
                 contador -= 4*tam
             else:
                 self.ensamblador += f"\n FALTA NODO : {dec} \n"
-        
+        '''
+        # compruebo si se puede iterar sobre el objeto
+        if isinstance(self.cuerpo[0], list):
+                for dec in self.cuerpo[0]:
+                        print(dec)
+                        if isinstance(dec, Nododeclaracion):
+                                self.ensamblador += dec.cadena()
+                                
+                                tam = 1
+                                for n in dec.array:  # sumar las dimensiones para el tamaño del array
+                                        tam *= n
+
+                                pila[dec.nombre] = f"{contador}(%ebp)"
+                                contador -= 4 * tam
+                        else:
+                                self.ensamblador += f"\n FALTA NODO : {dec} \n"
+        else:
+                dec = self.cuerpo[0]
+                print(dec)
+                if isinstance(dec, Nododeclaracion):
+                        self.ensamblador += dec.cadena()
+
+                        tam = 1
+                        for n in dec.array:  # sumar las dimensiones para el tamaño del array
+                                tam *= n
+
+                        pila[dec.nombre] = f"{contador}(%ebp)"
+                        contador -= 4 * tam
+                else:
+                        self.ensamblador += f"\n FALTA NODO : {dec} \n"
+
+
+                
         print(pila)
 
         #instrucciones
@@ -285,7 +319,7 @@ class NodoopUnario(Nodo):
         self.right = right
 
     def cadena(self):
-        return f"{self.operador.cadena()}{self.right.cadena()}"
+        return f"{self.operador}{self.right.cadena()}"
 
     def escribe(self):
         print(self.cadena())
@@ -359,15 +393,15 @@ class Nododeclaracion(Nodo):
 
 class Nodoasignacion(Nodo):
     #dest = origen;
-    def __init__(self, operacion , dest , ):
+    def __init__(self, operacion, dest):  # quito un , sin nada despues de dest
         self.dest = dest
 
         esoperacion = True
         cadena = []
-        cadena += "\n# " +operacion.cadena()+"\n\n"
+        cadena += "\n# " + operacion.cadena() + "\n\n"
         # self.bajar_arbo2(p.operacion,0,cadena)
         # print("\n\n-----\n\n")
-        if not isinstance(operacion , Nodotermino):#si no es un id recorre arbol
+        if not isinstance(operacion, Nodotermino): #si no es un id recorre arbol
             bajar_arbo(operacion, 0, cadena)
 
             cadena = "".join(cadena)

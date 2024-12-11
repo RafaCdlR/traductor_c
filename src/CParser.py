@@ -60,6 +60,7 @@ class CParser(Parser):
     ################################ S ########################################
     ###########################################################################
 
+    '''
     @_('globales "$" funciones')
     def S(self, p):
         for g in p.globales:
@@ -87,7 +88,46 @@ class CParser(Parser):
        # print("\n\nFIN ASM\n==========================================================\n")
 
         return (p.globales, p.funciones)
+    '''
+    
+    @_('globales "$" funciones')
+    def S(self, p):
+        if isinstance(p.globales, list):
+            for g in p.globales:
+                punt = ""
+                if g.espuntero:
+                    punt = "* "
+                # Añadir símbolo y ensamblador
+                self.anadir_simbolo(g.tipo + punt, punt + g.nombre + str(g.array))
+                self.push_asm(f".globl {g.nombre}")
+        else:
+            g = p.globales
+            punt = ""
+            if g.espuntero:
+                punt = "* "
+            # Añadir símbolo y ensamblador
+            self.anadir_simbolo(g.tipo + punt, punt + g.nombre + str(g.array))
+            self.push_asm(f".globl {g.nombre}")
 
+        # Verificar y procesar `p.funciones`
+        if isinstance(p.funciones, list):
+            for f in p.funciones:
+                # Añadir símbolo y ensamblador
+                self.anadir_simbolo(f.tipo, f.nombre, f.cuerpo)
+                self.push_asm(f.ensamblador)
+        else:
+            f = p.funciones
+            # Añadir símbolo y ensamblador
+            self.anadir_simbolo(f.tipo, f.nombre, f.cuerpo)
+            self.push_asm(f.ensamblador)
+
+        # Guardar ensamblador en archivo
+        with open("asm.txt", "w") as archivo:
+            archivo.write(self.asm)
+
+        return (p.globales, p.funciones)
+
+    
     ###########################################################################
     # -------------------------------------------------------------------------
     # -------------------------- FIN_S ----------------------------------------
@@ -123,7 +163,7 @@ class CParser(Parser):
     @_('TYPE ID "(" parametros ")" "{" statement retorno ";" "}"')
     def funcion(self, p):
 
-        return nodofuncion(p.TYPE,p.ID,p.parametros,p.statement , p.retorno)
+        return nodofuncion(p.TYPE, p.ID, p.parametros, p.statement, p.retorno)
         #return ("funcion", p.TYPE, p.ID, p.parametros, p.statement)
 
     @_('VOID ID "(" parametros ")" "{" statement "}"')
@@ -368,9 +408,8 @@ class CParser(Parser):
 
     @_('lvalue ASSIGN operacion')
     def expr(self, p):
-       
 
-        return Nodoasignacion( p.operacion ,p.lvalue)
+        return Nodoasignacion(p.operacion, p.lvalue)
 
     @_('operacion')
     def expr(self, p):
