@@ -30,7 +30,6 @@ clean:
 	${RM} *.txt *.out
 	find -type f -name '*~' -delete
 	find -type f -name '#*#' -delete
-	clear
 
 ejecutar:
 	${PY} src/CParser.py

@@ -7,6 +7,15 @@ operdict = {
     '/': 'divl'
 }
 
+jumpcodes = {
+    '>': 'jg',
+    '>=': 'jge',
+    '<': 'jl',
+    '<=': 'jle',
+    '==': 'je',
+    '!=': 'jne'
+}
+
 # name es el nombre del fichero fuente
 # crea el inicio del programa
 
@@ -76,3 +85,7 @@ def translate_oper(off1, off2, oper: str):
 # más sencillo acceder a la operación directamente y traducirlo
 def raw_oper(oper: str):
     return f'{operdict[oper]} %eax, %ebx'
+
+
+def call_function(name: str, params: list):
+    pass
