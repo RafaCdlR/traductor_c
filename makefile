@@ -35,7 +35,7 @@ ejecutar:
 	${PY} src/CParser.py
 
 probar:
-	${PY} src/main.py tests/cosasc.c traducido.txt
+	${PY} src/main.py tests/cosasc.c traducido.s
 
 clean-all: clean
 	find -type f -name '*.out' -delete
