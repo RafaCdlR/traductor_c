@@ -1,9 +1,14 @@
-int x;
+// DECLARACIONES DE VARIABLES
+
+// Globales
+int a;
+int b;
+int c, d;
+int e, f;
 
 int main() {
-  int g1;
-  
-  g1 = -g1;
-
+  b = 3;
+  e = 2;
+  a = b + e;
   return 0;
 }
