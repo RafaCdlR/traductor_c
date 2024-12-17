@@ -101,9 +101,9 @@ class nodoreturn(Nodo):
         # si la cadena esta vacia es un void y solo se hace la parte final
         if self.cad != "":
             if self.esoperacion:
-                cad = self.cad + f"mov1 $eax$ ${cad}$\n"
+                cad = self.cad + f"movl $eax$ ${cad}$\n"
             else:
-                cad = f"mov1 ${self.cad}$ $eax$\n"
+                cad = f"movl ${self.cad}$ $eax$\n"
 
         return cad + "movl %ebp, %esp  \npopl %ebp \nret  \n"
 
@@ -408,13 +408,13 @@ class Nodoasignacion(Nodo):
     def cadena(self):
 
         if self.esoperacion:
-            cad = self.orig + f"mov1 $eax$ ${self.dest[-1]}$\n"
+            cad = self.orig + f"movl $eax$ ${self.dest[-1]}$\n"
         else:
-            cad = f"mov1 ${self.orig}$ ${self.dest[-1]}$\n"
+            cad = f"movl ${self.orig}$ ${self.dest[-1]}$\n"
 
         ant = self.dest[-1]
         for id in self.dest[-2::-1]:
-            cad += f"mov1 ${ant}$ ${id}$\n"
+            cad += f"movl ${ant}$ ${id}$\n"
             ant = id
 
         return cad
