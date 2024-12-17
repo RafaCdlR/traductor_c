@@ -1,50 +1,57 @@
 
 
-def bajar_arbo( nod, prof, cadena, der=False):
-        aux = "%ebx" if der else "%eax"
+def bajar_arbo(nod, prof, cadena, der=False):
+    aux = "%ebx" if der else "%eax"
 
-        if (not isinstance(nod, (Nodotermino, Nodocadena))):
+    operators = {
+        "*": "mull",
+        "+": "addl",
+        "-": "subl",
+        "&&": "andl",
+        "||": "orl",
+    }
 
-            if(not isinstance(nod, NodoopUnario)):
-               pila1 = bajar_arbo(nod.left, prof+1, cadena, False)
-            else:
-               pila1 = None
+    if (not isinstance(nod, (Nodotermino, Nodocadena))):
 
-               
-            pila2 = bajar_arbo(nod.right, prof+1, cadena, True)
-
-
-            cadena += "\n#  " + nod.cadena() + " \n\n"
-            if pila1:#sacar de la pila si fuera necesario
-                cadena += rf"popl %eax"+"\n"
-            if pila2:
-                cadena += rf"popl %ebx"+"\n"
-
-            if nod.operador == '*':
-                cadena += "imull %ebx, %eax\npushl %eax \n\n"
-                
-            elif nod.operador == '/':
-                cadena += "cdq \nidivl %ebx\npushl %eax \n\n"
-
-
-            elif nod.operador == '+':
-                cadena += "addl %ebx, %eax \npushl %eax \n\n"
-            
-            elif nod.operador == '-':
-                cadena += "subl %ebx, %eax \npushl %eax \n\n"
-
-            
-            
-            return True
-
+        if (not isinstance(nod, NodoopUnario)):
+            pila1 = bajar_arbo(nod.left, prof+1, cadena, False)
         else:
-            cadena += f"movl ${nod.cadena()}$, {aux}\n"
-            return False
+            pila1 = None
 
+        pila2 = bajar_arbo(nod.right, prof+1, cadena, True)
 
+        cadena += "\n#  " + nod.cadena() + " \n\n"
+        if pila1:  # sacar de la pila si fuera necesario
+            cadena += r"popl %eax"+"\n"
+        if pila2:
+            cadena += r"popl %ebx"+"\n"
 
+#        if nod.operador == '*':
+#            cadena += "imull %ebx, %eax\npushl %eax \n\n"
 
+        if nod.operador == '/':
+            cadena += "cdq \nidivl %ebx\npushl %eax \n\n"
+        else:
+            cadena += f"{operators[nod.operador]} %ebx, %eax\npushl %eax\n\n"
 
+        '''
+        elif nod.operador == '+':
+            cadena += "addl %ebx, %eax \npushl %eax \n\n"
+
+        elif nod.operador == '-':
+            cadena += "subl %ebx, %eax \npushl %eax \n\n"
+
+        elif nod.operador == '&&':
+            cadena += "andl %ebx, %eax\npushl %eax\n\n"
+
+        elif nod.operador == '||':
+            cadena += "orl %ebx, %eax\npushl %eax\n\n"
+        '''
+        return True
+
+    else:
+        cadena += f"movl ${nod.cadena()}$, {aux}\n"
+        return False
 
 
 class Nodo():
@@ -61,11 +68,10 @@ class Nodo():
 
     def __repr__(self):
         return self.cadena()
-    
+
 
 class nodoreturn(Nodo):
-    def __init__(self,operacion = ""):
-        
+    def __init__(self, operacion=""):
 
         self.esoperacion = True
 
@@ -74,34 +80,26 @@ class nodoreturn(Nodo):
 
         else:
             cadena = []
-            cadena += "\n# " +operacion.cadena()+"\n\n"
+            cadena += "\n# " + operacion.cadena()+"\n\n"
             # self.bajar_arbo2(p.operacion,0,cadena)
             # print("\n\n-----\n\n")
-            if not isinstance(operacion , Nodotermino):#si no es un id recorre arbol
+            # si no es un id recorre arbol
+            if not isinstance(operacion, Nodotermino):
                 self.bajar_arbo(operacion, 0, cadena)
 
                 cadena = "".join(cadena)
-
 
             else:
                 self.esoperacion = False
                 cadena = operacion.cadena()
 
-
-
         self.cad = cadena
-       
-
-
-
-
-
 
     def cadena(self):
         cad = ""
-        if self.cad != "":#si la cadena esta vacia es un void y solo se hace la parte final
-                
-            
+
+        # si la cadena esta vacia es un void y solo se hace la parte final
+        if self.cad != "":
             if self.esoperacion:
                 cad = self.cad + f"mov1 $eax$ ${cad}$\n"
             else:
@@ -110,48 +108,46 @@ class nodoreturn(Nodo):
         return cad + "movl %ebp, %esp  \npopl %ebp \nret  \n"
 
 
-
 class nodofuncion(Nodo):
-    
 
-    #pushear ebp(base antes de la funcion)
-    #luego copiar esp a ebp
-    #al final volver a copiar la primera posicion de la base de la pila a ebp (base anterior) (ret)
+    # pushear ebp(base antes de la funcion)
+    # luego copiar esp a ebp
+    # al final volver a copiar la primera posicion de
+    # la base de la pila a ebp (base anterior) (ret)
 
-    def __init__(self,tipo,nombre, parametros , cuerpo , retorno = nodoreturn("")):
+    def __init__(self, tipo, nombre, parametros, cuerpo, retorno=nodoreturn("")):
         pila = dict()
         self.tipo = tipo
         self.nombre = nombre
         self.parametros = parametros
         self.cuerpo = cuerpo
-        
+
         self.ensamblador = f'''
-.text \n 
-.globl {nombre} \n 
-.type {nombre}, @function \n 
-{nombre}:  \n 
-pushl %ebp \n 
+.text \n
+.globl {nombre} \n
+.type {nombre}, @function \n
+{nombre}:  \n
+pushl %ebp \n
 movl %esp, %ebp\n'''
 
         contador = 8
-        print("funcion : ",nombre,"\n\n")
+        print("funcion : ", nombre, "\n\n")
         for var in parametros:
             print(var)
 
-            if var[1] in pila:#MANEJO DE ERRORES
-                
-                raise ValueError(f"Error: variable repetida {var[1]} en la función {nombre}")
-            
+            if var[1] in pila:  # MANEJO DE ERRORES
 
+                raise ValueError(f"Error: variable repetida {
+                                 var[1]} en la función {nombre}")
 
             pila[var[1]] = f"{contador}(%ebp)"
-            
+
             contador += 4
 
-        #restar la memoria de los parametros:
+        # restar la memoria de los parametros:
         self.ensamblador += f"subl ${contador} %esp\n"
         contador = -4
-        #declaraciones
+        # declaraciones
         '''
         for dec in self.cuerpo[0]:
             print(dec)
@@ -159,10 +155,10 @@ movl %esp, %ebp\n'''
                 self.ensamblador += dec.cadena()
 
                 tam = 1
-                for n in dec.array:#sumar las dimensiones para el tamaño del array
+                #sumar las dimensiones para el tamaño del array
+                for n in dec.array:
                     tam *= n
 
-                
                 pila[dec.nombre] = f"{contador}(%ebp)"
                 contador -= 4*tam
             else:
@@ -170,65 +166,59 @@ movl %esp, %ebp\n'''
         '''
         # compruebo si se puede iterar sobre el objeto
         if isinstance(self.cuerpo[0], list):
-                for dec in self.cuerpo[0]:
-                        print(dec)
-                        if isinstance(dec, Nododeclaracion):
-                                self.ensamblador += dec.cadena()
-                                
-                                tam = 1
-                                for n in dec.array:  # sumar las dimensiones para el tamaño del array
-                                        tam *= n
-
-                                pila[dec.nombre] = f"{contador}(%ebp)"
-                                contador -= 4 * tam
-                        else:
-                                self.ensamblador += f"\n FALTA NODO : {dec} \n"
-        else:
-                dec = self.cuerpo[0]
+            for dec in self.cuerpo[0]:
                 print(dec)
                 if isinstance(dec, Nododeclaracion):
-                        self.ensamblador += dec.cadena()
+                    self.ensamblador += dec.cadena()
 
-                        tam = 1
-                        for n in dec.array:  # sumar las dimensiones para el tamaño del array
-                                tam *= n
+                    tam = 1
+                    # sumar las dimensiones para el tamaño del array
+                    for n in dec.array:
+                        tam *= n
 
-                        pila[dec.nombre] = f"{contador}(%ebp)"
-                        contador -= 4 * tam
+                    pila[dec.nombre] = f"{contador}(%ebp)"
+                    contador -= 4 * tam
                 else:
-                        self.ensamblador += f"\n FALTA NODO : {dec} \n"
+                    self.ensamblador += f"\n FALTA NODO : {dec} \n"
+        else:
+            dec = self.cuerpo[0]
+            print(dec)
+            if isinstance(dec, Nododeclaracion):
+                self.ensamblador += dec.cadena()
 
+                tam = 1
+                # sumar las dimensiones para el tamaño del array
+                for n in dec.array:
+                    tam *= n
 
-                
+                pila[dec.nombre] = f"{contador}(%ebp)"
+                contador -= 4 * tam
+            else:
+                self.ensamblador += f"\n FALTA NODO : {dec} \n"
+
         print(pila)
 
-        #instrucciones
+        # instrucciones
         for ins in self.cuerpo[1]:
 
-            self.ensamblador += "\n#" +type(ins).__name__+ "\n\n"
-            if isinstance(ins,Nodo):
+            self.ensamblador += "\n#" + type(ins).__name__ + "\n\n"
+            if isinstance(ins, Nodo):
                 self.ensamblador += ins.cadena()
             else:
                 self.ensamblador += f"\n FALTA NODO : {ins} \n"
-            
 
+        self.ensamblador += "\n# el return : \n\n"  # comentario del return
 
-
-
-
-        self.ensamblador += "\n# el return : \n\n"#comentario del return
-
-        #final el return
+        # final el return
         self.ensamblador += retorno.cadena()
 
-        
-        print("\n\nfin funcion",nombre)
-
-
-
+        print("\n\nfin funcion", nombre)
 
     def cadena(self):
-        return f"{self.nombre}( {self.parametros} )" + "{ " + f" {self.cuerpo} " + " }\n"  # devuelve cadena a imprimir
+        # devuelve cadena a imprimir
+        return f"{self.nombre}( {self.parametros} )" +\
+            "{ " + f" {self.cuerpo} " + " }\n"
+
     def escribe(self):
         print(self.cadena())
 
@@ -303,7 +293,7 @@ class NodoopUn(Nodo):
 
     def cadena(self):
         return f"{self.operador}"
-    
+
     def escribe(self):
         print(self.cadena())
 '''
@@ -391,8 +381,9 @@ class Nododeclaracion(Nodo):
     def escribe(self):
         print(self.cadena())
 
+
 class Nodoasignacion(Nodo):
-    #dest = origen;
+    # dest = origen;
     def __init__(self, operacion, dest):  # quito un , sin nada despues de dest
         self.dest = dest
 
@@ -401,11 +392,11 @@ class Nodoasignacion(Nodo):
         cadena += "\n# " + operacion.cadena() + "\n\n"
         # self.bajar_arbo2(p.operacion,0,cadena)
         # print("\n\n-----\n\n")
-        if not isinstance(operacion, Nodotermino): #si no es un id recorre arbol
+        # si no es un id recorre arbol
+        if not isinstance(operacion, Nodotermino):
             bajar_arbo(operacion, 0, cadena)
 
             cadena = "".join(cadena)
-
 
         else:
             esoperacion = False
@@ -415,27 +406,21 @@ class Nodoasignacion(Nodo):
         self.esoperacion = esoperacion
 
     def cadena(self):
-        
+
         if self.esoperacion:
             cad = self.orig + f"mov1 $eax$ ${self.dest[-1]}$\n"
         else:
             cad = f"mov1 ${self.orig}$ ${self.dest[-1]}$\n"
 
-
-
         ant = self.dest[-1]
-        for id  in self.dest[-2::-1]:
+        for id in self.dest[-2::-1]:
             cad += f"mov1 ${ant}$ ${id}$\n"
             ant = id
-
 
         return cad
 
     def escribe(self):
         print(self.cadena())
-
-
-
 
 
 class Nodocadena(Nodo):
