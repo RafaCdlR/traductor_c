@@ -11,6 +11,8 @@ class CParser(Parser):
     debugfile = 'parser.out'
     simbolos = dict()
     asm = ""
+    contadoretiquetas = 0
+
     precedence = (
         ('right', ASSIGN),
         ('left', OR),
@@ -92,6 +94,7 @@ class CParser(Parser):
     
     @_('globales "$" funciones')
     def S(self, p):
+        print(p.globales)
         if isinstance(p.globales, list):
             for g in p.globales:
                 punt = ""
@@ -101,13 +104,14 @@ class CParser(Parser):
                 self.anadir_simbolo(g.tipo + punt, punt + g.nombre + str(g.array))
                 self.push_asm(f".globl {g.nombre}")
         else:
-            g = p.globales
-            punt = ""
-            if g.espuntero:
-                punt = "* "
-            # Añadir símbolo y ensamblador
-            self.anadir_simbolo(g.tipo + punt, punt + g.nombre + str(g.array))
-            self.push_asm(f".globl {g.nombre}")
+            if p.globales:
+                g = p.globales
+                punt = ""
+                if g.espuntero:
+                    punt = "* "
+                # Añadir símbolo y ensamblador
+                self.anadir_simbolo(g.tipo + punt, punt + g.nombre + str(g.array))
+                self.push_asm(f".globl {g.nombre}")
 
         # Verificar y procesar `p.funciones`
         if isinstance(p.funciones, list):
@@ -545,15 +549,15 @@ class CParser(Parser):
 
     @_('IF "(" operacion ")" "{" expr_list "}" cont_cond')
     def block_expr(self, p):
-        return ("if", p.operacion, p.expr_list, p.cont_cond)
+        return NodoIF(p.operacion,p.expr_list,p.cont_cond,self.contadoretiquetas)
 
     @_('ELSE "{" expr_list "}"')
     def cont_cond(self, p):
-        return ("else", p.expr_list)
+        return p.expr_list
 
     @_('')
     def cont_cond(self, p):
-        pass
+        return None
 
     ###########################################################################
     # -------------------------------------------------------------------------
@@ -568,7 +572,8 @@ class CParser(Parser):
 
     @_('WHILE "(" operacion ")" "{" expr_list "}"')
     def block_expr(self, p):
-        return ("while", p.operacion, p.expr_list)
+        
+        return NodoWhile( p.operacion, p.expr_list , self.contadoretiquetas)
     
     ###########################################################################
     # -------------------------------------------------------------------------

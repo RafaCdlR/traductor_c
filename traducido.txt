@@ -1,0 +1,37 @@
+.file	C:\Users\ALEJANDRO\Desktop\comp c\traductor_c\tests\cosasc.c
+
+
+.text 
+
+.globl main 
+
+.type main, @function 
+
+main:  
+
+pushl %ebp 
+
+movl %esp, %ebp
+subl $8 %esp
+
+#Nodoasignacion
+
+
+# b+e
+
+movl $b$, %eax
+movl $e$, %ebx
+
+#  b+e 
+
+addl %ebx, %eax
+pushl %eax
+
+mov1 $eax$ $a$
+
+# el return : 
+
+mov1 $0$ $eax$
+movl %ebp, %esp  
+popl %ebp 
+ret  

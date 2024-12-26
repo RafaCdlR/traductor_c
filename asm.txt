@@ -1,0 +1,50 @@
+
+.globl a
+.globl b
+.globl c
+.globl d
+.globl e
+.globl f
+
+.text 
+
+.globl main 
+
+.type main, @function 
+
+main:  
+
+pushl %ebp 
+
+movl %esp, %ebp
+subl $8 %esp
+
+#Nodoasignacion
+
+movl $3$ $b$
+
+#Nodoasignacion
+
+movl $2$ $e$
+
+#Nodoasignacion
+
+
+# b+e
+
+movl $b$, %eax
+movl $e$, %ebx
+
+#  b+e 
+
+addl %ebx, %eax
+pushl %eax
+
+movl $eax$ $a$
+
+# el return : 
+
+movl $0$ $eax$
+movl %ebp, %esp  
+popl %ebp 
+ret  
