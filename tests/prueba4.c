@@ -4,8 +4,9 @@ int b;
 
 
 int main() {
+ 
 
-  if(a && b){
+  if(a){
     a = a+1;
   }else{
     b = b+1;

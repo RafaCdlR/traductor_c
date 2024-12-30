@@ -202,14 +202,22 @@ movl %esp, %ebp\n'''
 
         print(pila)
 
-        # instrucciones
-        for ins in self.cuerpo[1]:
-
+        # Instrucciones
+        if isinstance(self.cuerpo[1], list):
+            for ins in self.cuerpo[1]:
+                self.ensamblador += "\n#" + type(ins).__name__ + "\n\n"
+                if isinstance(ins, Nodo):
+                    self.ensamblador += ins.cadena()
+                else:
+                    self.ensamblador += f"\n FALTA NODO : {ins} \n"
+        else:
+            ins = self.cuerpo[1]
             self.ensamblador += "\n#" + type(ins).__name__ + "\n\n"
             if isinstance(ins, Nodo):
                 self.ensamblador += ins.cadena()
             else:
                 self.ensamblador += f"\n FALTA NODO : {ins} \n"
+
 
         self.ensamblador += "\n# el return : \n\n"  # comentario del return
 
@@ -512,7 +520,7 @@ class NodoIF(Nodo):
             
             cadena += operacion.cadena()
 
-        cadena += f"cmpl $0, %eax\n jne if{contador}_fin\n"
+        cadena += f"cmpl $0, %eax\n je if{contador}_fin\n"
         
         #CUERPO IF
         
