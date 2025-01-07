@@ -27,8 +27,7 @@ zip:
 
 clean:
 	${RM} -rf ${BUILD_PATH} *.zip src/__pycache__/
-	${RM} *.txt *.out
-	find -type f -name '*~' -delete
+		find -type f -name '*~' -delete
 	find -type f -name '#*#' -delete
 
 ejecutar:
@@ -38,4 +37,5 @@ probar:
 	${PY} src/main.py tests/cosasc.c traducido.s
 
 clean-all: clean
+	${RM} *.txt *.out
 	find -type f -name '*.out' -delete
