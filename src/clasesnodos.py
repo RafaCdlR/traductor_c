@@ -225,6 +225,7 @@ movl %esp, %ebp\n'''
 
             print(pila)
 
+        if self.cuerpo and self.cuerpo[1]:
             # Instrucciones
             if isinstance(self.cuerpo[1], list):
                 for ins in self.cuerpo[1]:

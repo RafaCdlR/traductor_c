@@ -28,6 +28,12 @@
         \end{itemize}
 
         \section{Capacidades}
-        En esta sección hablaremos del código fuente en C con el que es capaz de trabajar el traductor divido por las secciones en base a las diferentes prácticas que se han trabajado en el curso de \texttt{Procesadores de Lenguajes}. \\\\ Como referencia, se puede acceder en el código fuente adjunto junto a esta documentación a una carpeta llamada \texttt{\textbf{tests}} en la que se encuentra un código en C de ejemplo que demuestra el funcionamiento de cada una de los subapartados. \\\\ Una condición necesaria para poder realizar cualquier traducción es que debe de existir en el código fuente al menos una función.
+        En esta sección hablaremos del código fuente en C con el que es capaz de trabajar el traductor divido por las secciones en base a las diferentes prácticas que se han trabajado en el curso de \texttt{Procesadores de Lenguajes}. \\\\ Como referencia, se puede acceder en el código fuente adjunto junto a esta documentación a una carpeta llamada \texttt{\textbf{tests}} en la que se encuentra un código en C de ejemplo que demuestra el funcionamiento de cada una de los subapartados. \\\\ Las dos principales restricciones de nuestro traductor son: \\ \begin{itemize}
+        \item Para poder realizar cualquier traducción debe de existir en el código fuente al menos una función.
+        \item No puede haber ningún comentario ni al inicio del código fuente ni entre la última declaración de variable global y la primera función. \\
+        \end{itemize}
+
+        \subsection{Variables globales}
+        Hemos determinado que, para simplificar la traducción, las variables son inicalizadas siempre al inicio de la función, esto no genera ningún problema debido a que siempre debe de existir al menos una función. \\\\ \textbf{Nota:} Como referencia traducir el archivo \texttt{\textbf{tests\textbackslash variables\_{globales.c}}}.
         
 \end{document}
