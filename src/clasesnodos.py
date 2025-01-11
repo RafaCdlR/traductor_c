@@ -10,7 +10,7 @@ def bajar_arbo(nod, prof, cadena,contador = 0, der=False):
    
     }
 
-    if(isinstance(nod,(NodoAnd,NodoOr))):
+    if(isinstance(nod,(NodoAnd,NodoOr,NodoopUnario))):
         cadena += nod.cadena()
         return False
 
@@ -336,34 +336,23 @@ class NodoopUnario(Nodo):
     right = ""
 
     def __init__(self, operador, right,contador):
-
+        contador += 1
         self.operador = operador
         self.right = right
         cadena = []
 
         if operador == "!":
-            contador += 1
-
-        
-            
                 
-            #segunda parte parte del and
-            if isinstance(right,NodoAnd) or isinstance(right,NodoOr):
-                cadena += right.cadena()
+            cadena += "\n   #NOT\n\n"
+
+            bajar_arbo(right, 0, cadena,contador)
+
+            
 
 
-            else:
-                if not isinstance(right, Nodotermino):
-                    bajar_arbo(right, 0, cadena,contador)
+            cadena += f"cmpl $0, %eax \nje finalNOT{contador}   \nmovl $0, %eax \nfinalNOT{contador}:\n\n"
 
-                    cadena = "".join(cadena)
-
-                else:
-                    
-                    cadena += right.cadena()
-
-            #cadena += f"cmpl $0, %eax  \n  je final{contador} \nmovl $0, %eax\n"
-
+            
         else: # posible error
             bajar_arbo(right, 0, cadena,contador)
             cadena += "subl $0 %eax\n"

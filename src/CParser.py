@@ -167,13 +167,13 @@ class CParser(Parser):
     @_('TYPE ID "(" parametros ")" "{" statement retorno ";" "}"')
     def funcion(self, p):
 
-        return nodofuncion(p.TYPE, p.ID, p.parametros, p.statement, p.retorno)
+        return nodofuncion(p.TYPE, p.ID, p.parametros, p.statement,self.contadoretiquetas, p.retorno)
         #return ("funcion", p.TYPE, p.ID, p.parametros, p.statement)
 
     @_('VOID ID "(" parametros ")" "{" statement "}"')
     def funcion(self, p):
 
-        return nodofuncion(p.VOID, p.ID,p.parametros,p.statement)
+        return nodofuncion(p.VOID, p.ID,p.parametros,p.statement,self.contadoretiquetas)
         # return ("funcion", p.VOID, p.ID, p.parametros, p.statement)
 
     @_('')
@@ -218,7 +218,7 @@ class CParser(Parser):
         
 
         
-        return nodoreturn(p.operacion)
+        return nodoreturn(p.operacion,self.contadoretiquetas)
 
     ###########################################################################
     # -------------------------------------------------------------------------
@@ -413,7 +413,7 @@ class CParser(Parser):
     @_('lvalue ASSIGN operacion')
     def expr(self, p):
 
-        return Nodoasignacion(p.operacion, p.lvalue)
+        return Nodoasignacion(p.operacion, p.lvalue,self.contadoretiquetas)
 
     @_('operacion')
     def expr(self, p):
