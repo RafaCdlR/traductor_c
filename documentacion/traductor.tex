@@ -1,0 +1,33 @@
+\documentclass[]{article}
+
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{pgfplots}
+\usepackage{amsmath}
+\pgfplotsset{compat=1.18}
+
+%opening
+\title{\textbf{Traductor de C a ensamblador \\ - \\ Procesadores de Lenguajes}}
+\author{Rafael Caro de los Reyes \\ Alejandro García Ramos \\ Adrián Muñoz López \\\\ - Estudiantes de la Universidad de Cádiz - \\\\ rafa.carodelosreyes@alum.uca.es \\ ale.garciara@alum.uca.es \\ adrian.munozlopez@alum.uca.es}
+
+\begin{document}
+	
+	\maketitle
+	
+	\begin{abstract}
+	En este proyecto se lleva a cabo el desarrollo de una aplicación que permite traducir un código fuente en el lenguaje de programación C a ensamblador. A lo largo de este documento se especificaran las capacidades del traductor, detallando desde cómo debe de ser el código fuente que es capaz de traducir a los problemas que tenga el traductor si los tuviera.\\ \\
+	\end{abstract}
+	
+	\section{Introducción}
+        Antes de comenzar, es importante destacar que el traductor está desarrollado utilizando una librería de python llamada \texttt{\textbf{Sly}}. En nuestro proyecto hemos modularizado el traductor en 5 archivos principales: \\ \begin{itemize}
+        \item \textbf{main.py:} Es el archivo principal que se usa para lanzar el programa.
+        \item \textbf{CLexer.py:} Como el nombre indica, contiene todo el código relacionado con el Lexer.
+        \item \textbf{CParser.py:} Como el nombre indica, contiene todo el código relacionado con el Parser.
+        \item \textbf{clasesnodos.py:} Contiene el código relacionado con la semántica del traductor.
+        \item \textbf{asm\_{translator.py:}} Contiene todo el código relacionado con la traducción a ensamblador. \\ \\
+        \end{itemize}
+
+        \section{Capacidades}
+        En esta sección hablaremos del código fuente en C con el que es capaz de trabajar el traductor divido por las secciones en base a las diferentes prácticas que se han trabajado en el curso de \texttt{Procesadores de Lenguajes}. \\\\ Como referencia, se puede acceder en el código fuente adjunto junto a esta documentación a una carpeta llamada \texttt{\textbf{tests}} en la que se encuentra un código en C de ejemplo que demuestra el funcionamiento de cada una de los subapartados. \\\\ Una condición necesaria para poder realizar cualquier traducción es que debe de existir en el código fuente al menos una función.
+        
+\end{document}

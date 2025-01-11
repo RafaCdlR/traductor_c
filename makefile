@@ -26,7 +26,7 @@ zip:
 	zip ${ZIP_PATH} makefile src
 
 clean:
-	${RM} -rf ${BUILD_PATH} *.zip src/__pycache__/
+	${RM} -rf ${BUILD_PATH} *.zip src/__pycache__/ *.pdf *.aux *.log
 		find -type f -name '*~' -delete
 	find -type f -name '#*#' -delete
 
@@ -35,6 +35,10 @@ ejecutar:
 
 probar:
 	${PY} src/main.py tests/cosasc.c traducido.s
+
+latex:
+	pdflatex documentacion/traductor.tex
+	evince traductor.pdf &
 
 clean-all: clean
 	${RM} *.txt *.out
