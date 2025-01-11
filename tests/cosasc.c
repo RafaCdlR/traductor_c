@@ -1,5 +1,5 @@
-int a;
-int b, c;
+int a; // Esto es la declaración de una variable global
+int b, c; // Esto son las declaraciones de varias variables globales
 
 int main() {
   a = 3;

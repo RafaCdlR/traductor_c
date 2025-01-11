@@ -9,6 +9,10 @@ class CLexer(Lexer):
     # ignorar tabs
     ignore = ' \t'
 
+    @_(r'//.*')  # ignorar comentarios
+    def ignorar_comentario(self, t):
+        pass
+
     # caracteres literales
     literals = {'(', ')', ';', ',', '{', '}', '$','[',']', '&'}
 
@@ -36,12 +40,6 @@ class CLexer(Lexer):
     OR = r'\|\|'
     ASSIGN = r'='
     NOT = r'!'
-    
-
-
-    @_(r'//.*')  # ignorar comentarios
-    def ignorar_comentario(self, t):
-        pass
 
     @_(r'\n+')
     def newline(self, t):
