@@ -269,7 +269,7 @@ movl %esp, %ebp\n'''
             asm.append("Section.rodata    \n")
             for text in self.Variables_texto:
                 self.contador += 1
-                asm.append(f".S{self.contador}\n  {text}\n\n") 
+                asm.append(f"{text}\n\n") 
 
            
 
@@ -449,12 +449,19 @@ class Nododeclaracion(Nodo):
         self.espuntero = espuntero
         self.array = array
 
-    def cadena(self):
+    def cadena2(self):
         p = ""
         if self.espuntero:
             p = "* "
 
         return f"{self.tipo}{p} {self.nombre} {self.array}"
+    
+    def cadena(self):
+        p = ""
+        if self.espuntero:
+            p = "* "
+
+        return f"{self.nombre}"
 
     def escribe(self):
         print(self.cadena())
@@ -726,26 +733,43 @@ class NodoOr(Nodo):
 
 class Nodoprint(Nodo):
 
-    def __init__(self,parametros,contador = 0):
+    def __init__(self,parametros,contador_variable = 0):
+        contador_variable += 0
         cadena = []
         contador = 0
         
         if isinstance(parametros,tuple):
-            self.texto = parametros[0]
+            self.texto = f".S{contador_variable}: \n    .text {parametros[0]}\n"
             
             if isinstance(parametros[1],list):
                 for v in parametros[1][::-1]:
-                    cadena += f"pushl ${v.nombre}$\n"
-                    contador += 4
-            else:
-                cadena += f"pushl ${parametros[1].nombre}$\n"
-                contador += 4
 
-            cadena += f"pushl $s{contador}$\n\n"
+                    if isinstance(v,Nododeclaracion):
+                        cadena += f"pushl ${v.cadena()}$\n"
+                        
+                    else:
+                        cadena_arbo = []
+                        bajar_arbo(v,0,cadena_arbo,contador_variable)
+                        cadena += cadena_arbo
+                        cadena += f"pushl $eax$\n"
+                    contador += 4
+
+            else:
+                v = parametros[1]
+                if isinstance(v,Nododeclaracion):
+                    cadena += f"pushl ${v.cadena()}$\n"
+                        
+                else:
+                    cadena_arbo = []
+                    bajar_arbo(v,0,cadena_arbo,contador_variable)
+                    cadena += cadena_arbo
+                    cadena += f"pushl $eax$\n"
+
+            cadena += f"pushl $s{contador_variable}$\n\n"
             cadena += "call printf\n"
             cadena += f"addl ${contador} esp\n\n"
         else:
-            self.texto = parametros
+            self.texto = f".S{contador_variable}: \n    .text {parametros}\n"
 
         self.cad = "".join(cadena)
 
