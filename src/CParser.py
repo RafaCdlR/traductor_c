@@ -587,35 +587,14 @@ class CParser(Parser):
     ################################ OPERACIONES ##############################
     ###########################################################################
 
-    @_('opComp')
-    def operacion(self, p):
-
-        return p.opComp
-
-    @_('opComp EQ opLogOr')
-    def opComp(self, p):
-        return NodoOpComp(p.opComp, '==', p.opLogOr)
-
-    @_('opComp NE opLogOr')
-    def opComp(self, p):
-        return NodoOpComp(p.opComp, '!=', p.opLogOr)
-
-    @_('opComp LE opLogOr')
-    def opComp(self, p):
-        return NodoOpComp(p.opComp, '<=', p.opLogOr)
-
-    @_('opComp GE opLogOr')
-    def opComp(self, p):
-        return NodoOpComp(p.opComp, '>=', p.opLogOr)
-
     @_('opLogOr')
-    def opComp(self, p):
+    def operacion(self, p):
         return p.opLogOr
-
+    
     # opLogOr
     @_('opLogOr OR opLogAnd')
     def opLogOr(self, p):
-        return NodoopLogOr(p.opLogOr, p.opLogAnd)
+        return NodoOr(p.opLogOr, p.opLogAnd,self.contadoretiquetas,"||")
 
     @_('opLogAnd')
     def opLogOr(self, p):
@@ -624,7 +603,7 @@ class CParser(Parser):
     # opLogAnd
     @_('opLogAnd AND opUnario')
     def opLogAnd(self, p):
-        return NodoopLogAnd(p.opLogAnd, p.opUnario)
+        return NodoAnd(p.opLogAnd, p.opUnario,self.contadoretiquetas,"&&")
 
     @_('opUnario')
     def opLogAnd(self, p):
@@ -636,17 +615,12 @@ class CParser(Parser):
         # print("-------------------")
         return p.opUnario
 
-    # opUnario
+    
 
-    @_('opUn opSumaResta')
+    @_('opUn opComp')
     def opUnario(self, p):
-
-        return NodoopUnario(p.opUn, p.opSumaResta)
-
-    # @_('opUn NOT')
-    # def opUn(self, p):
-    #    return not p.opUn
-
+        return NodoopUnario(p.opUn, p.opComp,self.contadoretiquetas)
+    
     @_('NOT')
     def opUn(self, p):
         return '!'
@@ -655,12 +629,35 @@ class CParser(Parser):
     def opUn(self, p):
         return '-'
 
-    # opSumaResta
+    @_('opComp')
+    def opUnario(self, p):
+        return p.opComp
+    # -------------------------------------------------------------------------
+
+    # Operaciones de comparación
+    
+    @_('opComp EQ opSumaResta')
+    def opComp(self, p):
+        return NodoOpComp(p.opComp, '==', p.opSumaResta)
+
+    @_('opComp NE opSumaResta')
+    def opComp(self, p):
+        return NodoOpComp(p.opComp, '!=', p.opSumaResta)
+
+    @_('opComp LE opSumaResta')
+    def opComp(self, p):
+        return NodoOpComp(p.opComp, '<=', p.opSumaResta)
+
+    @_('opComp GE opSumaResta')
+    def opComp(self, p):
+        return NodoOpComp(p.opComp, '>=', p.opSumaResta)
 
     @_('opSumaResta')
-    def opUnario(self, p):
+    def opComp(self, p):
         return p.opSumaResta
-
+    
+    # -------------------------------------------------------------------------
+    
     # opSumaResta
     @_('opSumaResta PLUS opMultDiv')
     def opSumaResta(self, p):
@@ -691,6 +688,7 @@ class CParser(Parser):
     # term rules (variables or numbers)
     @_('ID')
     def term(self, p):
+        print(p.ID)
         return Nodotermino(p.ID)
 
     @_('NUMBER')
