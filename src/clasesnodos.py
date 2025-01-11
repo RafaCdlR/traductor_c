@@ -41,28 +41,28 @@ def bajar_arbo(nod, prof, cadena,contador = 0, der=False):
 
         elif nod.operador == '==':
             contador += 1
-            cadena += f"""cmpl %ebx, %eax\n jne falso{contador}   \nmovl $0 eax\nfalso{contador}:\n\n"""
+            cadena += f"""cmpl %ebx, %eax   \nmovl $1 %eax  \njne verdadero{contador}   \nmovl $0 %eax  \nverdadero{contador}:\n\n"""
                         
                         
         elif nod.operador == '!=':
             contador += 1
-            cadena += f"""cmpl %ebx, %eax  \nje falso{contador}   \nmovl $0 eax\nfalso{contador}:\n\n"""
+            cadena += f"""cmpl %ebx, %eax   \nmovl $1 %eax  \nje verdadero{contador}   \nmovl $0 %eax  \nverdadero{contador}:\n\n"""
 
         elif nod.operador == '<=':
             contador += 1
-            cadena += f"""cmpl %ebx, %eax  \njg falso{contador}   \nmovl $0 eax\nfalso{contador}:\n\n"""
+            cadena += f"""cmpl %ebx, %eax   \nmovl $1 %eax  \njg verdadero{contador}   \nmovl $0 %eax  \nverdadero{contador}:\n\n"""
 
         elif nod.operador == '>=':
             contador += 1
-            cadena += f"""cmpl %ebx, %eax  \njl falso{contador}   \nmovl $0 eax\nfalso{contador}:\n\n"""
+            cadena += f"""cmpl %ebx, %eax   \nmovl $1 %eax  \njl verdadero{contador}   \nmovl $0 %eax  \nverdadero{contador}:\n\n"""
 
         elif nod.operador == '<':
             contador += 1
-            cadena += f"""cmpl %ebx, %eax  \njge falso{contador}   \nmovl $0 eax\nfalso{contador}:\n\n"""
+            cadena += f"""cmpl %ebx, %eax   \nmovl $1 %eax  \njge verdadero{contador}   \nmovl $0 %eax  \nverdadero{contador}:\n\n"""
 
         elif nod.operador == '>':
             contador += 1
-            cadena += f"""cmpl %ebx, %eax  \njle falso{contador}   \nmovl $0 eax\nfalso{contador}:\n\n"""
+            cadena += f"""cmpl %ebx, %eax   \nmovl $1 %eax  \njle verdadero{contador}   \nmovl $0 %eax  \nverdadero{contador}:\n\n"""
             
             
         else:
@@ -638,7 +638,7 @@ class NodoAnd(Nodo):
 
         
             
-        cadena += right.cadena()
+        
         
        
         
@@ -690,7 +690,7 @@ class NodoOr(Nodo):
 
         
             
-        cadena += right.cadena()
+        
         
        
         
