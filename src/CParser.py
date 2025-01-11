@@ -118,13 +118,18 @@ class CParser(Parser):
             for f in p.funciones:
                 # Añadir símbolo y ensamblador
                 self.anadir_simbolo(f.tipo, f.nombre, f.cuerpo)
-                self.push_asm(f.ensamblador)
+                textos_globales = [""]
+                self.push_asm(f.cadena(textos_globales))
+                self.asm = "".join(textos_globales) + self.asm
+                
         else:
             f = p.funciones
             # Añadir símbolo y ensamblador
             self.anadir_simbolo(f.tipo, f.nombre, f.cuerpo)
-            self.push_asm(f.ensamblador)
-
+            textos_globales = []
+            self.push_asm(f.cadena(textos_globales))
+           
+            self.asm = "".join(textos_globales) + self.asm
         # Guardar ensamblador en archivo
         with open("asm.txt", "w") as archivo:
             archivo.write(self.asm)
@@ -447,7 +452,7 @@ class CParser(Parser):
 
     @_('PRINTF "(" printf_args ")"')
     def expr(self, p):
-        return ("printf", p.printf_args)
+        return Nodoprint(p.printf_args)
 
     @_('STRING "," variables_a_imprimir')
     def printf_args(self, p):
@@ -491,7 +496,7 @@ class CParser(Parser):
         if isinstance(p.id_list, tuple):
             return list(p.id_list)
         else:
-            return [p.id_list]
+            return p.id_list
 
     @_('operaciones_a_imprimir "," operacion')
     def operaciones_a_imprimir(self, p):
@@ -503,7 +508,7 @@ class CParser(Parser):
     @_('operacion')
     def operaciones_a_imprimir(self, p):
 
-        return [p.operacion]
+        return p.operacion
 
     ###########################################################################
     # -------------------------------------------------------------------------

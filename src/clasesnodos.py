@@ -146,6 +146,8 @@ class nodofuncion(Nodo):
         self.nombre = nombre
         self.parametros = parametros
         self.cuerpo = cuerpo
+        self.Variables_texto = []
+        self.contador = contador
 
         self.ensamblador = f'''
 .text \n
@@ -188,27 +190,9 @@ movl %esp, %ebp\n'''
             else:
                 self.ensamblador += f"\n FALTA NODO : {dec} \n"
         '''
-
-        # Compruebo que la función no tenga solo el return
-        if self.cuerpo and self.cuerpo[0]:
-            # compruebo si se puede iterar sobre el objeto
-            if isinstance(self.cuerpo[0], list):
-                for dec in self.cuerpo[0]:
-                    print(dec)
-                    if isinstance(dec, Nododeclaracion):
-                        self.ensamblador += dec.cadena()
-
-                        tam = 1
-                        # sumar las dimensiones para el tamaño del array
-                        for n in dec.array:
-                            tam *= n
-
-                        pila[dec.nombre] = f"{contador}(%ebp)"
-                        contador -= 4 * tam
-                    else:
-                        self.ensamblador += f"\n FALTA NODO : {dec} \n"
-            else:
-                dec = self.cuerpo[0]
+        # compruebo si se puede iterar sobre el objeto
+        if isinstance(self.cuerpo[0], list):
+            for dec in self.cuerpo[0]:
                 print(dec)
                 if isinstance(dec, Nododeclaracion):
                     self.ensamblador += dec.cadena()
@@ -222,25 +206,53 @@ movl %esp, %ebp\n'''
                     contador -= 4 * tam
                 else:
                     self.ensamblador += f"\n FALTA NODO : {dec} \n"
+        else:
+            dec = self.cuerpo[0]
+            print(dec)
+            if isinstance(dec, Nododeclaracion):
+                self.ensamblador += dec.cadena()
 
-            print(pila)
+                tam = 1
+                # sumar las dimensiones para el tamaño del array
+                for n in dec.array:
+                    tam *= n
 
-        if self.cuerpo and self.cuerpo[1]:
-            # Instrucciones
-            if isinstance(self.cuerpo[1], list):
-                for ins in self.cuerpo[1]:
-                    self.ensamblador += "\n#" + type(ins).__name__ + "\n\n"
-                    if isinstance(ins, Nodo):
-                        self.ensamblador += ins.cadena()
-                    else:
-                        self.ensamblador += f"\n FALTA NODO : {ins} \n"
+                pila[dec.nombre] = f"{contador}(%ebp)"
+                contador -= 4 * tam
             else:
-                ins = self.cuerpo[1]
+                self.ensamblador += f"\n FALTA NODO : {dec} \n"
+
+        print(pila)
+
+        # Instrucciones
+        if isinstance(self.cuerpo[1], list):
+            for ins in self.cuerpo[1]:
                 self.ensamblador += "\n#" + type(ins).__name__ + "\n\n"
                 if isinstance(ins, Nodo):
                     self.ensamblador += ins.cadena()
+
+                    if isinstance(ins,Nodoprint):#anadir texto a las globales
+                        print("DENTRO")
+                        print(ins.rodata())
+                        self.Variables_texto.append(ins.rodata())
+
+
                 else:
                     self.ensamblador += f"\n FALTA NODO : {ins} \n"
+        else:
+            ins = self.cuerpo[1]
+            self.ensamblador += "\n#" + type(ins).__name__ + "\n\n"
+            if isinstance(ins, Nodo):
+                self.ensamblador += ins.cadena()
+
+                if isinstance(ins,Nodoprint):#anadir texto a las globales
+                    print("DENTRO")
+                    self.Variables_texto.append(ins.rodata())
+
+
+
+            else:
+                self.ensamblador += f"\n FALTA NODO : {ins} \n"
 
 
         self.ensamblador += "\n# el return : \n\n"  # comentario del return
@@ -250,10 +262,19 @@ movl %esp, %ebp\n'''
 
         print("\n\nfin funcion", nombre)
 
-    def cadena(self):
-        # devuelve cadena a imprimir
-        return f"{self.nombre}( {self.parametros} )" +\
-            "{ " + f" {self.cuerpo} " + " }\n"
+    def cadena(self,asm =[]):
+        if len(self.Variables_texto)>0:
+            print("CADENA")
+            
+            asm.append("Section.rodata    \n")
+            for text in self.Variables_texto:
+                self.contador += 1
+                asm.append(f".S{self.contador}\n  {text}\n\n") 
+
+           
+
+            
+        return self.ensamblador
 
     def escribe(self):
         print(self.cadena())
@@ -703,3 +724,38 @@ class NodoOr(Nodo):
 
 
 
+class Nodoprint(Nodo):
+
+    def __init__(self,parametros,contador = 0):
+        cadena = []
+        contador = 0
+        
+        if isinstance(parametros,tuple):
+            self.texto = parametros[0]
+            
+            if isinstance(parametros[1],list):
+                for v in parametros[1][::-1]:
+                    cadena += f"pushl ${v.nombre}$\n"
+                    contador += 4
+            else:
+                cadena += f"pushl ${parametros[1].nombre}$\n"
+                contador += 4
+
+            cadena += f"pushl $s{contador}$\n\n"
+            cadena += "call printf\n"
+            cadena += f"addl ${contador} esp\n\n"
+        else:
+            self.texto = parametros
+
+        self.cad = "".join(cadena)
+
+    def cadena(self):
+
+        return self.cad
+    
+    def rodata(self):
+        print("RODATA",self.texto)
+        return self.texto
+
+    def escribe(self):
+        print(self.cadena())
