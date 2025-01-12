@@ -5,12 +5,12 @@ int prueba(int k) {
 
 int main() {
 
-  int a,b,c;
+  int a,b,c[5];
  
   a = 5;
   b = 3;
 
-  a = prueba(b);
+  c[2] = 7;
 
   return 0;
 }
