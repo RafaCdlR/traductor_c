@@ -9,23 +9,39 @@ def bajar_arbo(nod, prof, cadena,contador = 0, der=False):
     "-": "subl"       # Resta
    
     }
+    #cadena += "\n#  " + str(type(nod)) + " \n\n"
 
     if(isinstance(nod,(NodoAnd,NodoOr,NodoopUnario))):
         cadena += nod.cadena()
-        return False
+        return False,False
 
    
 
     elif (not isinstance(nod, (Nodotermino, Nodocadena))):
 
         if (not isinstance(nod, NodoopUnario)):
-            pila1 = bajar_arbo(nod.left, prof+1, cadena,contador, False)
+            pila1 , estermino = bajar_arbo(nod.left, prof+1, cadena,contador, False)
         else:
-            pila1 = None
+            pila1 = False
 
-        pila2 = bajar_arbo(nod.right, prof+1, cadena,contador, True)
+        #mirar si a la derecha hay operacion pa meter en la pila 
+        if estermino and hasattr(nod, 'right') and not isinstance(nod.right, (Nodotermino, Nodocadena)):
+
+            cadena += "pushl %eax\n"
+            pila1 = True
+
+
+
+
+        
+
+        
+
+        pila2,_ = bajar_arbo(nod.right, prof+1, cadena,contador, True)
 
         cadena += "\n#  " + nod.cadena() + " \n\n"
+
+        
         
         if pila1:  # sacar de la pila si fuera necesario
             cadena += r"popl %eax"+"\n"
@@ -69,14 +85,15 @@ def bajar_arbo(nod, prof, cadena,contador = 0, der=False):
             cadena += f"{operators[nod.operador]} %ebx, %eax\n\n"
 
         if prof != 0:
-           cadena += "push1 %eax\n"
+           cadena += "pushl %eax\n"
 
         
-        return True
+        return True , False
 
     else:
+        cadena += "\n#  " + nod.cadena() + " \n\n"
         cadena += f"movl ${nod.cadena()}$, {aux}\n"
-        return False
+        return False , True #por si hay parentesis a la derecha hay q meter en pila 
 
 
 class Nodo():

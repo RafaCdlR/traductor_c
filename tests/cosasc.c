@@ -3,7 +3,7 @@ int b, c; // Esto son las declaraciones de varias variables globales
 
 int prueba(int prob) {
   
-  return prob + 25;
+  return prob *(25+1);
 }
 
 int main() {
