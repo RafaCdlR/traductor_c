@@ -120,7 +120,7 @@ class CParser(Parser):
                 # Añadir símbolo y ensamblador
                 self.anadir_simbolo(f.tipo, f.nombre, f.cuerpo)
                 textos_globales = [""]
-                self.push_asm(f.cadena(textos_globales))
+                self.push_asm(f.cadena(textos_globales,self.simbolos))
                 self.asm = "".join(textos_globales) + self.asm
                 
         else:
@@ -128,7 +128,7 @@ class CParser(Parser):
             # Añadir símbolo y ensamblador
             self.anadir_simbolo(f.tipo, f.nombre, f.cuerpo)
             textos_globales = []
-            self.push_asm(f.cadena(textos_globales))
+            self.push_asm(f.cadena(textos_globales,self.simbolos))
            
             self.asm = "".join(textos_globales) + self.asm
         # Guardar ensamblador en archivo
@@ -436,16 +436,16 @@ class CParser(Parser):
     def lvalue(self, p):
 
 
-        return p.lvalue + [p.ID]
-        
+        return p.lvalue + [Nodotermino(p.ID)]
+    
 
     @_('ID')
     def lvalue(self, p):
-        return [p.ID]
+        return [Nodotermino(p.ID)]
 
     @_('"*" ID')
     def lvalue(self, p):
-        return [('*', p.ID)]
+        return [Nodotermino(p.ID,simbolo = "*")]
 
     ###########################################################################
     # -------------------------------------------------------------------------

@@ -1,5 +1,4 @@
-int a; // Esto es la declaración de una variable global
-int b, c; // Esto son las declaraciones de varias variables globales
+
 
 int prueba(int prob) {
   
@@ -7,7 +6,9 @@ int prueba(int prob) {
 }
 
 int main() {
-  a = 3;
+  int a; // Esto es la declaración de una variable global
+  int b, c; // Esto son las declaraciones de varias variables globales
+  b = c = a;
  
   prueba(a);
   return 0;

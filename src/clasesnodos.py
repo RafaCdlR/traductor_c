@@ -1,4 +1,4 @@
-
+import re
 
 def bajar_arbo(nod, prof, cadena,contador = 0, der=False):
     aux = "%ebx" if der else "%eax"
@@ -106,10 +106,10 @@ class Nodo():
 
     def __str__(self):
 
-        return self.cadena()
+       return self.cadena()
 
     def __repr__(self):
-        return self.cadena()
+       return self.cadena()
 
 
 class nodoreturn(Nodo):
@@ -224,7 +224,7 @@ movl %esp, %ebp\n'''
                         for n in dec.array:
                             tam *= n
 
-                        pila[dec.nombre] = f"{contador}(%ebp)"
+                        pila[dec.nombre] = contador
                         contador -= 4 * tam
                     else:
                         self.ensamblador += f"\n FALTA NODO : {dec} \n"
@@ -239,12 +239,15 @@ movl %esp, %ebp\n'''
                     for n in dec.array:
                         tam *= n
 
-                    pila[dec.nombre] = f"{contador}(%ebp)"
+                    pila[dec.nombre] = contador
                     contador -= 4 * tam
                 else:
                     self.ensamblador += f"\n FALTA NODO : {dec} \n"
 
         print(pila)
+
+
+        self.simbolos = pila
 
         if self.cuerpo and self.cuerpo[1]:
             # Instrucciones
@@ -279,11 +282,12 @@ movl %esp, %ebp\n'''
         self.ensamblador += "\n# el return : \n\n"  # comentario del return
 
         # final el return
+        
         self.ensamblador += retorno.cadena()
 
         print("\n\nfin funcion", nombre)
 
-    def cadena(self,asm =[]):
+    def cadena(self,asm = "",SIMBOLOS_GLOBALES = dict()):
         if len(self.Variables_texto)>0:
             print("CADENA")
             
@@ -295,12 +299,44 @@ movl %esp, %ebp\n'''
            
 
             
-        return self.ensamblador
+        return self.cambiar_variables(self.ensamblador,SIMBOLOS_GLOBALES)
 
     def escribe(self):
         print(self.cadena())
 
 
+    def cambiar_variables(self,texto,simbolos):
+
+
+        def transformar(texto):
+            partes = texto.group(1).split(' ')
+            numero  = 0
+            #buscar en la tabla
+            if partes[0] == "eax" or partes[0] == "ebx":
+                texto_encontrado = f"${partes[0]}"
+            elif partes[0].isdigit():
+                texto_encontrado = f"${int(partes[0])}"
+            elif partes[0] in self.simbolos:
+                numero = self.simbolos[partes[0]]
+                texto_encontrado = f"{numero}(%ebp)" # Captura el texto entre $
+                
+            elif partes[0] in simbolos:
+                numero = self.simbolos[partes[0]]
+                texto_encontrado = f"{numero}(%ebp)" # Captura el texto entre $
+            else:
+                raise(ValueError(f"LA VARIABLE %{partes[0]}% en la funcion {self.nombre} NO ESTA DEFINIDA"))
+            
+
+            
+            return texto_encontrado 
+
+
+
+        return re.sub(r'\$(.+?)\$', transformar, texto)
+        
+        
+
+'''
 class Nodotermino(Nodo):
     valor = None  # valor numerico
 
@@ -324,6 +360,46 @@ class Nodotermino(Nodo):
 
     def escribe(self):
         print(self.cadena())
+'''
+
+
+class Nodotermino(Nodo):
+    valor = None  # valor numerico
+
+    def __init__(self, v, simbolo=None, offset=None):
+        
+        self.nombre = v
+        self.simbolo = simbolo
+        self.offset = offset
+
+       
+    def cadena(self):
+        cadena = []
+        cadena += self.nombre
+        
+        if self.simbolo:
+            cadena += " "
+            cadena += str(self.simbolo)
+            
+
+        
+
+        if self.offset:
+            cadena += " "
+            if isinstance(self.offset,list):
+                cadena += ",".join(self.offset)
+            else:
+                cadena += str(self.offset)
+            
+
+        return "".join(cadena)
+
+
+    def escribe(self):
+        print(self.cadena())
+
+
+
 
 
 class Nodosumaresta(Nodo):
@@ -513,16 +589,23 @@ class Nodoasignacion(Nodo):
         self.esoperacion = esoperacion
 
     def cadena(self):
-        
-        if self.esoperacion:
-            cad = self.orig + f"movl $eax$ ${self.dest[-1]}$\n"
-        else:
-            cad = f"movl ${self.orig}$ ${self.dest[-1]}$\n"
+        if isinstance(self.dest,list):
+            if self.esoperacion:
+                cad = self.orig + f"movl $eax$ ${self.dest[-1]}$\n"
+            else:
+                cad = f"movl ${self.orig}$ ${self.dest[-1]}$\n"
 
-        ant = self.dest[-1]
-        for id in self.dest[-2::-1]:
-            cad += f"movl ${ant}$ ${id}$\n"
-            ant = id
+            ant = self.dest[-1]
+            for id in self.dest[-2::-1]:
+                cad += f"movl ${ant}$ ${id}$\n"
+                ant = id
+        else:
+            if self.esoperacion:
+                cad = self.orig + f"movl $eax$ ${self.dest}$\n"
+            else:
+                cad = f"movl ${self.orig}$ ${self.dest}$\n"
+
+
 
         return cad
 
