@@ -843,7 +843,7 @@ class Nodoprint(Nodo):
     def __init__(self,parametros,contador_variable = 0):
         contador_variable += 0
         cadena = []
-        contador = 0
+        contador = 4
         
         if isinstance(parametros,tuple):
             self.texto = f".S{contador_variable}: \n    .text {parametros[0]}\n"
@@ -865,14 +865,15 @@ class Nodoprint(Nodo):
                 v = parametros[1]
                 if isinstance(v,Nododeclaracion):
                     cadena += f"pushl ${v.cadena()}$\n"
+                    
                         
                 else:
                     cadena_arbo = []
                     bajar_arbo(v,0,cadena_arbo,contador_variable)
                     cadena += cadena_arbo
                     cadena += f"pushl $eax$\n"
-
-            cadena += f"pushl $s{contador_variable}$\n\n"
+                contador += 4
+            cadena += f"pushl s{contador_variable}\n\n"
             cadena += "call printf\n"
             cadena += f"addl ${contador} esp\n\n"
         else:
