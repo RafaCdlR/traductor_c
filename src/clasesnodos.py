@@ -556,7 +556,7 @@ class Nodoasignacion(Nodo):
         # self.bajar_arbo2(p.operacion,0,cadena)
         # print("\n\n-----\n\n")
         # si no es un id recorre arbol
-        if not isinstance(operacion, Nodotermino):
+        if not isinstance(operacion, (Nodotermino, Nodollamada_funcion)):
             bajar_arbo(operacion, 0, cadena, contador)
 
             cadena = "".join(cadena)
