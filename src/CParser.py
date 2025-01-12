@@ -36,9 +36,10 @@ class CParser(Parser):
             self.anadir_simbolo_individual(tipo, nombre, contenido)
 
     def anadir_simbolo_individual(self, tipo, nombre, contenido=0):
+        
         try:
             if nombre not in self.simbolos:
-                if tipo == "int" or tipo == "funcion" or tipo == "int* ":
+                if tipo == "int" or tipo == "funcion" or tipo == "int* " or tipo == "void":
                     self.simbolos[nombre] = contenido
                 else:
                     raise Exception("tipo no valido")
@@ -172,11 +173,17 @@ class CParser(Parser):
     @_('TYPE ID "(" parametros ")" "{" statement retorno ";" "}"')
     def funcion(self, p):
 
+        # añadir simbolo?
+        self.anadir_simbolo(p.TYPE, p.ID, [p.statement] + [p.retorno])
+
         return nodofuncion(p.TYPE, p.ID, p.parametros, p.statement,self.contadoretiquetas, p.retorno)
         #return ("funcion", p.TYPE, p.ID, p.parametros, p.statement)
 
     @_('VOID ID "(" parametros ")" "{" statement "}"')
     def funcion(self, p):
+
+        # añadir simbolo?
+        self.anadir_simbolo(p.VOID, p.ID, p.statement)
 
         return nodofuncion(p.VOID, p.ID,p.parametros,p.statement,self.contadoretiquetas)
         # return ("funcion", p.VOID, p.ID, p.parametros, p.statement)
@@ -447,6 +454,60 @@ class CParser(Parser):
     ###########################################################################
 
     ###########################################################################
+    ############################### FUNCIONES #################################
+    ###########################################################################
+
+    '''
+    @_('ID "(" funcion_args ")"')
+    def expr(self, p):
+        return (p.ID, p.funcion_args)
+    '''
+
+    @_('ID funcion_parentesis')
+    def expr(self, p):
+        # try:
+            if self.simbolos:
+                if p.ID not in self.simbolos:
+                    raise Exception("Funcion no declarada")
+        
+                return (p.ID, p.funcion_parentesis)
+            else:
+                raise Exception("Funcion no declarada.")
+        # except Exception:
+          #  pass
+
+    @_('"(" funcion_args ")"')
+    def funcion_parentesis(self, p):
+        return p.funcion_args
+
+    # Posibilidad de estar vacío sin definir una regla @_('') que causa conflictos
+    @_('"(" ")"')
+    def funcion_parentesis(self, p):
+        pass
+
+    @_('funcion_args "," parametro_funcion')
+    def funcion_args(self, p):
+        return (p.funcion_args, p.parametro_funcion)
+
+    @_('parametro_funcion')
+    def funcion_args(self, p):
+        return p.parametro_funcion
+
+    @_('operacion')
+    def parametro_funcion(self, p):
+        return p.operacion
+
+    @_('id_list')
+    def parametro_funcion(self, p):
+        return p.id_list
+    
+    ###########################################################################
+    # -------------------------------------------------------------------------
+    # --------------------------- FIN_FUNCIONES -------------------------------
+    # -------------------------------------------------------------------------
+    ###########################################################################
+
+    ###########################################################################
     ################################## PRINTF #################################
     ###########################################################################
 
@@ -484,6 +545,7 @@ class CParser(Parser):
     def printf_args(self, p):
         return p.STRING
 
+    # debería de ser 'variables_a_imprimir, operaciones_a_imprimir' -> mirar en detalle
     @_('operaciones_a_imprimir')
     def variables_a_imprimir(self, p):
         if isinstance(p.operaciones_a_imprimir, tuple):
@@ -491,6 +553,7 @@ class CParser(Parser):
         else:
             return [p.operaciones_a_imprimir]
 
+    # debería de ser 'variables_a_imprimir, id_list' -> mirar en detalle
     @_('id_list')
     def variables_a_imprimir(self, p):
         if isinstance(p.id_list, tuple):
@@ -569,7 +632,6 @@ class CParser(Parser):
     # ----------------------------- IF_ELSE_FIN -------------------------------
     # -------------------------------------------------------------------------
     ###########################################################################
-    
 
     ###########################################################################
     ################################ WHILE_LOOP ###############################
@@ -766,6 +828,24 @@ if __name__ == '__main__':
               }
                 '''
               }
+
+    textos = {'''
+    int a; // Esto es la declaración de una variable global
+    int b, c; // Esto son las declaraciones de varias variables globales
+
+    void prueba() {
+    }
+
+    int main() {
+    a = 3;
+    b = 57;
+    c = 100;
+    prueba();
+    return 0;
+    }
+    '''
+    }
+    
     for texto in textos:
         # try:
         print("\n\n\n\n", texto, " :")
@@ -779,8 +859,7 @@ if __name__ == '__main__':
     print("tabla de simbolos :")
 
     for clave, valor in parser.simbolos.items():
-        pass
-        #print(type(valor), " ", clave, " = ", valor)
+        print(type(valor), " ", clave, " = ", valor)
 
 
 ###########################################################################

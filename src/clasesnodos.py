@@ -190,9 +190,26 @@ movl %esp, %ebp\n'''
             else:
                 self.ensamblador += f"\n FALTA NODO : {dec} \n"
         '''
-        # compruebo si se puede iterar sobre el objeto
-        if isinstance(self.cuerpo[0], list):
-            for dec in self.cuerpo[0]:
+
+        if self.cuerpo and self.cuerpo[0]:
+            # compruebo si se puede iterar sobre el objeto
+            if isinstance(self.cuerpo[0], list):
+                for dec in self.cuerpo[0]:
+                    print(dec)
+                    if isinstance(dec, Nododeclaracion):
+                        self.ensamblador += dec.cadena()
+
+                        tam = 1
+                        # sumar las dimensiones para el tamaño del array
+                        for n in dec.array:
+                            tam *= n
+
+                        pila[dec.nombre] = f"{contador}(%ebp)"
+                        contador -= 4 * tam
+                    else:
+                        self.ensamblador += f"\n FALTA NODO : {dec} \n"
+            else:
+                dec = self.cuerpo[0]
                 print(dec)
                 if isinstance(dec, Nododeclaracion):
                     self.ensamblador += dec.cadena()
@@ -206,53 +223,36 @@ movl %esp, %ebp\n'''
                     contador -= 4 * tam
                 else:
                     self.ensamblador += f"\n FALTA NODO : {dec} \n"
-        else:
-            dec = self.cuerpo[0]
-            print(dec)
-            if isinstance(dec, Nododeclaracion):
-                self.ensamblador += dec.cadena()
-
-                tam = 1
-                # sumar las dimensiones para el tamaño del array
-                for n in dec.array:
-                    tam *= n
-
-                pila[dec.nombre] = f"{contador}(%ebp)"
-                contador -= 4 * tam
-            else:
-                self.ensamblador += f"\n FALTA NODO : {dec} \n"
 
         print(pila)
 
-        # Instrucciones
-        if isinstance(self.cuerpo[1], list):
-            for ins in self.cuerpo[1]:
+        if self.cuerpo and self.cuerpo[0]:
+            # Instrucciones
+            if isinstance(self.cuerpo[1], list):
+                for ins in self.cuerpo[1]:
+                    self.ensamblador += "\n#" + type(ins).__name__ + "\n\n"
+                    if isinstance(ins, Nodo):
+                        self.ensamblador += ins.cadena()
+
+                        if isinstance(ins,Nodoprint):#anadir texto a las globales
+                            print("DENTRO")
+                            print(ins.rodata())
+                            self.Variables_texto.append(ins.rodata())
+
+                    else:
+                        self.ensamblador += f"\n FALTA NODO : {ins} \n"
+            else:
+                ins = self.cuerpo[1]
                 self.ensamblador += "\n#" + type(ins).__name__ + "\n\n"
                 if isinstance(ins, Nodo):
                     self.ensamblador += ins.cadena()
 
                     if isinstance(ins,Nodoprint):#anadir texto a las globales
                         print("DENTRO")
-                        print(ins.rodata())
                         self.Variables_texto.append(ins.rodata())
-
 
                 else:
                     self.ensamblador += f"\n FALTA NODO : {ins} \n"
-        else:
-            ins = self.cuerpo[1]
-            self.ensamblador += "\n#" + type(ins).__name__ + "\n\n"
-            if isinstance(ins, Nodo):
-                self.ensamblador += ins.cadena()
-
-                if isinstance(ins,Nodoprint):#anadir texto a las globales
-                    print("DENTRO")
-                    self.Variables_texto.append(ins.rodata())
-
-
-
-            else:
-                self.ensamblador += f"\n FALTA NODO : {ins} \n"
 
 
         self.ensamblador += "\n# el return : \n\n"  # comentario del return
