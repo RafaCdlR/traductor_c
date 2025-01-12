@@ -5,13 +5,123 @@ from collections import deque
 import asm_translator
 
 
+
+class Numero:
+    def __init__(self, valor):
+        self.valor = valor
+    
+    # Sobrecarga de operadores aritméticos
+    def __add__(self, otro):
+        if isinstance(otro, Numero):
+            return Numero(self.valor + otro.valor)
+        return Numero(self.valor + otro)
+    
+    def __sub__(self, otro):
+        if isinstance(otro, Numero):
+            return Numero(self.valor - otro.valor)
+        return Numero(self.valor - otro)
+    
+    def __mul__(self, otro):
+        if isinstance(otro, Numero):
+            return Numero(self.valor * otro.valor)
+        return Numero(self.valor * otro)
+    
+    def __truediv__(self, otro):
+        if isinstance(otro, Numero):
+            return Numero(self.valor / otro.valor)
+        return Numero(self.valor / otro)
+    
+    def __floordiv__(self, otro):
+        if isinstance(otro, Numero):
+            return Numero(self.valor // otro.valor)
+        return Numero(self.valor // otro)
+    
+    def __mod__(self, otro):
+        if isinstance(otro, Numero):
+            return Numero(self.valor % otro.valor)
+        return Numero(self.valor % otro)
+    
+    def __pow__(self, otro):
+        if isinstance(otro, Numero):
+            return Numero(self.valor ** otro.valor)
+        return Numero(self.valor ** otro)
+    
+    # Sobrecarga de operadores de comparación
+    def __eq__(self, otro):
+        if isinstance(otro, Numero):
+            return self.valor == otro.valor
+        return self.valor == otro
+    
+    def __ne__(self, otro):
+        if isinstance(otro, Numero):
+            return self.valor != otro.valor
+        return self.valor != otro
+    
+    def __lt__(self, otro):
+        if isinstance(otro, Numero):
+            return self.valor < otro.valor
+        return self.valor < otro
+    
+    def __le__(self, otro):
+        if isinstance(otro, Numero):
+            return self.valor <= otro.valor
+        return self.valor <= otro
+    
+    def __gt__(self, otro):
+        if isinstance(otro, Numero):
+            return self.valor > otro.valor
+        return self.valor > otro
+    
+    def __ge__(self, otro):
+        if isinstance(otro, Numero):
+            return self.valor >= otro.valor
+        return self.valor >= otro
+    
+    # Sobrecarga de operadores de asignación
+    def __iadd__(self, otro):
+        self.valor += otro.valor if isinstance(otro, Numero) else otro
+        return self
+
+    def __isub__(self, otro):
+        self.valor -= otro.valor if isinstance(otro, Numero) else otro
+        return self
+
+    def __imul__(self, otro):
+        self.valor *= otro.valor if isinstance(otro, Numero) else otro
+        return self
+
+    def __itruediv__(self, otro):
+        self.valor /= otro.valor if isinstance(otro, Numero) else otro
+        return self
+
+    def __ifloordiv__(self, otro):
+        self.valor //= otro.valor if isinstance(otro, Numero) else otro
+        return self
+
+    def __imod__(self, otro):
+        self.valor %= otro.valor if isinstance(otro, Numero) else otro
+        return self
+
+    def __ipow__(self, otro):
+        self.valor **= otro.valor if isinstance(otro, Numero) else otro
+        return self
+
+    # Representación en cadena
+    def __str__(self):
+        return str(self.valor)
+    
+    def __repr__(self):
+        return f"Numero({self.valor})"
+
+
+
 class CParser(Parser):
     # lexer
     tokens = CLexer.tokens
     debugfile = 'parser.out'
     simbolos = dict()
     asm = ""
-    contadoretiquetas = 0
+    contadoretiquetas = Numero(0)
 
     precedence = (
         ('right', ASSIGN),
@@ -424,6 +534,7 @@ class CParser(Parser):
 
     @_('lvalue ASSIGN operacion_asignacion')
     def expr(self, p):
+        print(p.lvalue)
         return Nodoasignacion(p.operacion_asignacion, p.lvalue,self.contadoretiquetas)
 
     @_('operacion')
@@ -448,14 +559,15 @@ class CParser(Parser):
 
     @_('lvalue ASSIGN ID')
     def lvalue(self, p):
-
-
         return p.lvalue + [Nodotermino(p.ID)]
-    
 
     @_('ID')
     def lvalue(self, p):
         return [Nodotermino(p.ID)]
+
+    @_('id_array')
+    def lvalue(self, p):
+        return p.id_array
 
     @_('"*" ID')
     def lvalue(self, p):
@@ -527,7 +639,7 @@ class CParser(Parser):
 
     @_('PRINTF "(" printf_args ")"')
     def expr(self, p):
-        return Nodoprint(p.printf_args,self.contadoretiquetas)
+        return Nodoprint(p.printf_args)
 
     @_('STRING "," variables_a_imprimir')
     def printf_args(self, p):
