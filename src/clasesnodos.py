@@ -552,20 +552,23 @@ class Nodoasignacion(Nodo):
         esoperacion = True
         cadena = []
 
-        cadena += "\n# " + str(dest) + " = " + operacion.cadena() + "\n\n"
+        cadena += "\n# Asignacion : \n\n"
         # self.bajar_arbo2(p.operacion,0,cadena)
         # print("\n\n-----\n\n")
         # si no es un id recorre arbol
-        if not isinstance(operacion, (Nodotermino, Nodollamada_funcion)):
+        if not isinstance(operacion, (Nodotermino,Nodollamada_funcion)):
             bajar_arbo(operacion, 0, cadena, contador)
 
-            cadena = "".join(cadena)
-
+            
+        elif isinstance(operacion,Nodollamada_funcion):
+                        
+            cadena += operacion.cadena()
+            esoperacion = True
         else:
             esoperacion = False
             cadena = operacion.cadena()
 
-        self.orig = cadena
+        self.orig =  "".join(cadena)
         self.esoperacion = esoperacion
 
     def cadena(self):
@@ -762,19 +765,22 @@ class Nodoprint(Nodo):
 
     def __init__(self,parametros,contador_variable):
         contador_variable += 1
-  
         cadena = []
         contador = 4
 
         if isinstance(parametros, tuple):
-            self.texto = f".S{contador_variable}: \n    .text {
-                parametros[0]}\n"
+            self.texto = f".S{contador_variable}: \n    .text {parametros[0]}\n"
+                
 
             if isinstance(parametros[1], list):
                 for v in parametros[1][::-1]:
 
                     if isinstance(v, Nododeclaracion):
                         cadena += f"pushl ${v.cadena()}$\n"
+                    elif isinstance(v,Nodollamada_funcion):
+                        
+                        cadena += v.cadena()
+                        cadena += "pushl $eax$\n"
 
                     else:
                         cadena_arbo = []
@@ -787,7 +793,9 @@ class Nodoprint(Nodo):
                 v = parametros[1]
                 if isinstance(v, Nododeclaracion):
                     cadena += f"pushl ${v.cadena()}$\n"
-
+                elif isinstance(v,Nodollamada_funcion):
+                    cadena += v.cadena()
+                    cadena += "pushl $eax$\n"
                 else:
                     cadena_arbo = []
                     bajar_arbo(v, 0, cadena_arbo, contador_variable)
