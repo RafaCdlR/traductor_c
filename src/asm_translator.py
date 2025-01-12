@@ -87,5 +87,13 @@ def raw_oper(oper: str):
     return f'{operdict[oper]} %eax, %ebx'
 
 
+# params: array de strings, almacena strings de la forma %ebp+offset para
+# variables locales o con el nombre de la variable global
 def call_function(name: str, params: list):
-    pass
+    assembled = ""
+    for i in reversed(params):
+        assembled += f"movl {i}, %eax\n"
+    assembled += f"call {name}\n"
+    assembled += f"addl ${4*len(params)}, %esp"
+
+    return assembled
