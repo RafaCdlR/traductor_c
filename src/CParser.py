@@ -513,7 +513,7 @@ class CParser(Parser):
 
     @_('PRINTF "(" printf_args ")"')
     def expr(self, p):
-        return Nodoprint(p.printf_args)
+        return Nodoprint(p.printf_args,self.contadoretiquetas)
 
     @_('STRING "," variables_a_imprimir')
     def printf_args(self, p):

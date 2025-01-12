@@ -840,8 +840,8 @@ class NodoOr(Nodo):
 
 class Nodoprint(Nodo):
 
-    def __init__(self,parametros,contador_variable = 0):
-        contador_variable += 0
+    def __init__(self,parametros,contador_variable):
+        contador_variable += 1
         cadena = []
         contador = 4
         
