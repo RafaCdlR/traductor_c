@@ -11,6 +11,7 @@ TEST_PATH=tests
 BUILD_PATH=build
 ZIP_PATH=entrega.zip
 
+OPEN_PDF?=True
 
 .PHONY: all tests clean zip clean-all
 .SILENT: all

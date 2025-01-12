@@ -422,6 +422,19 @@ class CParser(Parser):
     ################################## EXPR ###################################
     ###########################################################################
 
+    @_('lvalue ASSIGN operacion_asignacion')
+    def expr(self, p):
+        return Nodoasignacion(p.operacion_asignacion, p.lvalue,self.contadoretiquetas)
+
+    @_('operacion')
+    def operacion_asignacion(self, p):
+        return p.operacion
+
+    @_('operacion_asignacion')
+    def expr(self, p):
+        return p.operacion_asignacion
+
+    '''
     @_('lvalue ASSIGN operacion')
     def expr(self, p):
 
@@ -431,6 +444,7 @@ class CParser(Parser):
     def expr(self, p):
         
         return p.operacion
+    '''
 
     @_('lvalue ASSIGN ID')
     def lvalue(self, p):
@@ -464,7 +478,7 @@ class CParser(Parser):
     '''
 
     @_('ID funcion_parentesis')
-    def expr(self, p):
+    def operacion_asignacion(self, p):
         # try:
             if self.simbolos:
                 if p.ID not in self.simbolos:
