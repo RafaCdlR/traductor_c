@@ -1,4 +1,4 @@
-
+import re
 
 def bajar_arbo(nod, prof, cadena, contador=0, der=False):
     aux = "%ebx" if der else "%eax"
@@ -9,22 +9,49 @@ def bajar_arbo(nod, prof, cadena, contador=0, der=False):
         "-": "subl"       # Resta
 
     }
+    #cadena += "\n#  " + str(type(nod)) + " \n\n"
 
     if (isinstance(nod, (NodoAnd, NodoOr, NodoopUnario))):
         cadena += nod.cadena()
-        return False
+        return False,False
 
     elif (not isinstance(nod, (Nodotermino, Nodocadena))):
 
         if (not isinstance(nod, NodoopUnario)):
+<<<<<<< HEAD
             pila1 = bajar_arbo(nod.left, prof+1, cadena, contador, False)
+=======
+            pila1 , estermino = bajar_arbo(nod.left, prof+1, cadena,contador, False)
+>>>>>>> 1185185647f5e725c18c1b848c02245e33aad648
         else:
-            pila1 = None
+            pila1 = False
 
+<<<<<<< HEAD
         pila2 = bajar_arbo(nod.right, prof+1, cadena, contador, True)
 
         cadena += "\n#  " + nod.cadena() + " \n\n"
 
+=======
+        #mirar si a la derecha hay operacion pa meter en la pila 
+        if estermino and hasattr(nod, 'right') and not isinstance(nod.right, (Nodotermino, Nodocadena)):
+
+            cadena += "pushl %eax\n"
+            pila1 = True
+
+
+
+
+        
+
+        
+
+        pila2,_ = bajar_arbo(nod.right, prof+1, cadena,contador, True)
+
+        cadena += "\n#  " + nod.cadena() + " \n\n"
+
+        
+        
+>>>>>>> 1185185647f5e725c18c1b848c02245e33aad648
         if pila1:  # sacar de la pila si fuera necesario
             cadena += r"popl %eax"+"\n"
         if pila2:
@@ -71,13 +98,21 @@ def bajar_arbo(nod, prof, cadena, contador=0, der=False):
             cadena += f"{operators[nod.operador]} %ebx, %eax\n\n"
 
         if prof != 0:
+<<<<<<< HEAD
             cadena += "pushl %eax\n"
 
         return True
+=======
+           cadena += "pushl %eax\n"
+
+        
+        return True , False
+>>>>>>> 1185185647f5e725c18c1b848c02245e33aad648
 
     else:
+        cadena += "\n#  " + nod.cadena() + " \n\n"
         cadena += f"movl ${nod.cadena()}$, {aux}\n"
-        return False
+        return False , True #por si hay parentesis a la derecha hay q meter en pila 
 
 
 class Nodo():
@@ -90,10 +125,10 @@ class Nodo():
 
     def __str__(self):
 
-        return self.cadena()
+       return self.cadena()
 
     def __repr__(self):
-        return self.cadena()
+       return self.cadena()
 
 
 class nodoreturn(Nodo):
@@ -125,11 +160,12 @@ class nodoreturn(Nodo):
         cad = ""
 
         # si la cadena esta vacia es un void y solo se hace la parte final
-        if self.cad != "":
-            if self.esoperacion:
-                cad = self.cad + f"movl $eax$ ${cad}$\n"
-            else:
-                cad = f"movl ${self.cad}$ $eax$\n"
+        
+        if not self.esoperacion and self.cad != "":
+            cad = f"movl ${self.cad}$ $eax$\n"
+        else:
+            cad += self.cad
+                
 
         return cad + "movl %ebp, %esp  \npopl %ebp \nret  \n"
 
@@ -141,7 +177,12 @@ class nodofuncion(Nodo):
     # al final volver a copiar la primera posicion de
     # la base de la pila a ebp (base anterior) (ret)
 
+<<<<<<< HEAD
     def __init__(self, tipo, nombre, parametros, cuerpo, contador, retorno=nodoreturn("", 0)):
+=======
+    def __init__(self, tipo, nombre, parametros, cuerpo, contador,retorno=nodoreturn("",0)):
+        print("CUERPO",cuerpo)
+>>>>>>> 1185185647f5e725c18c1b848c02245e33aad648
         pila = dict()
         self.tipo = tipo
         self.nombre = nombre
@@ -149,8 +190,9 @@ class nodofuncion(Nodo):
         self.cuerpo = cuerpo
         self.Variables_texto = []
         self.contador = contador
+        self.ensamblador = f"\n\n\n\n################ FUNCION {nombre} ####################\n\n\n\n\n"
 
-        self.ensamblador = f'''
+        self.ensamblador += f'''
 .text \n
 .globl {nombre} \n
 .type {nombre}, @function \n
@@ -168,7 +210,7 @@ movl %esp, %ebp\n'''
                 raise ValueError(f"Error: variable repetida {
                                  var[1]} en la función {nombre}")
 
-            pila[var[1]] = f"{contador}(%ebp)"
+            pila[var[1]] = contador
 
             contador += 4
 
@@ -206,7 +248,7 @@ movl %esp, %ebp\n'''
                         for n in dec.array:
                             tam *= n
 
-                        pila[dec.nombre] = f"{contador}(%ebp)"
+                        pila[dec.nombre] = contador
                         contador -= 4 * tam
                     else:
                         self.ensamblador += f"\n FALTA NODO : {dec} \n"
@@ -221,19 +263,23 @@ movl %esp, %ebp\n'''
                     for n in dec.array:
                         tam *= n
 
-                    pila[dec.nombre] = f"{contador}(%ebp)"
+                    pila[dec.nombre] = contador
                     contador -= 4 * tam
                 else:
                     self.ensamblador += f"\n FALTA NODO : {dec} \n"
 
         print(pila)
 
-        if self.cuerpo and self.cuerpo[0]:
+
+        self.simbolos = pila
+
+        if self.cuerpo and self.cuerpo[1]:
             # Instrucciones
             if isinstance(self.cuerpo[1], list):
                 for ins in self.cuerpo[1]:
-                    self.ensamblador += "\n#" + type(ins).__name__ + "\n\n"
+                    
                     if isinstance(ins, Nodo):
+                        self.ensamblador += "\n#" + type(ins).__name__ + "\n\n"
                         self.ensamblador += ins.cadena()
 
                         if isinstance(ins, Nodoprint):  # anadir texto a las globales
@@ -259,12 +305,21 @@ movl %esp, %ebp\n'''
         self.ensamblador += "\n# el return : \n\n"  # comentario del return
 
         # final el return
+        
         self.ensamblador += retorno.cadena()
 
         print("\n\nfin funcion", nombre)
 
+<<<<<<< HEAD
     def cadena(self, asm=[]):
         if len(self.Variables_texto) > 0:
+=======
+    def cadena(self):
+        return f"funcion : {self.nombre}\n"
+
+    def cadena2(self,asm = "",SIMBOLOS_GLOBALES = dict()):
+        if len(self.Variables_texto)>0:
+>>>>>>> 1185185647f5e725c18c1b848c02245e33aad648
             print("CADENA")
 
             asm.append("Section.rodata    \n")
@@ -272,12 +327,51 @@ movl %esp, %ebp\n'''
                 self.contador += 1
                 asm.append(f"{text}\n\n")
 
+<<<<<<< HEAD
         return self.ensamblador
+=======
+           
+
+            
+        return self.cambiar_variables(self.ensamblador,SIMBOLOS_GLOBALES)
+>>>>>>> 1185185647f5e725c18c1b848c02245e33aad648
 
     def escribe(self):
         print(self.cadena())
 
 
+    def cambiar_variables(self,texto,simbolos):
+
+
+        def transformar(texto):
+            partes = texto.group(1).split(' ')
+            numero  = 0
+            #buscar en la tabla
+            if partes[0] == "eax" or partes[0] == "ebx":
+                texto_encontrado = f"${partes[0]}"
+            elif partes[0].isdigit():
+                texto_encontrado = f"${int(partes[0])}"
+            elif partes[0] in self.simbolos:
+                numero = self.simbolos[partes[0]]
+                texto_encontrado = f"{numero}(%ebp)" # Captura el texto entre $
+                
+            elif partes[0] in simbolos:
+                numero = simbolos[partes[0]]
+                texto_encontrado = f"{numero}" # Captura el texto entre $
+            else:
+                raise(ValueError(f"LA VARIABLE %{partes[0]}% en la funcion {self.nombre} NO ESTA DEFINIDA : \n tabla global : \n {simbolos} \n\n#############\n\n tabla de funcion : \n {self.simbolos}"))
+            
+
+            
+            return texto_encontrado 
+
+
+
+        return re.sub(r'\$([^\n]+?)\$', transformar, texto)
+        
+        
+
+'''
 class Nodotermino(Nodo):
     valor = None  # valor numerico
 
@@ -301,6 +395,46 @@ class Nodotermino(Nodo):
 
     def escribe(self):
         print(self.cadena())
+'''
+
+
+class Nodotermino(Nodo):
+    valor = None  # valor numerico
+
+    def __init__(self, v, simbolo=None, offset=None):
+        
+        self.nombre = v
+        self.simbolo = simbolo
+        self.offset = offset
+
+       
+    def cadena(self):
+        cadena = []
+        cadena += self.nombre
+        
+        if self.simbolo:
+            cadena += " "
+            cadena += str(self.simbolo)
+            
+
+        
+
+        if self.offset:
+            cadena += " "
+            if isinstance(self.offset,list):
+                cadena += ",".join(self.offset)
+            else:
+                cadena += str(self.offset)
+            
+
+        return "".join(cadena)
+
+
+    def escribe(self):
+        print(self.cadena())
+
+
+
 
 
 class Nodosumaresta(Nodo):
@@ -488,16 +622,31 @@ class Nodoasignacion(Nodo):
         self.esoperacion = esoperacion
 
     def cadena(self):
+<<<<<<< HEAD
 
         if self.esoperacion:
             cad = self.orig + f"movl $eax$ ${self.dest[-1]}$\n"
         else:
             cad = f"movl ${self.orig}$ ${self.dest[-1]}$\n"
+=======
+        if isinstance(self.dest,list):
+            if self.esoperacion:
+                cad = self.orig + f"movl $eax$ ${self.dest[-1]}$\n"
+            else:
+                cad = f"movl ${self.orig}$ ${self.dest[-1]}$\n"
 
-        ant = self.dest[-1]
-        for id in self.dest[-2::-1]:
-            cad += f"movl ${ant}$ ${id}$\n"
-            ant = id
+            ant = self.dest[-1]
+            for id in self.dest[-2::-1]:
+                cad += f"movl ${ant}$ ${id}$\n"
+                ant = id
+        else:
+            if self.esoperacion:
+                cad = self.orig + f"movl $eax$ ${self.dest}$\n"
+            else:
+                cad = f"movl ${self.orig}$ ${self.dest}$\n"
+
+>>>>>>> 1185185647f5e725c18c1b848c02245e33aad648
+
 
         return cad
 
@@ -673,6 +822,7 @@ class Nodoprint(Nodo):
     def __init__(self, parametros, contador_variable=0):
         contador_variable += 0
         cadena = []
+<<<<<<< HEAD
         contador = 0
 
         if isinstance(parametros, tuple):
@@ -680,6 +830,14 @@ class Nodoprint(Nodo):
                 parametros[0]}\n"
 
             if isinstance(parametros[1], list):
+=======
+        contador = 4
+        
+        if isinstance(parametros,tuple):
+            self.texto = f".S{contador_variable}: \n    .text {parametros[0]}\n"
+            
+            if isinstance(parametros[1],list):
+>>>>>>> 1185185647f5e725c18c1b848c02245e33aad648
                 for v in parametros[1][::-1]:
 
                     if isinstance(v, Nododeclaracion):
@@ -696,14 +854,19 @@ class Nodoprint(Nodo):
                 v = parametros[1]
                 if isinstance(v, Nododeclaracion):
                     cadena += f"pushl ${v.cadena()}$\n"
+<<<<<<< HEAD
 
+=======
+                    
+                        
+>>>>>>> 1185185647f5e725c18c1b848c02245e33aad648
                 else:
                     cadena_arbo = []
                     bajar_arbo(v, 0, cadena_arbo, contador_variable)
                     cadena += cadena_arbo
                     cadena += f"pushl $eax$\n"
-
-            cadena += f"pushl $s{contador_variable}$\n\n"
+                contador += 4
+            cadena += f"pushl s{contador_variable}\n\n"
             cadena += "call printf\n"
             cadena += f"addl ${contador} esp\n\n"
         else:
@@ -721,3 +884,60 @@ class Nodoprint(Nodo):
 
     def escribe(self):
         print(self.cadena())
+
+
+
+
+class Nodollamada_funcion(Nodo):
+
+    def __init__(self,nombre,parametros,contador_variable = 0):
+        contador_variable += 0
+        cadena = []
+        contador = 0
+        
+        if parametros:
+            
+            if isinstance(parametros,list):
+                for v in parametros[::-1]:
+
+                    if isinstance(v,Nododeclaracion):
+                        cadena += f"pushl ${v.cadena()}$\n"
+                        
+                    else:
+                        cadena_arbo = []
+                        bajar_arbo(v,0,cadena_arbo,contador_variable)
+                        cadena += cadena_arbo
+                        cadena += f"pushl $eax$\n"
+
+                    contador += 4
+
+            else:
+                v = parametros
+                if isinstance(v,Nododeclaracion):
+                    cadena += f"pushl ${v.cadena()}$\n"
+                        
+                else:
+                    cadena_arbo = []
+                    bajar_arbo(v,0,cadena_arbo,contador_variable)
+                    cadena += cadena_arbo
+                    cadena += f"pushl $eax$\n"
+                
+                contador += 4
+
+            
+        cadena += f"call {nombre}\n"
+        cadena += f"addl ${contador} esp\n\n"
+    
+        self.cad = "".join(cadena)
+
+    def cadena(self):
+
+        return self.cad
+    
+  
+
+    def escribe(self):
+        print(self.cadena())
+
+
+

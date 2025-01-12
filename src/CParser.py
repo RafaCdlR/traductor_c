@@ -28,26 +28,29 @@ class CParser(Parser):
     ##################### FUNCIONES AUXILIARES ################################
     ###########################################################################
 
-    def anadir_simbolo(self, tipo, nombre, contenido=0, globales=[]):
-        if isinstance(nombre, list):
-            for n in nombre:
-                self.anadir_simbolo_individual(tipo, n, contenido)
+    def anadir_simbolo(self, nodo):
+        if isinstance(nodo, list):
+            for n in nodo:
+                self.anadir_simbolo_individual(nodo)
         else:
-            self.anadir_simbolo_individual(tipo, nombre, contenido)
+            self.anadir_simbolo_individual(nodo)
 
-    def anadir_simbolo_individual(self, tipo, nombre, contenido=0):
+    def anadir_simbolo_individual(self, nodo):
         
         try:
-            if nombre not in self.simbolos:
-                if tipo == "int" or tipo == "funcion" or tipo == "int* " or tipo == "void":
-                    self.simbolos[nombre] = contenido
-                else:
-                    raise Exception("tipo no valido")
+            if nodo.nombre not in self.simbolos:
+                
+                self.simbolos[nodo.nombre] = nodo
+                
+                
             else:
                 raise Exception(
-                    f"variable {nombre} ya declarada anteriormente")
-        except Exception:
-            pass
+                    f"variable {nodo.nombre} ya declarada anteriormente")
+        except:
+            raise Exception(
+                    f"variable {nodo.nombre} ya declarada anteriormente")
+            
+            
 
    
     def push_asm(self, str):
@@ -98,29 +101,26 @@ class CParser(Parser):
         print(p.globales)
         if isinstance(p.globales, list):
             for g in p.globales:
-                punt = ""
-                if g.espuntero:
-                    punt = "* "
+                
                 # Añadir símbolo y ensamblador
-                self.anadir_simbolo(g.tipo + punt, punt + g.nombre + str(g.array))
+                self.anadir_simbolo(g)
                 self.push_asm(f".globl {g.nombre}")
         else:
             if p.globales:
                 g = p.globales
-                punt = ""
-                if g.espuntero:
-                    punt = "* "
+                
                 # Añadir símbolo y ensamblador
-                self.anadir_simbolo(g.tipo + punt, punt + g.nombre + str(g.array))
+                self.anadir_simbolo(g)
                 self.push_asm(f".globl {g.nombre}")
 
         # Verificar y procesar `p.funciones`
+
         if isinstance(p.funciones, list):
             for f in p.funciones:
                 # Añadir símbolo y ensamblador
-                self.anadir_simbolo(f.tipo, f.nombre, f.cuerpo)
+                
                 textos_globales = [""]
-                self.push_asm(f.cadena(textos_globales))
+                self.push_asm(f.cadena2(textos_globales,self.simbolos))
                 self.asm = "".join(textos_globales) + self.asm
                 
         else:
@@ -128,7 +128,7 @@ class CParser(Parser):
             # Añadir símbolo y ensamblador
             self.anadir_simbolo(f.tipo, f.nombre, f.cuerpo)
             textos_globales = []
-            self.push_asm(f.cadena(textos_globales))
+            self.push_asm(f.cadena2(textos_globales,self.simbolos))
            
             self.asm = "".join(textos_globales) + self.asm
         # Guardar ensamblador en archivo
@@ -173,10 +173,10 @@ class CParser(Parser):
     @_('TYPE ID "(" parametros ")" "{" statement retorno ";" "}"')
     def funcion(self, p):
 
-        # añadir simbolo?
-        self.anadir_simbolo(p.TYPE, p.ID, [p.statement] + [p.retorno])
+        nodo = nodofuncion(p.TYPE, p.ID, p.parametros, p.statement,self.contadoretiquetas, p.retorno)
+        self.anadir_simbolo(nodo)
 
-        return nodofuncion(p.TYPE, p.ID, p.parametros, p.statement,self.contadoretiquetas, p.retorno)
+        return nodo
         #return ("funcion", p.TYPE, p.ID, p.parametros, p.statement)
 
     @_('VOID ID "(" parametros ")" "{" statement "}"')
@@ -436,16 +436,16 @@ class CParser(Parser):
     def lvalue(self, p):
 
 
-        return p.lvalue + [p.ID]
-        
+        return p.lvalue + [Nodotermino(p.ID)]
+    
 
     @_('ID')
     def lvalue(self, p):
-        return [p.ID]
+        return [Nodotermino(p.ID)]
 
     @_('"*" ID')
     def lvalue(self, p):
-        return [('*', p.ID)]
+        return [Nodotermino(p.ID,simbolo = "*")]
 
     ###########################################################################
     # -------------------------------------------------------------------------
@@ -470,7 +470,7 @@ class CParser(Parser):
                 if p.ID not in self.simbolos:
                     raise Exception("Funcion no declarada")
         
-                return (p.ID, p.funcion_parentesis)
+                return Nodollamada_funcion(p.ID,p.funcion_parentesis,self.contadoretiquetas)
             else:
                 raise Exception("Funcion no declarada.")
         # except Exception:
