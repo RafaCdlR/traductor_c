@@ -470,7 +470,7 @@ class CParser(Parser):
                 if p.ID not in self.simbolos:
                     raise Exception("Funcion no declarada")
         
-                return (p.ID, p.funcion_parentesis)
+                return Nodollamada_funcion(p.ID,p.funcion_parentesis,self.contadoretiquetas)
             else:
                 raise Exception("Funcion no declarada.")
         # except Exception:

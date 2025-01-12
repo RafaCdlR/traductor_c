@@ -124,11 +124,12 @@ class nodoreturn(Nodo):
         cad = ""
 
         # si la cadena esta vacia es un void y solo se hace la parte final
-        if self.cad != "":
-            if self.esoperacion:
-                cad = self.cad + f"movl $eax$ ${cad}$\n"
-            else:
-                cad = f"movl ${self.cad}$ $eax$\n"
+        
+        if not self.esoperacion and self.cad != "":
+            cad = f"movl ${self.cad}$ $eax$\n"
+        else:
+            cad += self.cad
+                
 
         return cad + "movl %ebp, %esp  \npopl %ebp \nret  \n"
 
@@ -141,6 +142,7 @@ class nodofuncion(Nodo):
     # la base de la pila a ebp (base anterior) (ret)
 
     def __init__(self, tipo, nombre, parametros, cuerpo, contador,retorno=nodoreturn("",0)):
+        print("CUERPO",cuerpo)
         pila = dict()
         self.tipo = tipo
         self.nombre = nombre
@@ -148,8 +150,9 @@ class nodofuncion(Nodo):
         self.cuerpo = cuerpo
         self.Variables_texto = []
         self.contador = contador
+        self.ensamblador = f"\n\n\n\n################ FUNCION {nombre} ####################\n\n\n\n\n"
 
-        self.ensamblador = f'''
+        self.ensamblador += f'''
 .text \n
 .globl {nombre} \n
 .type {nombre}, @function \n
@@ -226,12 +229,13 @@ movl %esp, %ebp\n'''
 
         print(pila)
 
-        if self.cuerpo and self.cuerpo[0]:
+        if self.cuerpo and self.cuerpo[1]:
             # Instrucciones
             if isinstance(self.cuerpo[1], list):
                 for ins in self.cuerpo[1]:
-                    self.ensamblador += "\n#" + type(ins).__name__ + "\n\n"
+                    
                     if isinstance(ins, Nodo):
+                        self.ensamblador += "\n#" + type(ins).__name__ + "\n\n"
                         self.ensamblador += ins.cadena()
 
                         if isinstance(ins,Nodoprint):#anadir texto a las globales
@@ -783,3 +787,60 @@ class Nodoprint(Nodo):
 
     def escribe(self):
         print(self.cadena())
+
+
+
+
+class Nodollamada_funcion(Nodo):
+
+    def __init__(self,nombre,parametros,contador_variable = 0):
+        contador_variable += 0
+        cadena = []
+        contador = 0
+        
+        if parametros:
+            
+            if isinstance(parametros,list):
+                for v in parametros[::-1]:
+
+                    if isinstance(v,Nododeclaracion):
+                        cadena += f"pushl ${v.cadena()}$\n"
+                        
+                    else:
+                        cadena_arbo = []
+                        bajar_arbo(v,0,cadena_arbo,contador_variable)
+                        cadena += cadena_arbo
+                        cadena += f"pushl $eax$\n"
+
+                    contador += 4
+
+            else:
+                v = parametros
+                if isinstance(v,Nododeclaracion):
+                    cadena += f"pushl ${v.cadena()}$\n"
+                        
+                else:
+                    cadena_arbo = []
+                    bajar_arbo(v,0,cadena_arbo,contador_variable)
+                    cadena += cadena_arbo
+                    cadena += f"pushl $eax$\n"
+                
+                contador += 4
+
+            
+        cadena += f"call {nombre}\n"
+        cadena += f"addl ${contador} esp\n\n"
+    
+        self.cad = "".join(cadena)
+
+    def cadena(self):
+
+        return self.cad
+    
+  
+
+    def escribe(self):
+        print(self.cadena())
+
+
+
