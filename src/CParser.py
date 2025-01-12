@@ -40,7 +40,7 @@ class CParser(Parser):
         try:
             if nombre not in self.simbolos:
                 if tipo == "int" or tipo == "funcion" or tipo == "int* " or tipo == "void":
-                    self.simbolos[nombre] = contenido
+                    self.simbolos[nombre] = tipo
                 else:
                     raise Exception("tipo no valido")
             else:

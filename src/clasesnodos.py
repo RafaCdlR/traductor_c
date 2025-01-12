@@ -186,7 +186,7 @@ movl %esp, %ebp\n'''
 
                 raise ValueError(f"Error: variable repetida {var[1]} en la función {nombre}")
 
-            pila[var[1]] = f"{contador}(%ebp)"
+            pila[var[1]] = contador
 
             contador += 4
 
@@ -322,9 +322,9 @@ movl %esp, %ebp\n'''
                 
             elif partes[0] in simbolos:
                 numero = self.simbolos[partes[0]]
-                texto_encontrado = f"{numero}(%ebp)" # Captura el texto entre $
+                texto_encontrado = f"{numero}" # Captura el texto entre $
             else:
-                raise(ValueError(f"LA VARIABLE %{partes[0]}% en la funcion {self.nombre} NO ESTA DEFINIDA"))
+                raise(ValueError(f"LA VARIABLE %{partes[0]}% en la funcion {self.nombre} NO ESTA DEFINIDA : \n tabla global : \n {simbolos} \n\n#############\n\n tabla de funcion : \n {self.simbolos}"))
             
 
             
@@ -332,7 +332,7 @@ movl %esp, %ebp\n'''
 
 
 
-        return re.sub(r'\$(.+?)\$', transformar, texto)
+        return re.sub(r'\$([^\n]+?)\$', transformar, texto)
         
         
 
