@@ -287,7 +287,10 @@ movl %esp, %ebp\n'''
 
         print("\n\nfin funcion", nombre)
 
-    def cadena(self,asm = "",SIMBOLOS_GLOBALES = dict()):
+    def cadena(self):
+        return f"funcion : {self.nombre}\n"
+
+    def cadena2(self,asm = "",SIMBOLOS_GLOBALES = dict()):
         if len(self.Variables_texto)>0:
             print("CADENA")
             
@@ -321,7 +324,7 @@ movl %esp, %ebp\n'''
                 texto_encontrado = f"{numero}(%ebp)" # Captura el texto entre $
                 
             elif partes[0] in simbolos:
-                numero = self.simbolos[partes[0]]
+                numero = simbolos[partes[0]]
                 texto_encontrado = f"{numero}" # Captura el texto entre $
             else:
                 raise(ValueError(f"LA VARIABLE %{partes[0]}% en la funcion {self.nombre} NO ESTA DEFINIDA : \n tabla global : \n {simbolos} \n\n#############\n\n tabla de funcion : \n {self.simbolos}"))
