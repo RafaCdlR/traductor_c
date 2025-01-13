@@ -210,7 +210,8 @@ movl %esp, %ebp\n'''
                         pila[dec.nombre] = contador
                         contador -= 4 * tam
                     else:
-                        self.ensamblador += f"\n FALTA NODO : {dec} \n"
+                        
+                        self.ensamblador += " 1 error" + str(type(dec)) 
             else:
                 dec = self.cuerpo[0]
                 print(dec)
@@ -226,7 +227,7 @@ movl %esp, %ebp\n'''
                     pila[dec.nombre] = contador
                     contador -= 4 * tam
                 else:
-                    self.ensamblador += f"\n FALTA NODO : {dec} \n"
+                    self.ensamblador += " 2 error" + str(type(dec))
 
         #meter en ensamblador
         self.ensamblador += f"subl ${abs(contador)} %esp\n"
@@ -250,7 +251,7 @@ movl %esp, %ebp\n'''
                             self.Variables_texto.append(ins.rodata())
 
                     else:
-                        self.ensamblador += f"\n FALTA NODO : {ins} \n"
+                        self.ensamblador += " 4 error" + str(ins) + "\n\n ###################"
             else:
                 ins = self.cuerpo[1]
                 self.ensamblador += "\n#" + type(ins).__name__ + "\n\n"
@@ -263,7 +264,7 @@ movl %esp, %ebp\n'''
                         self.Variables_texto.append(ins.rodata())
 
                 else:
-                    self.ensamblador += f"\n FALTA NODO : {ins} \n"
+                    self.ensamblador += " 3 error" + str(type(dec))
 
         self.ensamblador += "\n# el return : \n\n"  # comentario del return
 

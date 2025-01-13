@@ -558,6 +558,9 @@ class CParser(Parser):
 
     @_('lvalue ASSIGN ID')
     def lvalue(self, p):
+        if not isinstance(p.lvalue,list):
+            return [p.lvalue] + [Nodotermino(p.ID)]
+        
         return p.lvalue + [Nodotermino(p.ID)]
 
     @_('ID')
@@ -743,11 +746,20 @@ class CParser(Parser):
 
     @_('expr_list block_expr')
     def expr_list(self, p):
-        return (p.expr_list, p.block_expr)
+        if not isinstance(p.expr_list,list):
+            aux1 = [p.expr_list]
+        else:
+            aux1 = p.expr_list
+
+        if not isinstance(p.block_expr,list):
+            aux2 = [p.block_expr]
+        else:
+            aux2 = p.block_expr
+        return aux1 + aux2
 
     @_('block_expr')
     def expr_list(self, p):
-        return (p.block_expr)
+        return p.block_expr
 
     @_('IF "(" operacion ")" "{" expr_list "}" cont_cond')
     def block_expr(self, p):
