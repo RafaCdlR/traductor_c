@@ -619,11 +619,13 @@ class CParser(Parser):
 
     @_('ID funcion_parentesis')
     def operacion_asignacion(self, p):
-        # try:
-        #if self.simbolos:
+            aux_par = p.funcion_parentesis
+            if not(isinstance(p.funcion_parentesis,list)):
+                aux_par = [aux_par]
+
             if p.ID not in self.simbolos:
                 raise Exception(f"Funcion {p.ID} no declarada , tabla globales : {self.simbolos}")
-            if len(self.simbolos[p.ID].parametros) != len(p.funcion_parentesis):
+            if len(self.simbolos[p.ID].parametros) != len(aux_par):
                 raise Exception(f"Funcion {p.ID} diferente numero de atributos")
 
             return Nodollamada_funcion(p.ID, p.funcion_parentesis, self.contadoretiquetas)
