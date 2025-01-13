@@ -1,10 +1,11 @@
 from sly import Lexer
 import re
 
+
 class CLexer(Lexer):
     tokens = {NUMBER, ID, EQ,  NE, LE, GE, AND, OR, PLUS,
               MINUS, MULTIPLY, DIVIDE, NOT, ASSIGN, TYPE, VOID, RETURN,
-              PRINTF, STRING, SCANF, IF, ELSE , WHILE}
+              PRINTF, STRING, SCANF, IF, ELSE, WHILE}
 
     # ignorar tabs
     ignore = ' \t'
@@ -14,7 +15,7 @@ class CLexer(Lexer):
         pass
 
     # caracteres literales
-    literals = {'(', ')', ';', ',', '{', '}', '$','[',']', '&'}
+    literals = {'(', ')', ';', ',', '{', '}', '$', '[', ']', '&'}
 
     TYPE = r'int'
     VOID = r'void'
@@ -49,22 +50,14 @@ class CLexer(Lexer):
         print("Illegal character '%s'" % t.value[0])
         self.index += 1
 
-
-
     def tokenize(self, text):
         pattern = rf'({self.TYPE}|{self.VOID})\s+({self.ID})\s*\('
 
-        match = re.search(pattern,text)
+        match = re.search(pattern, text)
         pos = match.start()
 
         text = text[:pos] + '$' + text[pos:]
 
-
-
-
         original_tokens = super().tokenize(text)
 
-
         return original_tokens
-        
-
