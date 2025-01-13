@@ -3,8 +3,8 @@ int main() {
 
     x = 20;
 
-    if (x > 10) {
-        if (x < 30) {
+    if (x >= 10) {
+        if (x <= 30) {
             printf("x está entre 10 y 30\n");
         } else {
             printf("x es mayor o igual a 30\n");

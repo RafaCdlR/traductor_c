@@ -1,3 +1,4 @@
+.file	/home/prodrik/Escritorio/pl/traductor_c/tests/funciones.c
 .Section_rodata
 
 .S1:     .text "Esta función no devuelve ningún valor\n"

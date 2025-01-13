@@ -1,18 +1,17 @@
 int main() {
     int a, b;
+
+    int suma;
+    int resta;
+    int multiplicacion;
+    int division;
+    
     a = 15;
     b = 5;
 
-    int suma;
     suma = a + b;
-    
-    int resta;
     resta = a - b;
-    
-    int multiplicacion;
     multiplicacion = a * b;
-    
-    int division;
     division = a / b;
 
     printf("Suma: %d\n", suma);
