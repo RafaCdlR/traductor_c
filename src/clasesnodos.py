@@ -189,7 +189,8 @@ movl %esp, %ebp\n'''
 
         # restar la memoria de los parametros:
         
-        contador = 0
+        contador = -4
+
         # declaraciones
         
 
@@ -199,7 +200,10 @@ movl %esp, %ebp\n'''
                 for dec in self.cuerpo[0]:
                     print(dec)
                     if isinstance(dec, Nododeclaracion):
-                        
+
+                        assert dec.nombre not in  self.variables_funcion, f"Variable {dec.nombre} declarada anteriormente."
+
+
                         self.variables_funcion[dec.nombre] = dec
                         tam = 1
                         # sumar las dimensiones para el tamaño del array
@@ -216,6 +220,7 @@ movl %esp, %ebp\n'''
                 dec = self.cuerpo[0]
                 print(dec)
                 if isinstance(dec, Nododeclaracion):
+                    assert dec.nombre not in  self.variables_funcion, f"Variable {dec.nombre} declarada anteriormente."
                         
                     self.variables_funcion[dec.nombre] = dec
                     tam = 1
@@ -227,7 +232,7 @@ movl %esp, %ebp\n'''
                     pila[dec.nombre] = contador
                     contador -= 4 * tam
                 else:
-                    self.ensamblador += " 2 error" + str(type(dec))
+                    self.ensamblador += " 2 error" + str(dec)
 
         #meter en ensamblador
         self.ensamblador += f"subl ${abs(contador)} %esp\n"

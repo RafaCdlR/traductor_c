@@ -410,7 +410,7 @@ class CParser(Parser):
             p.id_list.tipo = p.TYPE
 
         return p.id_list
-
+    '''
     @_('declaracion_variables')
     def defi(self, p):
         return ("defi", p.declaracion_variables)
@@ -426,7 +426,7 @@ class CParser(Parser):
     @_('expr')
     def expr_mult(self, p):
         return p.expr
-
+    '''
     # Lista de identificadores separados por comas
 
     ###########################################################################
