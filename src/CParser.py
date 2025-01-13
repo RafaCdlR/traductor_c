@@ -620,6 +620,7 @@ class CParser(Parser):
     @_('ID funcion_parentesis')
     def operacion_asignacion(self, p):
             aux_par = p.funcion_parentesis
+            
             if not(isinstance(p.funcion_parentesis,list)):
                 aux_par = [aux_par]
 
@@ -645,7 +646,9 @@ class CParser(Parser):
 
     @_('funcion_args "," parametro_funcion')
     def funcion_args(self, p):
-        return (p.funcion_args, p.parametro_funcion)
+        if not isinstance(p.funcion_args,list):
+            return [p.funcion_args] + [p.parametro_funcion]
+        return p.funcion_args + [p.parametro_funcion]
 
     @_('parametro_funcion')
     def funcion_args(self, p):
