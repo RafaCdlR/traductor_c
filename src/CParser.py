@@ -333,7 +333,6 @@ class CParser(Parser):
 
     @_('RETURN operacion')
     def retorno(self, p):
-
         return nodoreturn(p.operacion, self.contadoretiquetas)
 
     ###########################################################################
@@ -572,10 +571,6 @@ class CParser(Parser):
     @_('"*" ID')
     def lvalue(self, p):
         return [Nodotermino(p.ID, simbolo="*")]
-    
-    @_('"&" ID')
-    def lvalue(self, p):
-        return [Nodotermino(p.ID, simbolo="&")]
 
     ###########################################################################
     # -------------------------------------------------------------------------
@@ -584,7 +579,7 @@ class CParser(Parser):
     ###########################################################################
 
     ###########################################################################
-    ############################### FUNCIONES #################################
+    ########################### LLAMADA_FUNCIONES #############################
     ###########################################################################
 
     '''
@@ -633,7 +628,7 @@ class CParser(Parser):
 
     ###########################################################################
     # -------------------------------------------------------------------------
-    # --------------------------- FIN_FUNCIONES -------------------------------
+    # ------------------------ FIN_LLAMADA_FUNCIONES --------------------------
     # -------------------------------------------------------------------------
     ###########################################################################
 
@@ -905,22 +900,11 @@ class CParser(Parser):
     @_('"&" ID')
     def term(self, p):
         return Nodotermino(p.ID, '&')
-    
-    @_('"*" ID "[" term "]"')
-    def term(self, p):
-        return Nodotermino(p.ID,simbolo = "*",offset= p.term)
 
-
-    
-    @_('"&" ID "[" term "]"')
+    @_('id_array')
     def term(self, p):
-        return Nodotermino(p.ID,simbolo = "&",offset= p.term)
-
-    @_('ID "[" term "]"')
-    def term(self, p):
-        return Nodotermino(p.ID,offset= p.term)
-    
-    
+        # return Nodotermino(p.ID,offset= p.term)
+        return p.id_array
 
     @_('"(" expr ")"')
     def term(self, p):

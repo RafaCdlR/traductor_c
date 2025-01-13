@@ -16,7 +16,7 @@ def bajar_arbo(nod, prof, cadena, contador=0, der=False):
         cadena += nod.cadena()
         return False, False
 
-    elif (not isinstance(nod, (Nodotermino, Nodocadena))):
+    elif (not isinstance(nod, (Nodotermino, Nodocadena, Nododeclaracion))):
 
         if (not isinstance(nod, NodoopUnario)):
             pila1, estermino = bajar_arbo(
