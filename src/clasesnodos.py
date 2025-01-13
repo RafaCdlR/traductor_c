@@ -758,7 +758,8 @@ class NodoIF(Nodo):
 
         # BUCLE ELSE
         if hayelse:
-
+            if not isinstance(else_,list):
+                else_ = [else_]
             for ins in else_:
                 cadena += ins.cadena()
 
