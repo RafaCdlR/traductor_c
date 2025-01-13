@@ -13,7 +13,7 @@ ZIP_PATH=entrega.zip
 
 OPEN_PDF?=True
 
-.PHONY: all tests clean zip clean-all
+.PHONY: all tests clean zip clean-all latex probar ejecutar
 .SILENT: all
 
 all:
@@ -37,9 +37,11 @@ ejecutar:
 probar:
 	${PY} src/main.py tests/cosasc.c traducido.s
 
-latex:
-	pdflatex documentacion/traductor.tex
-	evince traductor.pdf &
+latex: traductor.pdf
+
+traductor.pdf: documentacion/traductor.tex
+	pdflatex $<
+	evince $@ &
 
 clean-all: clean
 	${RM} *.txt *.out

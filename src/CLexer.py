@@ -10,7 +10,8 @@ class CLexer(Lexer):
     # ignorar tabs
     ignore = ' \t'
 
-    @_(r'//.*')  # ignorar comentarios
+    # ignorar comentarios
+    @_(r'//.*')
     def ignorar_comentario(self, t):
         pass
 
