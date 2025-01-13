@@ -306,7 +306,7 @@ movl %esp, %ebp\n'''
                 numero = self.simbolos[partes[0]]
                 
                 
-                if len(partes)>1:
+                if len(partes)>1 and partes[2] != -1:
                     
                     dimensiones = self.variables_funcion[partes[0]].array
                     indices = list(map(int, partes[2].split(",")))
@@ -336,7 +336,7 @@ movl %esp, %ebp\n'''
                 numero  = 0
                 
                 
-                if len(partes)>1:
+                if len(partes)>1 and partes[2] != -1:
                     
                         dimensiones = simbolos[partes[0]].array
                         indices = list(map(int, partes[2].split(",")))
