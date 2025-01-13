@@ -243,7 +243,7 @@ movl %esp, %ebp\n'''
                         self.ensamblador += ins.cadena()
 
                         # anadir texto a las globales
-                        if isinstance(ins, Nodoprint):
+                        if isinstance(ins, (Nodoprint,Nodoscanf)):
                             print("DENTRO")
                             print(ins.rodata())
                             self.Variables_texto.append(ins.rodata())
@@ -938,3 +938,70 @@ class Nodollamada_funcion(Nodo):
 
     def escribe(self):
         print(self.cadena())
+
+
+
+
+class Nodoscanf(Nodo):
+
+    def __init__(self, parametros, contador_variable):
+        contador_variable += 1
+        cadena = []
+        contador = 4
+
+        if isinstance(parametros, tuple):
+            self.texto = f".S{contador_variable}: \n    .text {
+                parametros[0]}\n"
+
+            if isinstance(parametros[1], list):
+                for v in parametros[1][::-1]:
+
+                    if isinstance(v, Nododeclaracion):
+                        cadena += f"pushl ${v.cadena()}$\n"
+                    elif isinstance(v, Nodollamada_funcion):
+
+                        cadena += v.cadena()
+                        cadena += "pushl $eax$\n"
+
+                    else:
+                        cadena_arbo = []
+                        bajar_arbo(v, 0, cadena_arbo, contador_variable)
+                        cadena += cadena_arbo
+                        cadena += "pushl $eax$\n"
+                    contador += 4
+
+            else:
+                v = parametros[1]
+                if isinstance(v, Nododeclaracion):
+                    cadena += f"pushl ${v.cadena()}$\n"
+                elif isinstance(v, Nodollamada_funcion):
+                    cadena += v.cadena()
+                    cadena += "pushl $eax$\n"
+                else:
+                    cadena_arbo = []
+                    bajar_arbo(v, 0, cadena_arbo, contador_variable)
+                    cadena += cadena_arbo
+                    cadena += "pushl $eax$\n"
+                contador += 4
+            
+        else:
+            self.texto = f".S{contador_variable}: \n    .text {parametros}\n"
+
+        cadena += f"pushl s{contador_variable}\n\n"
+        cadena += "call scanf\n"
+        cadena += f"addl ${contador} esp\n\n"
+
+        self.cad = "".join(cadena)
+
+    def cadena(self):
+
+        return self.cad
+
+    def rodata(self):
+        print("RODATA", self.texto)
+        return self.texto
+
+    def escribe(self):
+        print(self.cadena())
+
+

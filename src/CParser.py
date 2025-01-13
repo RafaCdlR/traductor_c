@@ -711,19 +711,28 @@ class CParser(Parser):
 
     @_('SCANF "(" scanf_args ")"')
     def expr(self, p):
-        return ("scanf", p.scanf_args)
+
+        for i in p.scanf_args[1]:
+            if isinstance(i,Nodotermino):
+                pass
+            else:
+                ValueError("scanf no acepta operaciones ")
+                
+                    
+
+        return Nodoscanf(p.scanf_args,self.contadoretiquetas)
 
     @_('STRING "," variables_referenciadas')
     def scanf_args(self, p):
         return (p.STRING, p.variables_referenciadas)
 
-    @_('variables_referenciadas "," "&" ID')
+    @_('variables_referenciadas "," operacion')
     def variables_referenciadas(self, p):
-        return (p.variables_referenciadas, ('&', p.ID))
+        return p.variables_referenciadas + [ p.operacion]
 
-    @_('"&" ID')
+    @_('operacion')
     def variables_referenciadas(self, p):
-        return (p.ID)
+        return [p.operacion]
 
     # -------------------------------------------------------------------------
     # ------------------------------ SCANF_FIN --------------------------------
