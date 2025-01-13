@@ -1,6 +1,7 @@
 from sly import Parser
 from CLexer import CLexer
 from clasesnodos import *
+import re
 
 
 class Numero:
@@ -158,6 +159,29 @@ class CParser(Parser):
     def push_asm(self, str):
         self.asm += "\n" + str
 
+
+
+
+    def mover_strings(self,text):
+        # Busca todas las ocurrencias de texto entre ~~ (incluye varias líneas)
+        matches = re.findall(r'~~(.*?)~~', text, re.DOTALL)
+        ret = text
+        if matches:
+            # Une los textos extraídos con saltos de línea entre ellos
+            extracted_text = '\n'.join(matches)
+
+            # Elimina los textos entre ~~ del texto original
+            remaining_text = re.sub(r'~~.*?~~', '', text, flags=re.DOTALL)
+
+            ret = ".Section_rodata\n\n" + extracted_text + "\n\n.end_rodata"+ '\n\n' + remaining_text.strip()
+
+        
+
+        # Retorna el texto extraído seguido del texto restante
+        return ret
+
+
+
     ###########################################################################
     # -------------------------------------------------------------------------
     # -------------------- FIN DE FUNCIONES AUXILIARES ------------------------
@@ -236,6 +260,9 @@ class CParser(Parser):
             #DEBUG INSANO
 
         self.asm += "\n\n\n ############GLOBALES ##########3: \n\n\n\n" + str(self.simbolos) 
+
+
+        self.asm = self.mover_strings("".join(self.asm))
         # Guardar ensamblador en archivo
         with open("asm.txt", "w") as archivo:
             archivo.write(self.asm)
@@ -760,6 +787,7 @@ class CParser(Parser):
     @_('block_expr')
     def expr_list(self, p):
         return p.block_expr
+        
 
     @_('IF "(" operacion ")" "{" expr_list "}" cont_cond')
     def block_expr(self, p):

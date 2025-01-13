@@ -248,12 +248,7 @@ movl %esp, %ebp\n'''
                     if isinstance(ins, Nodo):
                         self.ensamblador += "\n#" + type(ins).__name__ + "\n\n"
                         self.ensamblador += ins.cadena()
-
-                        # anadir texto a las globales
-                        if isinstance(ins, (Nodoprint,Nodoscanf)):
-                            print("DENTRO")
-                            print(ins.rodata())
-                            self.Variables_texto.append(ins.rodata())
+                        
 
                     else:
                         self.ensamblador += " 4 error" + str(ins) + "\n\n ###################"
@@ -431,7 +426,7 @@ class Nodotermino(Nodo):
                 cadena += str(self.offset)
         else:
             cadena += " "
-            cadena += "_"
+            cadena += "-1"
 
 
         return "".join(cadena)
@@ -703,6 +698,8 @@ class NodoWhile(Nodo):
 
         # añadir codigo del cuerpo del bucle while
 
+        if not isinstance(cuerpo,list):
+            cuerpo = [cuerpo]
         for ins in cuerpo:
             cadena += ins.cadena()
 
@@ -748,7 +745,8 @@ class NodoIF(Nodo):
         cadena += f"cmpl $0, %eax\n je if{contador}_fin\n"
 
         # CUERPO IF
-
+        if not isinstance(cuerpo,list):
+            cuerpo = [cuerpo]
         for ins in cuerpo:
             cadena += ins.cadena()
 
@@ -843,8 +841,8 @@ class Nodoprint(Nodo):
         contador = 4
 
         if isinstance(parametros, tuple):
-            self.texto = f".S{contador_variable}: \n    .text {
-                parametros[0]}\n"
+            cadena += f"~~.S{contador_variable}:     .text {parametros[0]}~~\n"
+                
 
             if isinstance(parametros[1], list):
                 for v in parametros[1][::-1]:
@@ -878,13 +876,18 @@ class Nodoprint(Nodo):
                 contador += 4
             
         else:
-            self.texto = f".S{contador_variable}: \n    .text {parametros}\n"
+            cadena += f"~~.S{contador_variable}:     .text {parametros}~~\n"
+            
 
         cadena += f"pushl s{contador_variable}\n\n"
         cadena += "call printf\n"
         cadena += f"addl ${contador} esp\n\n"
 
+        
+
         self.cad = "".join(cadena)
+
+        
 
     def cadena(self):
 
@@ -959,8 +962,7 @@ class Nodoscanf(Nodo):
         contador = 4
 
         if isinstance(parametros, tuple):
-            self.texto = f".S{contador_variable}: \n    .text {
-                parametros[0]}\n"
+            cadena += f"~~.S{contador_variable}:     .text {parametros[0]}~~\n"
 
             if isinstance(parametros[1], list):
                 for v in parametros[1][::-1]:
@@ -994,7 +996,7 @@ class Nodoscanf(Nodo):
                 contador += 4
             
         else:
-            self.texto = f".S{contador_variable}: \n    .text {parametros}\n"
+            cadena += f"~~.S{contador_variable}:     .text {parametros}~~\n"
 
         cadena += f"pushl s{contador_variable}\n\n"
         cadena += "call scanf\n"
