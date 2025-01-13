@@ -32,7 +32,7 @@ def bajar_arbo(nod, prof, cadena, contador=0, der=False):
 
         pila2, _ = bajar_arbo(nod.right, prof+1, cadena, contador, True)
 
-        cadena += "\n#  " + nod.cadena() + " \n\n"
+        cadena += "\n#  ##" + nod.cadena() + "## \n\n"
 
         if pila1:  # sacar de la pila si fuera necesario
             cadena += r"popl %eax"+"\n"
@@ -85,7 +85,7 @@ def bajar_arbo(nod, prof, cadena, contador=0, der=False):
         return True, False
 
     else:
-        cadena += "\n#  " + nod.cadena() + " \n\n"
+        cadena += "\n#    ##" + nod.cadena() + "##   \n\n"
         cadena += f"movl ${nod.cadena()}$, {aux}\n"
         return False, True  # por si hay parentesis a la derecha hay q meter en pila
 
@@ -160,6 +160,8 @@ class nodofuncion(Nodo):
         self.cuerpo = cuerpo
         self.Variables_texto = []
         self.contador = contador
+
+        self.variables_funcion = dict()
         self.ensamblador = f"\n\n\n\n################ FUNCION {
             nombre} ####################\n\n\n\n\n"
 
@@ -186,25 +188,10 @@ movl %esp, %ebp\n'''
             contador += 4
 
         # restar la memoria de los parametros:
-        self.ensamblador += f"subl ${contador} %esp\n"
-        contador = -4
+        
+        contador = 0
         # declaraciones
-        '''
-        for dec in self.cuerpo[0]:
-            print(dec)
-            if isinstance(dec, Nododeclaracion):
-                self.ensamblador += dec.cadena()
-
-                tam = 1
-                #sumar las dimensiones para el tamaño del array
-                for n in dec.array:
-                    tam *= n
-
-                pila[dec.nombre] = f"{contador}(%ebp)"
-                contador -= 4*tam
-            else:
-                self.ensamblador += f"\n FALTA NODO : {dec} \n"
-        '''
+        
 
         if self.cuerpo and self.cuerpo[0]:
             # compruebo si se puede iterar sobre el objeto
@@ -212,13 +199,14 @@ movl %esp, %ebp\n'''
                 for dec in self.cuerpo[0]:
                     print(dec)
                     if isinstance(dec, Nododeclaracion):
-                        self.ensamblador += dec.cadena()
-
+                        
+                        self.variables_funcion[dec.nombre] = dec
                         tam = 1
                         # sumar las dimensiones para el tamaño del array
                         for n in dec.array:
                             tam *= n
-
+                        
+                        self.ensamblador += f"#declaracion : {dec.cadena2()} con {tam} posiciones\n"
                         pila[dec.nombre] = contador
                         contador -= 4 * tam
                     else:
@@ -239,6 +227,8 @@ movl %esp, %ebp\n'''
                 else:
                     self.ensamblador += f"\n FALTA NODO : {dec} \n"
 
+        #meter en ensamblador
+        self.ensamblador += f"subl ${abs(contador)} %esp\n"
         print(pila)
 
         self.simbolos = pila
@@ -303,6 +293,7 @@ movl %esp, %ebp\n'''
 
         def transformar(texto):
             partes = texto.group(1).split(' ')
+            print("PARTES = ",partes)
             numero = 0
             # buscar en la tabla
             if partes[0] == "eax" or partes[0] == "ebx":
@@ -311,6 +302,26 @@ movl %esp, %ebp\n'''
                 texto_encontrado = f"${int(partes[0])}"
             elif partes[0] in self.simbolos:
                 numero = self.simbolos[partes[0]]
+                
+                
+                if len(partes)>1:
+                    if partes[2] != "_":
+                        dimensiones = self.variables_funcion[partes[0]].array
+                        indices = list(map(int, partes[2].split(",")))
+                        #comprobar q son iguales
+                        if len(dimensiones)!= len(indices):
+                            raise ValueError(f"Las dimensiones de la variable {partes[0]} no coinciden")
+                        
+                        posicion = 0
+                        factor = 1
+                        for i in reversed(range(len(dimensiones))):
+                            posicion += indices[i] * factor
+                            factor *= dimensiones[i]
+    
+                        numero += -4 -(posicion * 4)
+
+
+
                 # Captura el texto entre $
                 texto_encontrado = f"{numero}(%ebp)"
 
@@ -369,6 +380,9 @@ class Nodotermino(Nodo):
         if self.simbolo:
             cadena += " "
             cadena += str(self.simbolo)
+        else:
+            cadena += " "
+            cadena += "_"
 
         if self.offset:
             cadena += " "
@@ -376,6 +390,10 @@ class Nodotermino(Nodo):
                 cadena += ",".join(self.offset)
             else:
                 cadena += str(self.offset)
+        else:
+            cadena += " "
+            cadena += "_"
+
 
         return "".join(cadena)
 
@@ -525,20 +543,38 @@ class Nododeclaracion(Nodo):
         self.espuntero = espuntero
         self.array = array
 
+    
     def cadena2(self):
-        p = ""
-        if self.espuntero:
-            p = "* "
-
-        return f"{self.tipo}{p} {self.nombre} {self.array}"
-
-    def cadena(self):
         p = ""
         if self.espuntero:
             p = "* "
 
         return f"{self.nombre}"
 
+    def cadena(self):
+        cadena = []
+        cadena += self.nombre
+
+        if self.espuntero:
+            cadena += " "
+            cadena += "*"
+        else:
+            cadena += " "
+            cadena += "_"
+
+        if self.array:
+            cadena += " "
+            if isinstance(self.array, list):
+                cadena += ",".join([str(item) for item in self.array])
+            else:
+                cadena += str(self.array)
+        else:
+            cadena += " "
+            cadena += "_"
+
+
+        return "".join(cadena)
+    
     def escribe(self):
         print(self.cadena())
 
@@ -801,11 +837,13 @@ class Nodoprint(Nodo):
                     cadena += cadena_arbo
                     cadena += "pushl $eax$\n"
                 contador += 4
-            cadena += f"pushl s{contador_variable}\n\n"
-            cadena += "call printf\n"
-            cadena += f"addl ${contador} esp\n\n"
+            
         else:
             self.texto = f".S{contador_variable}: \n    .text {parametros}\n"
+
+        cadena += f"pushl s{contador_variable}\n\n"
+        cadena += "call printf\n"
+        cadena += f"addl ${contador} esp\n\n"
 
         self.cad = "".join(cadena)
 
@@ -824,6 +862,8 @@ class Nodoprint(Nodo):
 class Nodollamada_funcion(Nodo):
 
     def __init__(self, nombre, parametros, contador_variable=0):
+        self.nombre = nombre
+        self.parametros = parametros
         contador_variable += 0
         cadena = []
         contador = 0

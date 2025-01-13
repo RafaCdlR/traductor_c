@@ -233,6 +233,9 @@ class CParser(Parser):
             self.push_asm(f.cadena2(textos_globales, self.simbolos))
 
             self.asm = "".join(textos_globales) + self.asm
+            #DEBUG INSANO
+
+        self.asm += "GLOBALES : \n\n\n\n" + str(self.simbolos) 
         # Guardar ensamblador en archivo
         with open("asm.txt", "w") as archivo:
             archivo.write(self.asm)
@@ -284,10 +287,12 @@ class CParser(Parser):
     @_('VOID ID "(" parametros ")" "{" statement "}"')
     def funcion(self, p):
 
-        # añadir simbolo?
-        self.anadir_simbolo(p.VOID, p.ID, p.statement)
+        nodo = nodofuncion("void", p.ID, p.parametros,
+                           p.statement, self.contadoretiquetas)
+        self.anadir_simbolo(nodo)
+        
 
-        return nodofuncion(p.VOID, p.ID, p.parametros, p.statement, self.contadoretiquetas)
+        return nodo
         # return ("funcion", p.VOID, p.ID, p.parametros, p.statement)
 
     @_('')
@@ -523,7 +528,13 @@ class CParser(Parser):
 
     @_('lvalue ASSIGN operacion_asignacion')
     def expr(self, p):
-        print(p.lvalue)
+        print("LVALUE")
+        print(type(p.lvalue))
+
+        if isinstance(p.operacion_asignacion,Nodollamada_funcion):
+            if self.simbolos[p.operacion_asignacion.nombre].tipo == "void":
+                raise TypeError("No se puede asignar una funcion void ")
+            
         return Nodoasignacion(p.operacion_asignacion, p.lvalue, self.contadoretiquetas)
 
     @_('operacion')
@@ -581,13 +592,13 @@ class CParser(Parser):
     @_('ID funcion_parentesis')
     def operacion_asignacion(self, p):
         # try:
-        if self.simbolos:
+        #if self.simbolos:
             if p.ID not in self.simbolos:
-                raise Exception("Funcion no declarada")
+                raise Exception(f"Funcion {p.ID} no declarada , tabla globales : {self.simbolos}")
 
             return Nodollamada_funcion(p.ID, p.funcion_parentesis, self.contadoretiquetas)
-        else:
-            raise Exception("Funcion no declarada.")
+        #else:
+          #  raise Exception("Funcion no declarada.")
         # except Exception:
       #  pass
 
@@ -628,7 +639,7 @@ class CParser(Parser):
 
     @_('PRINTF "(" printf_args ")"')
     def expr(self, p):
-        return Nodoprint(p.printf_args)
+        return Nodoprint(p.printf_args,self.contadoretiquetas)
 
     @_('STRING "," variables_a_imprimir')
     def printf_args(self, p):
@@ -872,7 +883,7 @@ class CParser(Parser):
     @_('NUMBER')
     def term(self, p):
         # print("soy un numero")
-        return Nodotermino(p.NUMBER)
+        return Nodocadena(p.NUMBER)
 
     @_('"*" ID')
     def term(self, p):
@@ -884,7 +895,7 @@ class CParser(Parser):
 
     @_('ID "[" term "]"')
     def term(self, p):
-        return Nodotermino(p.ID, 'a', p.term)
+        return Nodotermino(p.ID,offset= p.term)
 
     @_('"(" expr ")"')
     def term(self, p):
