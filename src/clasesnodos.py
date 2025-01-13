@@ -316,7 +316,7 @@ movl %esp, %ebp\n'''
                     dimensiones = self.variables_funcion[partes[0]].array
                     indices = list(map(int, partes[2].split(",")))
                     #comprobar q son iguales
-                    if len(dimensiones)!= len(indices) or ((partes[2] == "-1" or partes[2] == "_" )and dimensiones[0] != 1) or (not (partes[2] == "-1" or partes[2] == "_") and dimensiones[0] == -1):
+                    if len(dimensiones)!= len(indices) or ((partes[2] == "-1" or partes[2] == "_" )and dimensiones[0] != -1) or (not (partes[2] == "-1" or partes[2] == "_") and dimensiones[0] == -1):
                         raise ValueError(f"Las dimensiones de la variable {partes[0]} no coinciden declarado : {len(dimensiones)} real: {len(indices)} ")
                     
                     posicion = 0
@@ -346,8 +346,8 @@ movl %esp, %ebp\n'''
                         dimensiones = simbolos[partes[0]].array
                         indices = list(map(int, partes[2].split(",")))
                         #comprobar q son iguales
-                        if len(dimensiones)!= len(indices) or ((partes[2] == "-1" or partes[2] == "_" )and dimensiones[0] != 1) or (not (partes[2] == "-1" or partes[2] == "_") and dimensiones[0] == -1):
-                            raise ValueError(f"Las dimensiones de la variable {partes[0]} no coinciden")
+                        if (len(dimensiones)!= len(indices)) or ((partes[2] == "-1" or partes[2] == "_" )and dimensiones[0] != -1) or (not (partes[2] == "-1" or partes[2] == "_") and dimensiones[0] == -1):
+                            raise ValueError(f"Las dimensiones de la variable {partes[0]} no coinciden  {partes[2]} : {dimensiones[0]}")
                         
                         posicion = 0
                         factor = 1
