@@ -1,82 +1,79 @@
 from sly import Parser
 from CLexer import CLexer
 from clasesnodos import *
-from collections import deque
-import asm_translator
-
 
 
 class Numero:
     def __init__(self, valor):
         self.valor = valor
-    
+
     # Sobrecarga de operadores aritméticos
     def __add__(self, otro):
         if isinstance(otro, Numero):
             return Numero(self.valor + otro.valor)
         return Numero(self.valor + otro)
-    
+
     def __sub__(self, otro):
         if isinstance(otro, Numero):
             return Numero(self.valor - otro.valor)
         return Numero(self.valor - otro)
-    
+
     def __mul__(self, otro):
         if isinstance(otro, Numero):
             return Numero(self.valor * otro.valor)
         return Numero(self.valor * otro)
-    
+
     def __truediv__(self, otro):
         if isinstance(otro, Numero):
             return Numero(self.valor / otro.valor)
         return Numero(self.valor / otro)
-    
+
     def __floordiv__(self, otro):
         if isinstance(otro, Numero):
             return Numero(self.valor // otro.valor)
         return Numero(self.valor // otro)
-    
+
     def __mod__(self, otro):
         if isinstance(otro, Numero):
             return Numero(self.valor % otro.valor)
         return Numero(self.valor % otro)
-    
+
     def __pow__(self, otro):
         if isinstance(otro, Numero):
             return Numero(self.valor ** otro.valor)
         return Numero(self.valor ** otro)
-    
+
     # Sobrecarga de operadores de comparación
     def __eq__(self, otro):
         if isinstance(otro, Numero):
             return self.valor == otro.valor
         return self.valor == otro
-    
+
     def __ne__(self, otro):
         if isinstance(otro, Numero):
             return self.valor != otro.valor
         return self.valor != otro
-    
+
     def __lt__(self, otro):
         if isinstance(otro, Numero):
             return self.valor < otro.valor
         return self.valor < otro
-    
+
     def __le__(self, otro):
         if isinstance(otro, Numero):
             return self.valor <= otro.valor
         return self.valor <= otro
-    
+
     def __gt__(self, otro):
         if isinstance(otro, Numero):
             return self.valor > otro.valor
         return self.valor > otro
-    
+
     def __ge__(self, otro):
         if isinstance(otro, Numero):
             return self.valor >= otro.valor
         return self.valor >= otro
-    
+
     # Sobrecarga de operadores de asignación
     def __iadd__(self, otro):
         self.valor += otro.valor if isinstance(otro, Numero) else otro
@@ -109,10 +106,9 @@ class Numero:
     # Representación en cadena
     def __str__(self):
         return str(self.valor)
-    
+
     def __repr__(self):
         return f"Numero({self.valor})"
-
 
 
 class CParser(Parser):
@@ -146,23 +142,19 @@ class CParser(Parser):
             self.anadir_simbolo_individual(nodo)
 
     def anadir_simbolo_individual(self, nodo):
-        
+
         try:
             if nodo.nombre not in self.simbolos:
-                
+
                 self.simbolos[nodo.nombre] = nodo
-                
-                
+
             else:
                 raise Exception(
                     f"variable {nodo.nombre} ya declarada anteriormente")
         except:
             raise Exception(
-                    f"variable {nodo.nombre} ya declarada anteriormente")
-            
-            
+                f"variable {nodo.nombre} ya declarada anteriormente")
 
-   
     def push_asm(self, str):
         self.asm += "\n" + str
 
@@ -205,20 +197,20 @@ class CParser(Parser):
 
         return (p.globales, p.funciones)
     '''
-    
+
     @_('globales "$" funciones')
     def S(self, p):
         print(p.globales)
         if isinstance(p.globales, list):
             for g in p.globales:
-                
+
                 # Añadir símbolo y ensamblador
                 self.anadir_simbolo(g)
                 self.push_asm(f".globl {g.nombre}")
         else:
             if p.globales:
                 g = p.globales
-                
+
                 # Añadir símbolo y ensamblador
                 self.anadir_simbolo(g)
                 self.push_asm(f".globl {g.nombre}")
@@ -228,18 +220,18 @@ class CParser(Parser):
         if isinstance(p.funciones, list):
             for f in p.funciones:
                 # Añadir símbolo y ensamblador
-                
+
                 textos_globales = [""]
-                self.push_asm(f.cadena2(textos_globales,self.simbolos))
+                self.push_asm(f.cadena2(textos_globales, self.simbolos))
                 self.asm = "".join(textos_globales) + self.asm
-                
+
         else:
             f = p.funciones
             # Añadir símbolo y ensamblador
             self.anadir_simbolo(f.tipo, f.nombre, f.cuerpo)
             textos_globales = []
-            self.push_asm(f.cadena2(textos_globales,self.simbolos))
-           
+            self.push_asm(f.cadena2(textos_globales, self.simbolos))
+
             self.asm = "".join(textos_globales) + self.asm
         # Guardar ensamblador en archivo
         with open("asm.txt", "w") as archivo:
@@ -247,7 +239,6 @@ class CParser(Parser):
 
         return (p.globales, p.funciones)
 
-    
     ###########################################################################
     # -------------------------------------------------------------------------
     # -------------------------- FIN_S ----------------------------------------
@@ -283,11 +274,12 @@ class CParser(Parser):
     @_('TYPE ID "(" parametros ")" "{" statement retorno ";" "}"')
     def funcion(self, p):
 
-        nodo = nodofuncion(p.TYPE, p.ID, p.parametros, p.statement,self.contadoretiquetas, p.retorno)
+        nodo = nodofuncion(p.TYPE, p.ID, p.parametros,
+                           p.statement, self.contadoretiquetas, p.retorno)
         self.anadir_simbolo(nodo)
 
         return nodo
-        #return ("funcion", p.TYPE, p.ID, p.parametros, p.statement)
+        # return ("funcion", p.TYPE, p.ID, p.parametros, p.statement)
 
     @_('VOID ID "(" parametros ")" "{" statement "}"')
     def funcion(self, p):
@@ -295,7 +287,7 @@ class CParser(Parser):
         # añadir simbolo?
         self.anadir_simbolo(p.VOID, p.ID, p.statement)
 
-        return nodofuncion(p.VOID, p.ID,p.parametros,p.statement,self.contadoretiquetas)
+        return nodofuncion(p.VOID, p.ID, p.parametros, p.statement, self.contadoretiquetas)
         # return ("funcion", p.VOID, p.ID, p.parametros, p.statement)
 
     @_('')
@@ -314,7 +306,7 @@ class CParser(Parser):
 
     @_('parametros "," TYPE ID')
     def parametros(self, p):
-        return  p.parametros + [(p.TYPE, p.ID)]
+        return p.parametros + [(p.TYPE, p.ID)]
 
     @_('TYPE ID')
     def parametros(self, p):
@@ -322,12 +314,12 @@ class CParser(Parser):
 
     @_('parametros "," TYPE MULTIPLY ID')
     def parametros(self, p):
-        
-        return  p.parametros + [(('*', p.TYPE), p.ID)]
+
+        return p.parametros + [(('*', p.TYPE), p.ID)]
 
     @_('TYPE MULTIPLY ID')
     def parametros(self, p):
-        #print(p.ID,"sdijahndsaidhsa")
+        # print(p.ID,"sdijahndsaidhsa")
         return [(('*', p.TYPE), p.ID)]
 
     @_('')
@@ -337,10 +329,7 @@ class CParser(Parser):
     @_('RETURN operacion')
     def retorno(self, p):
 
-        
-
-        
-        return nodoreturn(p.operacion,self.contadoretiquetas)
+        return nodoreturn(p.operacion, self.contadoretiquetas)
 
     ###########################################################################
     # -------------------------------------------------------------------------
@@ -535,7 +524,7 @@ class CParser(Parser):
     @_('lvalue ASSIGN operacion_asignacion')
     def expr(self, p):
         print(p.lvalue)
-        return Nodoasignacion(p.operacion_asignacion, p.lvalue,self.contadoretiquetas)
+        return Nodoasignacion(p.operacion_asignacion, p.lvalue, self.contadoretiquetas)
 
     @_('operacion')
     def operacion_asignacion(self, p):
@@ -571,7 +560,7 @@ class CParser(Parser):
 
     @_('"*" ID')
     def lvalue(self, p):
-        return [Nodotermino(p.ID,simbolo = "*")]
+        return [Nodotermino(p.ID, simbolo="*")]
 
     ###########################################################################
     # -------------------------------------------------------------------------
@@ -592,15 +581,15 @@ class CParser(Parser):
     @_('ID funcion_parentesis')
     def operacion_asignacion(self, p):
         # try:
-            if self.simbolos:
-                if p.ID not in self.simbolos:
-                    raise Exception("Funcion no declarada")
-        
-                return Nodollamada_funcion(p.ID,p.funcion_parentesis,self.contadoretiquetas)
-            else:
-                raise Exception("Funcion no declarada.")
+        if self.simbolos:
+            if p.ID not in self.simbolos:
+                raise Exception("Funcion no declarada")
+
+            return Nodollamada_funcion(p.ID, p.funcion_parentesis, self.contadoretiquetas)
+        else:
+            raise Exception("Funcion no declarada.")
         # except Exception:
-          #  pass
+      #  pass
 
     @_('"(" funcion_args ")"')
     def funcion_parentesis(self, p):
@@ -626,7 +615,7 @@ class CParser(Parser):
     @_('id_list')
     def parametro_funcion(self, p):
         return p.id_list
-    
+
     ###########################################################################
     # -------------------------------------------------------------------------
     # --------------------------- FIN_FUNCIONES -------------------------------
@@ -743,7 +732,7 @@ class CParser(Parser):
 
     @_('IF "(" operacion ")" "{" expr_list "}" cont_cond')
     def block_expr(self, p):
-        return NodoIF(p.operacion,p.expr_list,p.cont_cond,self.contadoretiquetas)
+        return NodoIF(p.operacion, p.expr_list, p.cont_cond, self.contadoretiquetas)
 
     @_('ELSE "{" expr_list "}"')
     def cont_cond(self, p):
@@ -765,16 +754,14 @@ class CParser(Parser):
 
     @_('WHILE "(" operacion ")" "{" expr_list "}"')
     def block_expr(self, p):
-        
-        return NodoWhile( p.operacion, p.expr_list , self.contadoretiquetas)
-    
+
+        return NodoWhile(p.operacion, p.expr_list, self.contadoretiquetas)
+
     ###########################################################################
     # -------------------------------------------------------------------------
     # ----------------------------- WHILE_LOOP_FIN ----------------------------
     # -------------------------------------------------------------------------
     ###########################################################################
-
-
 
     ###########################################################################
     ################################ OPERACIONES ##############################
@@ -783,11 +770,11 @@ class CParser(Parser):
     @_('opLogOr')
     def operacion(self, p):
         return p.opLogOr
-    
+
     # opLogOr
     @_('opLogOr OR opLogAnd')
     def opLogOr(self, p):
-        return NodoOr(p.opLogOr, p.opLogAnd,self.contadoretiquetas,"||")
+        return NodoOr(p.opLogOr, p.opLogAnd, self.contadoretiquetas, "||")
 
     @_('opLogAnd')
     def opLogOr(self, p):
@@ -796,24 +783,22 @@ class CParser(Parser):
     # opLogAnd
     @_('opLogAnd AND opUnario')
     def opLogAnd(self, p):
-        return NodoAnd(p.opLogAnd, p.opUnario,self.contadoretiquetas,"&&")
+        return NodoAnd(p.opLogAnd, p.opUnario, self.contadoretiquetas, "&&")
 
     @_('opUnario')
     def opLogAnd(self, p):
         # pila = deque()
         # self.bajar_arbo(p.opUnario,pila)
-       # while pila:
+        # while pila:
         #    pila.pop().escribe()
 
         # print("-------------------")
         return p.opUnario
 
-    
-
     @_('opUn opComp')
     def opUnario(self, p):
-        return NodoopUnario(p.opUn, p.opComp,self.contadoretiquetas)
-    
+        return NodoopUnario(p.opUn, p.opComp, self.contadoretiquetas)
+
     @_('NOT')
     def opUn(self, p):
         return '!'
@@ -828,7 +813,7 @@ class CParser(Parser):
     # -------------------------------------------------------------------------
 
     # Operaciones de comparación
-    
+
     @_('opComp EQ opSumaResta')
     def opComp(self, p):
         return NodoOpComp(p.opComp, '==', p.opSumaResta)
@@ -848,9 +833,9 @@ class CParser(Parser):
     @_('opSumaResta')
     def opComp(self, p):
         return p.opSumaResta
-    
+
     # -------------------------------------------------------------------------
-    
+
     # opSumaResta
     @_('opSumaResta PLUS opMultDiv')
     def opSumaResta(self, p):
@@ -943,11 +928,11 @@ if __name__ == '__main__':
                 a = b;
               return 1;
               }
-            
+
               int main(int *a, int b , int c) {
                 int bc[12][43];
               int cb;
-                    
+
                     g1 = 5*a1 + a2/10 - a3 * a4 - 15;
                     g2 = g1 = c = b;
                   return 1;
@@ -970,14 +955,14 @@ if __name__ == '__main__':
     return 0;
     }
     '''
-    }
-    
+              }
+
     for texto in textos:
         # try:
         print("\n\n\n\n", texto, " :")
         tokens = lexer.tokenize(texto)
         result = parser.parse(tokens)
-        #print(result)
+        # print(result)
 
         # except Exception as err:
         # print(f"Error de compilación: {err}")
