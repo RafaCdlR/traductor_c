@@ -572,6 +572,10 @@ class CParser(Parser):
     @_('"*" ID')
     def lvalue(self, p):
         return [Nodotermino(p.ID, simbolo="*")]
+    
+    @_('"&" ID')
+    def lvalue(self, p):
+        return [Nodotermino(p.ID, simbolo="&")]
 
     ###########################################################################
     # -------------------------------------------------------------------------
@@ -901,10 +905,22 @@ class CParser(Parser):
     @_('"&" ID')
     def term(self, p):
         return Nodotermino(p.ID, '&')
+    
+    @_('"*" ID "[" term "]"')
+    def term(self, p):
+        return Nodotermino(p.ID,simbolo = "*",offset= p.term)
+
+
+    
+    @_('"&" ID "[" term "]"')
+    def term(self, p):
+        return Nodotermino(p.ID,simbolo = "&",offset= p.term)
 
     @_('ID "[" term "]"')
     def term(self, p):
         return Nodotermino(p.ID,offset= p.term)
+    
+    
 
     @_('"(" expr ")"')
     def term(self, p):
