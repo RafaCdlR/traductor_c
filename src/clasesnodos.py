@@ -305,7 +305,7 @@ movl %esp, %ebp\n'''
                 
                 
                 if len(partes)>1:
-                    if partes[2] != "_":
+                    if partes[2] != "_" and partes[2] != "1":
                         dimensiones = self.variables_funcion[partes[0]].array
                         indices = list(map(int, partes[2].split(",")))
                         #comprobar q son iguales
@@ -317,7 +317,11 @@ movl %esp, %ebp\n'''
                         for i in reversed(range(len(dimensiones))):
                             posicion += indices[i] * factor
                             factor *= dimensiones[i]
-    
+                            if indices[i] >= dimensiones[i]:
+                                raise ValueError(f"LLAMADA A LA VARIABLE {partes[0]} FUERA DE RANGO EN INDICE {i} : [{indices[i]}] > [{dimensiones[i]}]")
+
+
+                        
                         numero += -4 -(posicion * 4)
 
 
@@ -326,8 +330,34 @@ movl %esp, %ebp\n'''
                 texto_encontrado = f"{numero}(%ebp)"
 
             elif partes[0] in simbolos:
-                numero = simbolos[partes[0]]
-                texto_encontrado = f"{numero}"  # Captura el texto entre $
+                numero  = 0
+                
+                
+                if len(partes)>1:
+                    if partes[2] != "_" and partes[2] != "1":
+                        dimensiones = simbolos[partes[0]].array
+                        indices = list(map(int, partes[2].split(",")))
+                        #comprobar q son iguales
+                        if len(dimensiones)!= len(indices):
+                            raise ValueError(f"Las dimensiones de la variable {partes[0]} no coinciden")
+                        
+                        posicion = 0
+                        factor = 1
+                        for i in reversed(range(len(dimensiones))):
+                            posicion += indices[i] * factor
+                            factor *= dimensiones[i]
+                            if indices[i] >= dimensiones[i]:
+                                raise ValueError(f"LLAMADA A LA VARIABLE {partes[0]} FUERA DE RANGO EN INDICE {i} : [{indices[i]}] > [{dimensiones[i]}]")
+
+
+                        
+                        numero += -(posicion * 4)
+
+
+
+                # Captura el texto entre $
+                texto_encontrado = f"{numero}({partes[0]})"
+
             else:
                 raise (ValueError(f"LA VARIABLE %{partes[0]}% en la funcion {self.nombre} NO ESTA DEFINIDA : \n tabla global : \n {
                        simbolos} \n\n#############\n\n tabla de funcion : \n {self.simbolos}"))

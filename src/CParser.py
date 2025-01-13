@@ -235,7 +235,7 @@ class CParser(Parser):
             self.asm = "".join(textos_globales) + self.asm
             #DEBUG INSANO
 
-        self.asm += "GLOBALES : \n\n\n\n" + str(self.simbolos) 
+        self.asm += "\n\n\n ############GLOBALES ##########3: \n\n\n\n" + str(self.simbolos) 
         # Guardar ensamblador en archivo
         with open("asm.txt", "w") as archivo:
             archivo.write(self.asm)
