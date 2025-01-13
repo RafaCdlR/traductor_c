@@ -215,13 +215,14 @@ movl %esp, %ebp\n'''
                 dec = self.cuerpo[0]
                 print(dec)
                 if isinstance(dec, Nododeclaracion):
-                    self.ensamblador += dec.cadena()
-
+                        
+                    self.variables_funcion[dec.nombre] = dec
                     tam = 1
                     # sumar las dimensiones para el tamaño del array
                     for n in dec.array:
                         tam *= n
-
+                    
+                    self.ensamblador += f"#declaracion : {dec.cadena2()} con {tam} posiciones\n"
                     pila[dec.nombre] = contador
                     contador -= 4 * tam
                 else:

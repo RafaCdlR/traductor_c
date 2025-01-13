@@ -987,10 +987,7 @@ if __name__ == '__main__':
         # except Exception as err:
         # print(f"Error de compilación: {err}")
 
-    print("tabla de simbolos :")
-
-    for clave, valor in parser.simbolos.items():
-        print(type(valor), " ", clave, " = ", valor)
+   
 
 
 ###########################################################################
