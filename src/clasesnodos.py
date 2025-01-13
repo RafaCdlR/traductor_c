@@ -909,7 +909,7 @@ class Nodollamada_funcion(Nodo):
         contador_variable += 0
         cadena = []
         contador = 0
-
+        print("PARAMETROS",parametros)
         if parametros:
 
             if isinstance(parametros, list):

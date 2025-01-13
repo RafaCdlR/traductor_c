@@ -554,8 +554,7 @@ class CParser(Parser):
 
     @_('lvalue ASSIGN operacion_asignacion')
     def expr(self, p):
-        print("LVALUE")
-        print(type(p.lvalue))
+        
 
         if isinstance(p.operacion_asignacion,Nodollamada_funcion):
             if self.simbolos[p.operacion_asignacion.nombre].tipo == "void":
@@ -624,6 +623,7 @@ class CParser(Parser):
         #if self.simbolos:
             if p.ID not in self.simbolos:
                 raise Exception(f"Funcion {p.ID} no declarada , tabla globales : {self.simbolos}")
+            
 
             return Nodollamada_funcion(p.ID, p.funcion_parentesis, self.contadoretiquetas)
         #else:
