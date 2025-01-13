@@ -176,15 +176,16 @@ movl %esp, %ebp\n'''
         contador = 8
         print("funcion : ", nombre, "\n\n")
         for var in parametros:
-            print(var)
+            print("VARIABLES",var)
 
             if var[1] in pila:  # MANEJO DE ERRORES
 
                 raise ValueError(f"Error: variable repetida {
                                  var[1]} en la función {nombre}")
+            
 
             pila[var[1]] = contador
-
+            self.variables_funcion[var[1]] = Nododeclaracion(var[1],"int",False,[-1])
             contador += 4
 
         # restar la memoria de los parametros:
