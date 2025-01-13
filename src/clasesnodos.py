@@ -175,8 +175,9 @@ movl %esp, %ebp\n'''
 
         contador = 8
         print("funcion : ", nombre, "\n\n")
+        print("VARIABLES",parametros)
         for var in parametros:
-            print("VARIABLES",var)
+            
 
             if var[1] in pila:  # MANEJO DE ERRORES
 

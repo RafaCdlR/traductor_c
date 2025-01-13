@@ -623,7 +623,8 @@ class CParser(Parser):
         #if self.simbolos:
             if p.ID not in self.simbolos:
                 raise Exception(f"Funcion {p.ID} no declarada , tabla globales : {self.simbolos}")
-            
+            if len(self.simbolos[p.ID].parametros) != len(p.funcion_parentesis):
+                raise Exception(f"Funcion {p.ID} diferente numero de atributos")
 
             return Nodollamada_funcion(p.ID, p.funcion_parentesis, self.contadoretiquetas)
         #else:
