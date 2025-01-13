@@ -472,12 +472,12 @@ class CParser(Parser):
         p.id_array.espuntero = True
 
         return p.id_array
-
+    
     @_('ID')
     def id_array(self, p):
 
-        return Nododeclaracion(p.ID, "int", False, [1])
-
+        return Nododeclaracion(p.ID, "int", False, [-1])
+    
     @_('ID array')
     def id_array(self, p):
 

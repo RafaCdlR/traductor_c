@@ -307,29 +307,30 @@ movl %esp, %ebp\n'''
                 texto_encontrado = f"${partes[0]}"
             elif partes[0].isdigit():
                 texto_encontrado = f"${int(partes[0])}"
-            elif partes[0] in self.simbolos:
+            elif partes[0] in self.variables_funcion:
                 numero = self.simbolos[partes[0]]
                 
                 
                 if len(partes)>1:
-                    if partes[2] != "_" and partes[2] != "1":
-                        dimensiones = self.variables_funcion[partes[0]].array
-                        indices = list(map(int, partes[2].split(",")))
-                        #comprobar q son iguales
-                        if len(dimensiones)!= len(indices):
-                            raise ValueError(f"Las dimensiones de la variable {partes[0]} no coinciden")
-                        
-                        posicion = 0
-                        factor = 1
+                    
+                    dimensiones = self.variables_funcion[partes[0]].array
+                    indices = list(map(int, partes[2].split(",")))
+                    #comprobar q son iguales
+                    if len(dimensiones)!= len(indices) or ((partes[2] == "-1" or partes[2] == "_" )and dimensiones[0] != 1) or (not (partes[2] == "-1" or partes[2] == "_") and dimensiones[0] == -1):
+                        raise ValueError(f"Las dimensiones de la variable {partes[0]} no coinciden declarado : {len(dimensiones)} real: {len(indices)} ")
+                    
+                    posicion = 0
+                    factor = 1
+                    if not (partes[2] == "-1" or partes[2] == "_"):
                         for i in reversed(range(len(dimensiones))):
                             posicion += indices[i] * factor
                             factor *= dimensiones[i]
                             if indices[i] >= dimensiones[i]:
-                                raise ValueError(f"LLAMADA A LA VARIABLE {partes[0]} FUERA DE RANGO EN INDICE {i} : [{indices[i]}] > [{dimensiones[i]}]")
+                                raise ValueError(f"LLAMADA A LA VARIABLE {partes[0]} FUERA DE RANGO EN INDICE {i} : [{indices[i]}] >= [{dimensiones[i]}]")
 
 
-                        
-                        numero += -4 -(posicion * 4)
+                    
+                    numero += -(posicion * 4)
 
 
 
@@ -341,20 +342,21 @@ movl %esp, %ebp\n'''
                 
                 
                 if len(partes)>1:
-                    if partes[2] != "_" and partes[2] != "1":
+                    
                         dimensiones = simbolos[partes[0]].array
                         indices = list(map(int, partes[2].split(",")))
                         #comprobar q son iguales
-                        if len(dimensiones)!= len(indices):
+                        if len(dimensiones)!= len(indices) or ((partes[2] == "-1" or partes[2] == "_" )and dimensiones[0] != 1) or (not (partes[2] == "-1" or partes[2] == "_") and dimensiones[0] == -1):
                             raise ValueError(f"Las dimensiones de la variable {partes[0]} no coinciden")
                         
                         posicion = 0
                         factor = 1
-                        for i in reversed(range(len(dimensiones))):
-                            posicion += indices[i] * factor
-                            factor *= dimensiones[i]
-                            if indices[i] >= dimensiones[i]:
-                                raise ValueError(f"LLAMADA A LA VARIABLE {partes[0]} FUERA DE RANGO EN INDICE {i} : [{indices[i]}] > [{dimensiones[i]}]")
+                        if not (partes[2] == "-1" or partes[2] == "_"):
+                            for i in reversed(range(len(dimensiones))):
+                                posicion += indices[i] * factor
+                                factor *= dimensiones[i]
+                                if indices[i] >= dimensiones[i]:
+                                    raise ValueError(f"LLAMADA A LA VARIABLE {partes[0]} FUERA DE RANGO EN INDICE {i} : [{indices[i]}] > [{dimensiones[i]}]")
 
 
                         
