@@ -208,7 +208,7 @@ movl %esp, %ebp\n'''
                         tam = 1
                         # sumar las dimensiones para el tamaño del array
                         for n in dec.array:
-                            tam *= n
+                            tam *= abs(n)
                         
                         self.ensamblador += f"#declaracion : {dec.cadena2()} con {tam} posiciones\n"
                         pila[dec.nombre] = contador
@@ -226,7 +226,7 @@ movl %esp, %ebp\n'''
                     tam = 1
                     # sumar las dimensiones para el tamaño del array
                     for n in dec.array:
-                        tam *= n
+                        tam *= abs(n)
                     
                     self.ensamblador += f"#declaracion : {dec.cadena2()} con {tam} posiciones\n"
                     pila[dec.nombre] = contador
