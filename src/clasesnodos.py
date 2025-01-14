@@ -85,8 +85,16 @@ def bajar_arbo(nod, prof, cadena, contador=0, der=False):
         return True, False
 
     else:
+        
+
         cadena += "\n#    ##" + nod.cadena() + "##   \n\n"
-        cadena += f"movl ${nod.cadena()}$, {aux}\n"
+        if(isinstance(nod,Nodotermino)) and nod.simbolo == "&":
+            cadena += f"lea ${nod.cadena()}$, {aux}\n"
+        elif(isinstance(nod,Nodotermino)) and nod.simbolo == "*":
+            cadena += f"mov $[{nod.cadena()}]$, {aux}\n"
+        else:
+            cadena += f"movl ${nod.cadena()}$, {aux}\n"
+
         return False, True  # por si hay parentesis a la derecha hay q meter en pila
 
 
@@ -679,16 +687,17 @@ class NodoWhile(Nodo):
         self.cuerpo = cuerpo
         self.operacion = operacion
         contador += 1
-        self.contador = contador
+        
+        self.contador = contador.valor
 
         cadena = []
-        cadena += f"while{contador}_ini:"  # etiqueta inicio
+        cadena += f"while{self.contador}_ini:"  # etiqueta inicio
         cadena += "\n# " + operacion.cadena() + "\n\n"
         # self.bajar_arbo2(p.operacion,0,cadena)
         # print("\n\n-----\n\n")
         # si no es un id recorre arbol
         if not isinstance(operacion, Nodotermino):
-            bajar_arbo(operacion, 0, cadena, contador)
+            bajar_arbo(operacion, 0, cadena, self.contador)
 
             cadena = "".join(cadena)
 
@@ -696,7 +705,7 @@ class NodoWhile(Nodo):
 
             cadena += operacion.cadena()
 
-        cadena += f"cmpl $0, %eax\n jne while{contador}_fin\n"
+        cadena += f"cmpl $0, %eax\n jne while{self.contador}_fin\n"
 
         # añadir codigo del cuerpo del bucle while
 
@@ -706,7 +715,7 @@ class NodoWhile(Nodo):
             cadena += ins.cadena()
 
         # salto final
-        cadena += f"jmp while{contador}_ini\n\n while{contador}_fin:\n"
+        cadena += f"jmp while{self.contador}_ini\n\n while{self.contador}_fin:\n"
 
         self.cad = "".join(cadena)
         print(self.cad)
