@@ -259,7 +259,6 @@ class CParser(Parser):
             self.asm = "".join(textos_globales) + self.asm
             #DEBUG INSANO
 
-        self.asm += "\n\n\n ############GLOBALES ##########3: \n\n\n\n" + str(self.simbolos) 
 
 
         self.asm = self.mover_strings("".join(self.asm))

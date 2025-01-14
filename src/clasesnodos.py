@@ -48,33 +48,33 @@ def bajar_arbo(nod, prof, cadena, contador=0, der=False):
 
         elif nod.operador == '==':
             contador += 1
-            cadena += f"""cmpl %ebx, %eax   \nmovl $1 %eax  \njne verdadero{
-                contador}   \nmovl $0 %eax  \nverdadero{contador}:\n\n"""
+            cadena += f"""cmpl %ebx, %eax   \nmovl $1, %eax  \njne verdadero{
+                contador}   \nmovl $0, %eax  \nverdadero{contador}:\n\n"""
 
         elif nod.operador == '!=':
             contador += 1
-            cadena += f"""cmpl %ebx, %eax   \nmovl $1 %eax  \nje verdadero{
-                contador}   \nmovl $0 %eax  \nverdadero{contador}:\n\n"""
+            cadena += f"""cmpl %ebx, %eax   \nmovl $1, %eax  \nje verdadero{
+                contador}   \nmovl $0, %eax  \nverdadero{contador}:\n\n"""
 
         elif nod.operador == '<=':
             contador += 1
-            cadena += f"""cmpl %ebx, %eax   \nmovl $1 %eax  \njg verdadero{
-                contador}   \nmovl $0 %eax  \nverdadero{contador}:\n\n"""
+            cadena += f"""cmpl %ebx, %eax   \nmovl $1, %eax  \njg verdadero{
+                contador}   \nmovl $0, %eax  \nverdadero{contador}:\n\n"""
 
         elif nod.operador == '>=':
             contador += 1
-            cadena += f"""cmpl %ebx, %eax   \nmovl $1 %eax  \njl verdadero{
-                contador}   \nmovl $0 %eax  \nverdadero{contador}:\n\n"""
+            cadena += f"""cmpl %ebx, %eax   \nmovl $1, %eax  \njl verdadero{
+                contador}   \nmovl $0, %eax  \nverdadero{contador}:\n\n"""
 
         elif nod.operador == '<':
             contador += 1
-            cadena += f"""cmpl %ebx, %eax   \nmovl $1 %eax  \njge verdadero{
-                contador}   \nmovl $0 %eax  \nverdadero{contador}:\n\n"""
+            cadena += f"""cmpl %ebx, %eax   \nmovl $1, %eax  \njge verdadero{
+                contador}   \nmovl $0, %eax  \nverdadero{contador}:\n\n"""
 
         elif nod.operador == '>':
             contador += 1
-            cadena += f"""cmpl %ebx, %eax   \nmovl $1 %eax  \njle verdadero{
-                contador}   \nmovl $0 %eax  \nverdadero{contador}:\n\n"""
+            cadena += f"""cmpl %ebx, %eax   \nmovl $1, %eax  \njle verdadero{
+                contador}   \nmovl $0, %eax  \nverdadero{contador}:\n\n"""
 
         else:
             cadena += f"{operators[nod.operador]} %ebx, %eax\n\n"
@@ -145,7 +145,7 @@ class nodoreturn(Nodo):
         # si la cadena esta vacia es un void y solo se hace la parte final
 
         if not self.esoperacion and self.cad != "":
-            cad = f"movl ${self.cad}$ $eax$\n"
+            cad = f"movl ${self.cad}$ %eax\n"
         else:
             cad += self.cad
 
@@ -309,7 +309,7 @@ movl %esp, %ebp\n'''
             numero = 0
             # buscar en la tabla
             if partes[0] == "eax" or partes[0] == "ebx":
-                texto_encontrado = f"${partes[0]}"
+                texto_encontrado = f"%{partes[0]}"
             elif partes[0].isdigit():
                 texto_encontrado = f"${int(partes[0])}"
             elif partes[0] in self.variables_funcion:
@@ -517,7 +517,7 @@ class NodoopUnario(Nodo):
 
         else:  # posible error
             bajar_arbo(right, 0, cadena, contador)
-            cadena += "subl $0 %eax\n"
+            cadena += "subl $0, %eax\n"
 
         self.cad = "".join(cadena)
 
@@ -653,19 +653,19 @@ class Nodoasignacion(Nodo):
     def cadena(self):
         if isinstance(self.dest, list):
             if self.esoperacion:
-                cad = self.orig + f"movl $eax$ ${self.dest[-1]}$\n"
+                cad = self.orig + f"movl %eax, ${self.dest[-1]}$\n"
             else:
-                cad = f"movl ${self.orig}$ ${self.dest[-1]}$\n"
+                cad = f"movl ${self.orig}$, ${self.dest[-1]}$\n"
 
             ant = self.dest[-1]
             for id in self.dest[-2::-1]:
-                cad += f"movl ${ant}$ ${id}$\n"
+                cad += f"movl ${ant}$, ${id}$\n"
                 ant = id
         else:
             if self.esoperacion:
-                cad = self.orig + f"movl $eax$ ${self.dest}$\n"
+                cad = self.orig + f"movl %eax, ${self.dest}$\n"
             else:
-                cad = f"movl ${self.orig}$ ${self.dest}$\n"
+                cad = f"movl ${self.orig}$, ${self.dest}$\n"
 
         return cad
 
@@ -864,13 +864,13 @@ class Nodoprint(Nodo):
                     elif isinstance(v, Nodollamada_funcion):
 
                         cadena += v.cadena()
-                        cadena += "pushl $eax$\n"
+                        cadena += "pushl %eax\n"
 
                     else:
                         cadena_arbo = []
                         bajar_arbo(v, 0, cadena_arbo, contador_variable)
                         cadena += cadena_arbo
-                        cadena += "pushl $eax$\n"
+                        cadena += "pushl %eax\n"
                     contador += 4
 
             else:
@@ -879,12 +879,12 @@ class Nodoprint(Nodo):
                     cadena += f"pushl ${v.cadena()}$\n"
                 elif isinstance(v, Nodollamada_funcion):
                     cadena += v.cadena()
-                    cadena += "pushl $eax$\n"
+                    cadena += "pushl %eax\n"
                 else:
                     cadena_arbo = []
                     bajar_arbo(v, 0, cadena_arbo, contador_variable)
                     cadena += cadena_arbo
-                    cadena += "pushl $eax$\n"
+                    cadena += "pushl %eax\n"
                 contador += 4
             
         else:
@@ -893,7 +893,7 @@ class Nodoprint(Nodo):
 
         cadena += f"pushl s{contador_variable}\n\n"
         cadena += "call printf\n"
-        cadena += f"addl ${contador} esp\n\n"
+        cadena += f"addl ${contador}, esp\n\n"
 
         
 
@@ -934,7 +934,7 @@ class Nodollamada_funcion(Nodo):
                         cadena_arbo = []
                         bajar_arbo(v, 0, cadena_arbo, contador_variable)
                         cadena += cadena_arbo
-                        cadena += "pushl $eax$\n"
+                        cadena += "pushl %eax\n"
 
                     contador += 4
 
@@ -947,12 +947,12 @@ class Nodollamada_funcion(Nodo):
                     cadena_arbo = []
                     bajar_arbo(v, 0, cadena_arbo, contador_variable)
                     cadena += cadena_arbo
-                    cadena += "pushl $eax$\n"
+                    cadena += "pushl %eax\n"
 
                 contador += 4
 
         cadena += f"call {nombre}\n"
-        cadena += f"addl ${contador} esp\n\n"
+        cadena += f"addl ${contador}, esp\n\n"
 
         self.cad = "".join(cadena)
 
@@ -984,13 +984,13 @@ class Nodoscanf(Nodo):
                     elif isinstance(v, Nodollamada_funcion):
 
                         cadena += v.cadena()
-                        cadena += "pushl $eax$\n"
+                        cadena += "pushl %eax\n"
 
                     else:
                         cadena_arbo = []
                         bajar_arbo(v, 0, cadena_arbo, contador_variable)
                         cadena += cadena_arbo
-                        cadena += "pushl $eax$\n"
+                        cadena += "pushl %eax\n"
                     contador += 4
 
             else:
@@ -999,12 +999,12 @@ class Nodoscanf(Nodo):
                     cadena += f"pushl ${v.cadena()}$\n"
                 elif isinstance(v, Nodollamada_funcion):
                     cadena += v.cadena()
-                    cadena += "pushl $eax$\n"
+                    cadena += "pushl %eax\n"
                 else:
                     cadena_arbo = []
                     bajar_arbo(v, 0, cadena_arbo, contador_variable)
                     cadena += cadena_arbo
-                    cadena += "pushl $eax$\n"
+                    cadena += "pushl %eax\n"
                 contador += 4
             
         else:
@@ -1012,7 +1012,7 @@ class Nodoscanf(Nodo):
 
         cadena += f"pushl s{contador_variable}\n\n"
         cadena += "call scanf\n"
-        cadena += f"addl ${contador} esp\n\n"
+        cadena += f"addl ${contador}, esp\n\n"
 
         self.cad = "".join(cadena)
 
