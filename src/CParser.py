@@ -3,7 +3,7 @@ from CLexer import CLexer
 from clasesnodos import *
 import re
 
-
+#clase numero para poder pasar por referencia el contador de los tags sin cambiar el codigo (gracias python)
 class Numero:
     def __init__(self, valor):
         self.valor = valor
@@ -265,6 +265,9 @@ class CParser(Parser):
         # Guardar ensamblador en archivo
         with open("asm.txt", "w") as archivo:
             archivo.write(self.asm)
+
+
+        print("\n\n\n\n tracuccion ejecutada correctamente , guardado en el archivo : ","asm.txt")
 
         return (p.globales, p.funciones)
 

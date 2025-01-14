@@ -145,7 +145,7 @@ class nodoreturn(Nodo):
         # si la cadena esta vacia es un void y solo se hace la parte final
 
         if not self.esoperacion and self.cad != "":
-            cad = f"movl ${self.cad}$ %eax\n"
+            cad = f"movl ${self.cad}$, %eax\n"
         else:
             cad += self.cad
 
