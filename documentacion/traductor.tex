@@ -7,37 +7,135 @@
 \pgfplotsset{compat=1.18}
 
 %opening
-\title{\textbf{Traductor de C a ensamblador \\ - \\ Procesadores de Lenguajes}}
-\author{Rafael Caro de los Reyes \\ Alejandro García Ramos \\ Adrián Muñoz López \\\\ - Estudiantes de la Universidad de Cádiz - \\\\ rafa.carodelosreyes@alum.uca.es \\ ale.garciara@alum.uca.es \\ adrian.munozlopez@alum.uca.es}
+\title{\textbf{Translator from C to assembly \\ - \\ Language Processors}}
+\author{Rafael Caro de los Reyes \\ Alejandro García Ramos \\ Adrián Muñoz López \\\\ - Students at Cádiz's University - \\\\ rafa.carodelosreyes@alum.uca.es \\ ale.garciara@alum.uca.es \\ adrian.munozlopez@alum.uca.es}
 
 \begin{document}
 	
 	\maketitle
 	
 	\begin{abstract}
-	En este proyecto se lleva a cabo el desarrollo de una aplicación que permite traducir un código fuente en el lenguaje de programación C a ensamblador. A lo largo de este documento se especificaran las capacidades del traductor, detallando desde cómo debe de ser el código fuente que es capaz de traducir a los problemas que tenga el traductor si los tuviera.\\ \\
+	This project involves the development of an application that allows to translate a source code in C programming language to assembler. Throughout this document the capabilities of the translator will be specified, detailing from how the source code must be able to translate to the problems that the translator may have if any.\\ \\
 	\end{abstract}
 	
-	\section{Introducción}
-        Antes de comenzar, es importante destacar que el traductor está desarrollado utilizando una librería de python llamada \texttt{\textbf{Sly}}. En nuestro proyecto hemos modularizado el traductor en 5 archivos principales: \\ \begin{itemize}
-        \item \textbf{main.py:} Es el archivo principal que se usa para lanzar el programa.
-        \item \textbf{CLexer.py:} Como el nombre indica, contiene todo el código relacionado con el Lexer.
-        \item \textbf{CParser.py:} Como el nombre indica, contiene todo el código relacionado con el Parser.
-        \item \textbf{clasesnodos.py:} Contiene el código relacionado con la semántica del traductor.
-        \item \textbf{asm\_{translator.py:}} Contiene todo el código relacionado con la traducción a ensamblador. \\ \\
+	\section{Introduction}
+        Before we start, it is important to note that the translator is developed using a Python library called \texttt{\textbf{Sly}}. In our project we have modularized the translator into 5 main files: \\ \begin{itemize}
+        \item \textbf{main.py:} This is the main file used to launch the program.
+        \item \textbf{CLexer.py:} As the name implies, it contains all the code related to the Lexer.
+        \item \textbf{CParser.py:} As the name indicates, it contains all the code related to the Parser.
+        \item \textbf{clasesnodos.py:} It contains the code related to the semantics of the translator.
         \end{itemize}
 
-        \section{Capacidades}
-        En esta sección hablaremos del código fuente en C con el que es capaz de trabajar el traductor divido por las secciones en base a las diferentes prácticas que se han trabajado en el curso de \texttt{Procesadores de Lenguajes}. \\\\ Como referencia, se puede acceder en el código fuente adjunto junto a esta documentación a una carpeta llamada \texttt{\textbf{tests}} en la que se encuentra un código en C de ejemplo que demuestra el funcionamiento de cada una de los subapartados. \\\\ Las dos principales restricciones de nuestro traductor son: \\ \begin{itemize}
-        \item Para poder realizar cualquier traducción debe de existir en el código fuente al menos una función.
-        \item No puede haber ningún comentario al inicio del código fuente. \\
+        \section{Features}
+        In this section we will talk about the source code in C with which the translator is able to work, divided by sections based on the different practices that have been worked in the course \texttt{Language Processors}. \\\\ For reference, you can access in the source code enclosed with this documentation a folder called \texttt{\textbf{tests}} where you can find an example C code that demonstrates the operation of each of the subsections. \\\\ The two main restrictions of our translator are: \\ \begin{itemize}
+        \item At least one function must exist in the source code to be able to perform any translation.
+        \item There cannot be any comments at the beginning of the source code. \\
         \end{itemize}
 
-        \subsection{Variables globales}
-        Hemos determinado que, para simplificar la traducción, las variables son inicalizadas siempre al inicio de la función, esto no genera ningún problema debido a que siempre debe de existir al menos una función.\\\\
-        \textbf{Nota:} Como referencia traducir el archivo \texttt{\textbf{tests\textbackslash variables\_{globales.c}}}.
+        \subsection{Global variables}
+        If you want to make a variable declaration you must do it at the beginning of the file.\\\\Furthermore, we have determined that, to simplify the translation, the variables are always initialized at the beginning of a function (you cannot initialized them in their declaration) including the global variables.\\\\This is not a problem because there must always be at least one function in the code in order for the translator to work.\\\\
+        \textbf{Note:} As a reference, translate the \texttt{\textbf{tests\textbackslash variables\_{globales.c}}} file. \\\\
 
-        \subsection{Funciones}
-        
+        \subsection{Algebra and variables}
+        Everything works fine except for the already mentioned special case of the variables initialization.\\\\There are no $<$ and $>$ operators. \\\\
+
+        \textbf{Note:} As a reference, translate the \texttt{\textbf{tests\textbackslash operaciones.c, tests\textbackslash asignaciones.c, tests\textbackslash comparaciones.c and tests\textbackslash variables\_{y\_{numeros.c}}}} files. \\\\
+
+        \subsection{if, else and while}
+        We decided to establish the condition that it is mandatory to use braces to delimit the beginning and end of these instructions. \\\\We did not find any errors. \\\\
+        \textbf{Note:} As a reference, translate the \texttt{\textbf{tests\textbackslash if\_{else.c} and tests\textbackslash while.c}} files. \\\\
+
+        \subsection{Arrays, matrices and pointers}
+        Unfortunately, it is not possible to use a variable as an index for the arrays and matrices inside the []. \\\\On the other hand, the translator is able to detect if the dimensions are wrong or if they are out of range. \\\\ This has been the most difficult part of the project. We have found several problems with an unavoidable ambiguiti for our grammar in one rule, but in the end it is not a problem because Sly's lookahead is able to solve it just by looking at one more token. \\\\
+
+        \section{Grammar}
+        Rule 0     S' : S\\
+        Rule 1     S : globales \$ funciones\\
+        Rule 2     globales : $<$empty$>$\\
+        Rule 3     globales : defi\_list\\
+        Rule 4     funciones : $<$empty$>$\\
+        Rule 5     funciones : funciones funcion\\
+        Rule 6     funcion : VOID ID ( parametros ) \{ statement \}\\
+        Rule 7     funcion : TYPE ID ( parametros ) \{ statement retorno ; \}\\
+        Rule 8     parametros : $<$empty$>$\\
+        Rule 9     parametros : TYPE MULTIPLY ID\\
+        Rule 10    parametros : parametros , TYPE MULTIPLY ID\\
+        Rule 11    parametros : TYPE ID\\
+        Rule 12    parametros : parametros , TYPE ID\\
+        Rule 13    retorno : RETURN operacion\\
+        Rule 14    statement : $<$empty$>$\\
+        Rule 15    statement : expr\_list\\
+        Rule 16    statement : defi\_list\\
+        Rule 17    statement : defi\_list expr\_list\\
+        Rule 18    defi\_list : defi ;\\
+        Rule 19    defi\_list : defi\_list defi ;\\
+        Rule 20    defi : TYPE id\_list\\
+        Rule 21    id\_list : id\_array\\
+        Rule 22    id\_list : id\_list , id\_array\\
+        Rule 23    id\_array : ID array\\
+        Rule 24    id\_array : ID\\
+        Rule 25    id\_array : MULTIPLY id\_array  [precedence=left, level=6]\\
+        Rule 26    array : [ NUMBER ]\\
+        Rule 27    array : array [ NUMBER ]\\
+        Rule 28    expr\_list : block\_expr\\
+        Rule 29    expr\_list : expr\_list block\_expr\\
+        Rule 30    expr\_list : expr ;\\
+        Rule 31    expr\_list : expr\_list expr ;\\
+        Rule 32    expr : SCANF ( scanf\_args )\\
+        Rule 33    expr : PRINTF ( printf\_args )\\
+        Rule 34    expr : operacion\_asignacion\\
+        Rule 35    expr : lvalue ASSIGN operacion\_asignacion  [precedence=right, level=1]\\
+        Rule 36    operacion\_asignacion : ID funcion\_parentesis\\
+        Rule 37    operacion\_asignacion : operacion\\
+        Rule 38    lvalue : * ID\\
+        Rule 39    lvalue : id\_array\\
+        Rule 40    lvalue : ID\\
+        Rule 41    lvalue : lvalue ASSIGN ID\\
+        Rule 42    funcion\_parentesis : ( )\\
+        Rule 43    funcion\_parentesis : ( funcion\_args )\\
+        Rule 44    funcion\_args : parametro\_funcion\\
+        Rule 45    funcion\_args : funcion\_args , parametro\_funcion\\
+        Rule 46    parametro\_funcion : id\_list\\
+        Rule 47    parametro\_funcion : operacion\\
+        Rule 48    printf\_args : STRING\\
+        Rule 49    printf\_args : STRING , variables\_a\_imprimir\\
+        Rule 50    variables\_a\_imprimir : id\_list\\
+        Rule 51    variables\_a\_imprimir : operaciones\_a\_imprimir\\
+        Rule 52    operaciones\_a\_imprimir : operacion\\
+        Rule 53    operaciones\_a\_imprimir : operaciones\_a\_imprimir , operacion\\
+        Rule 54    scanf\_args : STRING , variables\_referenciadas\\
+        Rule 55    variables\_referenciadas : operacion\\
+        Rule 56    variables\_referenciadas : variables\_referenciadas , operacion\\
+        Rule 57    block\_expr : WHILE ( operacion ) \{ expr\_list \}\\
+        Rule 58    block\_expr : IF ( operacion ) \{ expr\_list \} cont\_cond\\
+        Rule 59    cont\_cond : $<$empty$>$\\
+        Rule 60    cont\_cond : ELSE \{ expr\_list \}\\
+        Rule 61    operacion : opLogOr\\
+        Rule 62    opLogOr : opLogAnd\\
+        Rule 63    opLogOr : opLogOr OR opLogAnd  [precedence=left, level=2]\\
+        Rule 64    opLogAnd : opUnario\\
+        Rule 65    opLogAnd : opLogAnd AND opUnario  [precedence=left, level=3]\\
+        Rule 66    opUnario : opComp\\
+        Rule 67    opUnario : opUn opComp\\
+        Rule 68    opUn : MINUS  [precedence=left, level=5]\\
+        Rule 69    opUn : NOT  [precedence=right, level=7]\\
+        Rule 70    opComp : opSumaResta\\
+        Rule 71    opComp : opComp GE opSumaResta  [precedence=left, level=4]\\
+        Rule 72    opComp : opComp LE opSumaResta  [precedence=left, level=4]\\
+        Rule 73    opComp : opComp NE opSumaResta  [precedence=left, level=4]\\
+        Rule 74    opComp : opComp EQ opSumaResta  [precedence=left, level=4]\\
+        Rule 75    opSumaResta : opMultDiv\\
+        Rule 76    opSumaResta : opSumaResta MINUS opMultDiv  [precedence=left, level=5]\\
+        Rule 77    opSumaResta : opSumaResta PLUS opMultDiv  [precedence=left, level=5]\\
+        Rule 78    opMultDiv : term\\
+        Rule 79    opMultDiv : opMultDiv DIVIDE term  [precedence=left, level=6]\\
+        Rule 80    opMultDiv : opMultDiv MULTIPLY term  [precedence=left, level=6]\\
+        Rule 81    term : ( expr )\\
+        Rule 82    term : id\_array\\
+        Rule 83    term : \& ID\\
+        Rule 84    term : * ID\\
+        Rule 85    term : NUMBER\\
+        Rule 86    term : ID
+
         
 \end{document}
